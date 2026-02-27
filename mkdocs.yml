@@ -27,8 +27,8 @@ theme:
         name: Switch to light mode
       primary: custom
       accent: lime
-  logo: images/logo/neorunbase-logo-without-name.png
-  favicon: images/logo/neorunbase-logo-without-name.png
+  logo: images/logo/neorunbase-without-name.png
+  favicon: images/logo/neorunbase-without-name.png
 
 
 nav:
@@ -37,6 +37,16 @@ nav:
   - "Getting Started":
       - "Getting Started": intro/intro.md
   - "Features":
+      - "PostgreSQL Compatibility": features/postgresql-compatibility.md
+      - "Distributed Sharding": features/distributed-sharding.md
+      - "Replication & High Availability": features/replication-ha.md
+      - "Distributed Transactions": features/transactions.md
+      - "Encryption at Rest": features/encryption.md
+      - "Iceberg Integration": features/iceberg-integration.md
+      - "Kafka Integration": features/kafka-integration.md
+      - "Geospatial Support": features/geospatial.md
+      - "Identity and Access Management": features/iam.md
+      - "Admin UI": features/admin-ui.md
 
 
 
