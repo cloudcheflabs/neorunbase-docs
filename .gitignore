@@ -1,0 +1,45 @@
+.classpath
+.project
+.settings
+*/.settings
+*/.vertx
+target/
+*/target/**
+.idea
+*.iml
+*.lck
+*.log
+*.log.gz
+*.tmp
+*.retry
+*/dist/**
+venv/
+*/venv/**
+*/.venv/**
+node_modules/
+*/node_modules/**
+*/.terraform/**
+
+# Tests
+tests/tmp/
+
+# Gradle
+.gradle/
+build/
+*/build/**
+out/
+*/out/**
+
+# IDEs
+.vscode/
+*.swp
+*.swo
+*.DS_Store
+
+# Frontend
+.eslintcache
+.stylelintcache
+*.local
+.env
+.env.*
+!.env.example
