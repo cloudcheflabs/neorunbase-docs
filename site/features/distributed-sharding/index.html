@@ -8,24 +8,24 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/shannonstore-docs/1.0.0/features/ec/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/features/distributed-sharding/">
       
       
-        <link rel="prev" href="../distributed-architecture/">
+        <link rel="prev" href="../postgresql-compatibility/">
       
       
-        <link rel="next" href="../kms/">
+        <link rel="next" href="../replication-ha/">
       
       
         
       
       
-      <link rel="icon" href="../../images/logo/shannonstore-logo-without-name.png">
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Erasure Coding - ShannonStore</title>
+        <title>Distributed Sharding - NeorunBase</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#erasure-coding" class="md-skip">
+        <a href="#distributed-sharding" class="md-skip">
           Skip to content
         </a>
       
@@ -94,9 +94,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="ShannonStore" class="md-header__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,13 +107,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            ShannonStore
+            NeorunBase
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Erasure Coding
+              Distributed Sharding
             
           </span>
         </div>
@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../s3-compatible-api/" class="md-tabs__link">
+        <a href="../postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -294,12 +294,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="ShannonStore" class="md-nav__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
-    ShannonStore
+    NeorunBase
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -370,7 +370,7 @@
   <span class="md-ellipsis">
     
   
-    ShannonStore Architecture
+    NeorunBase Architecture
   
 
     
@@ -542,42 +542,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../s3-compatible-api/" class="md-nav__link">
+      <a href="../postgresql-compatibility/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    S3 Compatible API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../distributed-architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Distributed Architecture
+    PostgreSQL Compatibility
   
 
     
@@ -607,6 +579,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Sharding
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -614,7 +604,7 @@
   <span class="md-ellipsis">
     
   
-    Erasure Coding
+    Distributed Sharding
   
 
     
@@ -623,6 +613,80 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-sharding-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Sharding Works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard Key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Routing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resharding
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -636,14 +700,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../kms/" class="md-nav__link">
+      <a href="../replication-ha/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Encryption & Key Management
+    Replication & High Availability
   
 
     
@@ -664,14 +728,154 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-compression/" class="md-nav__link">
+      <a href="../transactions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Data Compression
+    Distributed Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encryption at Rest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kafka-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geospatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geospatial Support
   
 
     
@@ -699,7 +903,7 @@
   <span class="md-ellipsis">
     
   
-    Identity & Access Management
+    Identity and Access Management
   
 
     
@@ -720,266 +924,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../auth-authz/" class="md-nav__link">
+      <a href="../admin-ui/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication & Authorization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../disk-repair/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Disk Repair Service
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../backup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backup & Restore
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../monitoring/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Monitoring & Metrics
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../metadata-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Metadata Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../multi-disk-storage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Multi-Disk Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../performance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Performance Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Maintenance Mode
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../network/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Network & Internal Communication
+    Admin UI
   
 
     
@@ -1017,14 +969,23 @@
 
 
 
-<h1 id="erasure-coding">Erasure Coding</h1>
-<p>ShannonStore uses Reed-Solomon erasure coding to protect data against hardware failures with minimal storage overhead.</p>
+<h1 id="distributed-sharding">Distributed Sharding</h1>
+<p>NeorunBase distributes table data across multiple Data Nodes through hash-based sharding, providing horizontal scalability for both reads and writes.</p>
+<h2 id="how-sharding-works">How Sharding Works</h2>
+<p>When a table is created, NeorunBase assigns a configurable number of shards and distributes them across the available Data Nodes. Each row is assigned to a shard based on a hash of the designated shard key column, ensuring even data distribution.</p>
+<h2 id="shard-key">Shard Key</h2>
+<p>The shard key is a column specified at table creation time. NeorunBase uses the shard key value to determine which shard a row belongs to. Queries that include the shard key in their <code>WHERE</code> clause can be routed directly to the relevant shard(s), significantly improving query performance.</p>
+<h2 id="query-routing">Query Routing</h2>
+<p>NeorunBase automatically routes queries to the appropriate shards:</p>
 <ul>
-<li>Objects are split into data shards and parity shards. Even if some shards are lost, the original data can be fully recovered.</li>
-<li>Default configuration tolerates up to 2 simultaneous shard failures with only 50% storage overhead, compared to 200–300% for traditional replication.</li>
-<li>Shards are automatically spread across different nodes and disks to maximize fault tolerance.</li>
-<li>When failures occur, only the missing shards are regenerated — no need to reassemble the entire object.</li>
+<li><strong>Point queries</strong>: When the shard key value is specified, the query is routed to a single shard.</li>
+<li><strong>Range queries</strong>: Queries are routed only to the shards that may contain matching data.</li>
+<li><strong>Full scan queries</strong>: When the shard key is not specified, the query is scattered to all shards in parallel and results are merged.</li>
 </ul>
+<h2 id="shard-pruning">Shard Pruning</h2>
+<p>NeorunBase maintains Bloom filter caches for shards, allowing it to skip shards that definitely do not contain the queried values. This reduces unnecessary I/O and improves query latency.</p>
+<h2 id="resharding">Resharding</h2>
+<p>NeorunBase supports online resharding, allowing you to change the number of shards for a table. During resharding, data is transparently migrated to the new shard layout without downtime.</p>
 
 
 

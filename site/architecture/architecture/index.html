@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/shannonstore-docs/1.0.0/architecture/architecture/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/architecture/architecture/">
       
       
       
@@ -18,12 +18,12 @@
         
       
       
-      <link rel="icon" href="../../images/logo/shannonstore-logo-without-name.png">
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>ShannonStore Architecture - ShannonStore</title>
+        <title>NeorunBase Architecture - NeorunBase</title>
       
     
     
@@ -92,9 +92,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="ShannonStore" class="md-header__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -105,13 +105,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            ShannonStore
+            NeorunBase
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ShannonStore Architecture
+              NeorunBase Architecture
             
           </span>
         </div>
@@ -256,7 +256,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../features/s3-compatible-api/" class="md-tabs__link">
+        <a href="../../features/postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -292,12 +292,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="ShannonStore" class="md-nav__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
-    ShannonStore
+    NeorunBase
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -382,7 +382,7 @@
   <span class="md-ellipsis">
     
   
-    ShannonStore Architecture
+    NeorunBase Architecture
   
 
     
@@ -400,7 +400,7 @@
   <span class="md-ellipsis">
     
   
-    ShannonStore Architecture
+    NeorunBase Architecture
   
 
     
@@ -426,13 +426,74 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#shannonstore-architecture" class="md-nav__link">
+  <a href="#neorunbase-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ShannonStore Architecture
+        NeorunBase Architecture
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="NeorunBase Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coordinator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cluster-coordination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster Coordination
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iceberg-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kafka-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kafka Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -598,14 +659,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/s3-compatible-api/" class="md-nav__link">
+      <a href="../../features/postgresql-compatibility/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    S3 Compatible API
+    PostgreSQL Compatibility
   
 
     
@@ -626,14 +687,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/distributed-architecture/" class="md-nav__link">
+      <a href="../../features/distributed-sharding/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Distributed Architecture
+    Distributed Sharding
   
 
     
@@ -654,14 +715,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/ec/" class="md-nav__link">
+      <a href="../../features/replication-ha/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Erasure Coding
+    Replication & High Availability
   
 
     
@@ -682,14 +743,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/kms/" class="md-nav__link">
+      <a href="../../features/transactions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Encryption & Key Management
+    Distributed Transactions
   
 
     
@@ -710,14 +771,126 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/data-compression/" class="md-nav__link">
+      <a href="../../features/encryption/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Data Compression
+    Encryption at Rest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/iceberg-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/kafka-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/geospatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geospatial Support
   
 
     
@@ -745,7 +918,7 @@
   <span class="md-ellipsis">
     
   
-    Identity & Access Management
+    Identity and Access Management
   
 
     
@@ -766,266 +939,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/auth-authz/" class="md-nav__link">
+      <a href="../../features/admin-ui/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication & Authorization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/disk-repair/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Disk Repair Service
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/backup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backup & Restore
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/monitoring/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Monitoring & Metrics
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/metadata-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Metadata Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/multi-disk-storage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Multi-Disk Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/performance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Performance Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Maintenance Mode
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../features/network/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Network & Internal Communication
+    Admin UI
   
 
     
@@ -1064,38 +985,51 @@
 
 
 <h1 id="architecture">Architecture</h1>
-<p>ShannonStore is a high-performance, S3-compatible object storage system designed for high availability
-and elastic scalability in modern data environments.</p>
-<h2 id="shannonstore-architecture">ShannonStore Architecture</h2>
-<p><img width="600" src="../../images/architecture/shannonstore-architecture.png" align="center"/></p>
-<p>Control &amp; Logic Layer (API Servers) is the "Brain" of ShannonStore. It interprets the S3 protocol and orchestrates data movement.</p>
+<p>NeorunBase is a distributed, sharded OLTP Lakebase that implements the PostgreSQL wire protocol. Any PostgreSQL-compatible client such as <code>psql</code>, JDBC drivers, or pgAdmin can connect to NeorunBase transparently without any modification.</p>
+<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as a general-purpose vector database, offering a pgvector-compatible <code>VECTOR</code> type and distributed HNSW approximate nearest neighbor search for embedding workloads. It integrates with Apache Iceberg,
+enabling automatic synchronization of transactional data to an open lakehouse format for downstream analytics by engines such as Apache Spark, Trino, and Hive. Additionally, NeorunBase supports streaming ingestion from Apache Kafka, allowing real-time data to flow directly into NeorunBase tables.</p>
+<h2 id="neorunbase-architecture">NeorunBase Architecture</h2>
+<p><img width="1200" src="../../images/architecture/neorunbase-architecture.png" align="center"/></p>
+<p>NeorunBase consists of two main deployable components: <strong>Coordinator</strong> and <strong>Data Node</strong>.</p>
+<h3 id="coordinator">Coordinator</h3>
+<p>The Coordinator is the SQL-facing entry point that clients connect to via the PostgreSQL wire protocol. It is responsible for:</p>
 <ul>
-<li>S3 Protocol Handling: Processes RESTful requests and generates S3-compliant XML/JSON responses.</li>
-<li>Metadata Management (RocksDB): Manages object locations, sizes, and permissions. Metadata is logically divided into 64+ Partitions and distributed across the API cluster.</li>
-<li>Security (KMS &amp; IAM): Enforces granular Role-Based Access Control (RBAC) and ensures all data is encrypted at rest(SSE-S3, SSE-KMS support) and in transit using a distributed Key Management Service.</li>
-<li>Request Coordination:<ul>
-<li>Writes: Encodes incoming data into Erasure Coding (EC) shards (e.g., 2+1 or 4+2) and transmits them in parallel to Data Nodes.</li>
-<li>Reads: Retrieves shards from multiple Data Nodes and reconstructs the original data via EC decoding.</li>
+<li><strong>SQL Parsing</strong>: Parses incoming SQL statements using Apache Calcite (for DML) and a custom DDL parser.</li>
+<li><strong>Query Routing</strong>: Determines the target shards using Murmur3 hash-based shard routing on the shard key, and prunes shards with Bloom filter caches.</li>
+<li><strong>Distributed Query Execution</strong>: Scatters queries to the relevant Data Nodes in parallel via an internal binary NIO protocol (with Snappy compression and AES encryption), then merges partial results (sort-merge, aggregation, LIMIT).</li>
+<li><strong>Distributed Transactions</strong>: Supports ACID transactions across shards using a two-phase commit protocol (PREPARE + COMMIT).</li>
+<li><strong>Cluster Metadata Management</strong>: The leader Coordinator maintains table schemas and shard maps in an encrypted RocksDB-backed metadata store, and synchronizes them to non-leader Coordinators.</li>
+<li><strong>Admin API</strong>: Exposes a Netty-based REST API and serves the React-based Admin UI for cluster management, IAM, metrics monitoring, and operational tasks.</li>
 </ul>
-</li>
-</ul>
-<p>Storage Layer (Data Nodes) is the "Warehouse" of the cluster, responsible for persisting the actual data fragments (chunks).</p>
+<h3 id="data-node">Data Node</h3>
+<p>The Data Node is the storage layer of NeorunBase. It is responsible for:</p>
 <ul>
-<li>Chunk Store: Physically stores binary fragments received from API servers on local disks.</li>
-<li>High-Speed I/O: Utilizes NIO (Non-blocking I/O) communication to handle high-throughput, large-scale data transfers efficiently.</li>
-<li>Agnostic Storage: Data nodes are "metadata-blind." They focus solely on storing and retrieving bytes associated with a Chunk ID, which maximizes the system’s horizontal scalability.</li>
+<li><strong>Shard Storage</strong>: Each shard is backed by a RocksDB <code>TransactionDB</code> instance with per-table column families, supporting data-at-rest encryption via envelope encryption (per-shard DEK).</li>
+<li><strong>Query Execution</strong>: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.</li>
+<li><strong>Vector / ANN</strong>: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.</li>
+<li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability.</li>
+<li><strong>Change Log</strong>: Records data changes for incremental Iceberg synchronization.</li>
 </ul>
-<p>Coordination Layer (ZooKeeper) is the "Nervous System" that maintains cluster consensus and global state.</p>
+<h3 id="cluster-coordination">Cluster Coordination</h3>
+<p>NeorunBase uses Apache ZooKeeper (via Curator) for:</p>
 <ul>
-<li>Service Discovery: Tracks the real-time availability of all API and Data nodes.</li>
-<li>Leader Election: Elects a Cluster Controller (Leader API node) responsible for partition assignments and centralized action history.</li>
-<li>Sticky Partitioning: Persists the Partition Assignment Map. This ensures that even after a restart, partitions remain mapped to the same nodes, preventing unnecessary data migration.</li>
+<li><strong>Service Discovery</strong>: Coordinators and Data Nodes register as ephemeral nodes, enabling automatic detection of node joins and failures.</li>
+<li><strong>Leader Election</strong>: Two separate leader elections — one for shard assignment (Controller) and one for metadata/KMS ownership (Coordinator Leader).</li>
+<li><strong>Shard Repair &amp; Rebalancing</strong>: Automatically detects dead Data Nodes and replicates shard replicas to healthy nodes; rebalances shards when nodes are added or removed.</li>
 </ul>
-<p>ShannonStore has the following architectural advantages.</p>
+<h3 id="iceberg-integration">Iceberg Integration</h3>
+<p>NeorunBase synchronizes table data to Apache Iceberg for open lakehouse analytics:</p>
 <ul>
-<li>Independent Scalability: Storage capacity (Data Nodes) and processing power (API Servers) can be scaled independently.</li>
-<li>Fault Tolerance: The system survives Data Node failures via Erasure Coding and API Node failures via ZooKeeper-based failover.</li>
-<li>Recoverable State: All critical states (IAM, KMS, History) are backed up to the Data Nodes, making API servers functionally stateless and easily replaceable.</li>
+<li>Connects to an Iceberg REST catalog (e.g., Polaris) with OAuth2 or static token authentication.</li>
+<li>Performs full snapshot sync on initial synchronization, followed by incremental sync via change logs using Iceberg RowDelta (equality deletes + data files).</li>
+<li>Writes Parquet files to S3-compatible object storage.</li>
+<li>Supports reading external Iceberg tables via distributed Parquet/ORC/Avro scan directly from S3.</li>
+</ul>
+<h3 id="kafka-integration">Kafka Integration</h3>
+<p>NeorunBase supports streaming data ingestion from Apache Kafka:</p>
+<ul>
+<li>Manages multiple Kafka consumer groups, each running as an independent consumer thread.</li>
+<li>Consumes JSON messages from Kafka topics and batch-inserts them into NeorunBase tables.</li>
 </ul>
 
 
