@@ -8,24 +8,24 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/shannonstore-docs/1.0.0/features/kms/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/features/iceberg-integration/">
       
       
-        <link rel="prev" href="../ec/">
+        <link rel="prev" href="../encryption/">
       
       
-        <link rel="next" href="../data-compression/">
+        <link rel="next" href="../kafka-integration/">
       
       
         
       
       
-      <link rel="icon" href="../../images/logo/shannonstore-logo-without-name.png">
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Encryption & Key Management - ShannonStore</title>
+        <title>Iceberg Integration - NeorunBase</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#encryption-key-management-kms" class="md-skip">
+        <a href="#iceberg-integration" class="md-skip">
           Skip to content
         </a>
       
@@ -94,9 +94,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="ShannonStore" class="md-header__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,13 +107,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            ShannonStore
+            NeorunBase
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Encryption & Key Management
+              Iceberg Integration
             
           </span>
         </div>
@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../s3-compatible-api/" class="md-tabs__link">
+        <a href="../postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -294,12 +294,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="ShannonStore" class="md-nav__button md-logo" aria-label="ShannonStore" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="../../images/logo/shannonstore-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
-    ShannonStore
+    NeorunBase
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -370,7 +370,7 @@
   <span class="md-ellipsis">
     
   
-    ShannonStore Architecture
+    NeorunBase Architecture
   
 
     
@@ -542,14 +542,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../s3-compatible-api/" class="md-nav__link">
+      <a href="../postgresql-compatibility/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    S3 Compatible API
+    PostgreSQL Compatibility
   
 
     
@@ -570,14 +570,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../distributed-architecture/" class="md-nav__link">
+      <a href="../distributed-sharding/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Distributed Architecture
+    Distributed Sharding
   
 
     
@@ -598,14 +598,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../ec/" class="md-nav__link">
+      <a href="../replication-ha/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Erasure Coding
+    Replication & High Availability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encryption at Rest
   
 
     
@@ -635,6 +691,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -642,7 +716,7 @@
   <span class="md-ellipsis">
     
   
-    Encryption & Key Management
+    Iceberg Integration
   
 
     
@@ -651,6 +725,80 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#automatic-data-synchronization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic Data Synchronization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iceberg-catalog-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg Catalog Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-lakehouse-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Lakehouse Analytics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-iceberg-table-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Iceberg Table Queries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s3-compatible-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3-Compatible Storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -664,14 +812,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-compression/" class="md-nav__link">
+      <a href="../kafka-integration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Data Compression
+    Kafka Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geospatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geospatial Support
   
 
     
@@ -699,7 +903,7 @@
   <span class="md-ellipsis">
     
   
-    Identity & Access Management
+    Identity and Access Management
   
 
     
@@ -720,266 +924,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../auth-authz/" class="md-nav__link">
+      <a href="../admin-ui/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication & Authorization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../disk-repair/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Disk Repair Service
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../backup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backup & Restore
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../monitoring/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Monitoring & Metrics
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../metadata-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Metadata Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../multi-disk-storage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Multi-Disk Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../performance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Performance Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Maintenance Mode
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../network/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Network & Internal Communication
+    Admin UI
   
 
     
@@ -1017,14 +969,32 @@
 
 
 
-<h1 id="encryption-key-management-kms">Encryption &amp; Key Management (KMS)</h1>
-<p>ShannonStore provides server-side encryption with a built-in distributed key management system.</p>
+<h1 id="iceberg-integration">Iceberg Integration</h1>
+<p>NeorunBase integrates with Apache Iceberg, enabling automatic synchronization of transactional data to an open lakehouse format. This allows downstream analytics engines such as Apache Spark, Trino, and Hive to query NeorunBase data directly.</p>
+<h2 id="automatic-data-synchronization">Automatic Data Synchronization</h2>
+<p>NeorunBase automatically syncs table data to Iceberg tables in the background:</p>
 <ul>
-<li>Uses envelope encryption: data is encrypted with a per-object key, which is itself encrypted by a master-derived key (AES-256-GCM).</li>
-<li>The master key is stored as an environment variable and never written to config files.</li>
-<li>Key rotation is supported — new keys are created for future encryption while old keys remain available for decrypting existing data.</li>
-<li>Key state is automatically synchronized across all cluster nodes by the leader.</li>
+<li><strong>Initial sync</strong>: A full snapshot of the table is exported as Parquet files to S3-compatible object storage and registered in the Iceberg catalog.</li>
+<li><strong>Incremental sync</strong>: After the initial sync, only the changes (inserts, updates, deletes) are synchronized incrementally, minimizing the overhead.</li>
 </ul>
+<h2 id="iceberg-catalog-support">Iceberg Catalog Support</h2>
+<p>NeorunBase connects to any Iceberg REST catalog (e.g., Polaris, Nessie) with support for:</p>
+<ul>
+<li>OAuth2 client credentials authentication</li>
+<li>Static bearer token authentication</li>
+</ul>
+<h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
+<p>Once data is synced to Iceberg, it can be queried by any engine that supports the Iceberg table format:</p>
+<ul>
+<li><strong>Apache Spark</strong>: Batch and streaming analytics</li>
+<li><strong>Trino</strong>: Interactive SQL queries</li>
+<li><strong>Apache Hive</strong>: Data warehousing workloads</li>
+<li><strong>Apache Flink</strong>: Stream processing</li>
+</ul>
+<h2 id="external-iceberg-table-queries">External Iceberg Table Queries</h2>
+<p>NeorunBase can also read data from external Iceberg tables. This allows you to query data stored in Iceberg (Parquet, ORC, Avro formats) directly from NeorunBase using standard SQL, bridging the gap between the transactional and analytical worlds.</p>
+<h2 id="s3-compatible-storage">S3-Compatible Storage</h2>
+<p>Iceberg data files are stored in S3-compatible object storage, supporting AWS S3, MinIO, and other S3-compatible services.</p>
 
 
 

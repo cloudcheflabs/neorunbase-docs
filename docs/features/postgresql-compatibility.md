@@ -30,6 +30,7 @@ NeorunBase supports a wide range of data types:
 - **Boolean**: `BOOLEAN`
 - **Binary**: `BYTEA`
 - **Geospatial**: `POINT`, `LINESTRING`, `POLYGON`, `GEOMETRY`
+- **Vector**: `VECTOR(dim)` (pgvector-compatible; see [Vector Database](vector-database.md))
 - **Other**: `JSON`, `UUID`
 
 ## Virtual Catalog

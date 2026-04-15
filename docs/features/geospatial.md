@@ -22,10 +22,6 @@ NeorunBase includes a set of spatial functions compatible with PostGIS conventio
 - **Buffer**: Create a buffer zone around a geometry
 - And more standard spatial operations
 
-## Spatial Indexing
-
-NeorunBase uses spatial indexing to accelerate geospatial queries. Spatial indexes enable efficient range queries and proximity searches without scanning the entire dataset.
-
 ## Use Cases
 
 - **Location-based services**: Find points of interest near a given location

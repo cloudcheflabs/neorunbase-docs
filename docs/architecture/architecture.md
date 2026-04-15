@@ -2,7 +2,7 @@
 
 NeorunBase is a distributed, sharded OLTP Lakebase that implements the PostgreSQL wire protocol. Any PostgreSQL-compatible client such as `psql`, JDBC drivers, or pgAdmin can connect to NeorunBase transparently without any modification.
 
-NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also integrates with Apache Iceberg, 
+NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as a general-purpose vector database, offering a pgvector-compatible `VECTOR` type and distributed HNSW approximate nearest neighbor search for embedding workloads. It integrates with Apache Iceberg,
 enabling automatic synchronization of transactional data to an open lakehouse format for downstream analytics by engines such as Apache Spark, Trino, and Hive. Additionally, NeorunBase supports streaming ingestion from Apache Kafka, allowing real-time data to flow directly into NeorunBase tables.
 
 ## NeorunBase Architecture
@@ -28,6 +28,7 @@ The Data Node is the storage layer of NeorunBase. It is responsible for:
 
 - **Shard Storage**: Each shard is backed by a RocksDB `TransactionDB` instance with per-table column families, supporting data-at-rest encryption via envelope encryption (per-shard DEK).
 - **Query Execution**: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.
+- **Vector / ANN**: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.
 - **Write-Ahead Log (WAL)**: Maintains encrypted, segmented WAL for durability.
 - **Change Log**: Records data changes for incremental Iceberg synchronization.
 
