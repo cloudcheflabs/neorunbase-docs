@@ -855,6 +855,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/geospatial/" class="md-nav__link">
         
   
@@ -958,7 +986,7 @@
 
 <h1 id="architecture">Architecture</h1>
 <p>NeorunBase is a distributed, sharded OLTP Lakebase that implements the PostgreSQL wire protocol. Any PostgreSQL-compatible client such as <code>psql</code>, JDBC drivers, or pgAdmin can connect to NeorunBase transparently without any modification.</p>
-<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also integrates with Apache Iceberg, 
+<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as a general-purpose vector database, offering a pgvector-compatible <code>VECTOR</code> type and distributed HNSW approximate nearest neighbor search for embedding workloads. It integrates with Apache Iceberg,
 enabling automatic synchronization of transactional data to an open lakehouse format for downstream analytics by engines such as Apache Spark, Trino, and Hive. Additionally, NeorunBase supports streaming ingestion from Apache Kafka, allowing real-time data to flow directly into NeorunBase tables.</p>
 <h2 id="neorunbase-architecture">NeorunBase Architecture</h2>
 <p><img width="1200" src="../../images/architecture/neorunbase-architecture.png" align="center"/></p>
@@ -978,6 +1006,7 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 <ul>
 <li><strong>Shard Storage</strong>: Each shard is backed by a RocksDB <code>TransactionDB</code> instance with per-table column families, supporting data-at-rest encryption via envelope encryption (per-shard DEK).</li>
 <li><strong>Query Execution</strong>: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.</li>
+<li><strong>Vector / ANN</strong>: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.</li>
 <li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability.</li>
 <li><strong>Change Log</strong>: Records data changes for incremental Iceberg synchronization.</li>
 </ul>
