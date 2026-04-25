@@ -1004,11 +1004,13 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 <h3 id="data-node">Data Node</h3>
 <p>The Data Node is the storage layer of NeorunBase. It is responsible for:</p>
 <ul>
-<li><strong>Shard Storage</strong>: Each shard is backed by a RocksDB <code>TransactionDB</code> instance with per-table column families, supporting data-at-rest encryption via envelope encryption (per-shard DEK).</li>
+<li><strong>Shard Storage</strong>: Each shard stores row data in append-only <strong>heap segment files</strong> (<code>{shardDir}/heap/seg-NNNNN.nrheap</code>, AES-256-GCM per record with a KMS-wrapped per-segment DEK), built for OLTP read latency at petabyte scale. A per-shard RocksDB <code>TransactionDB</code> holds the row → segment-pointer index (16 bytes per row), secondary indexes, and the change log — keeping LSM compaction off the row data path.</li>
 <li><strong>Query Execution</strong>: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.</li>
 <li><strong>Vector / ANN</strong>: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.</li>
-<li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability.</li>
+<li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability. Recovery halts on detected corruption (silent skip is treated as a bug, not an option) so the operator can investigate before any divergent state is created.</li>
 <li><strong>Change Log</strong>: Records data changes for incremental Iceberg synchronization.</li>
+<li><strong>Bitrot Scrubber</strong> (opt-in): A throttled background scanner periodically verifies the AES-GCM auth tag on every closed heap segment record and surfaces findings via the Admin API.</li>
+<li><strong>Kafka Consumer Service</strong> (when enabled): Each Data Node hosts its own Kafka consumer worker. The leader Coordinator distributes consumer groups round-robin across Data Nodes; each worker forwards parsed INSERTs to the leader Coordinator over the internal protocol so the Coordinator's normal shard routing still applies.</li>
 </ul>
 <h3 id="cluster-coordination">Cluster Coordination</h3>
 <p>NeorunBase uses Apache ZooKeeper (via Curator) for:</p>

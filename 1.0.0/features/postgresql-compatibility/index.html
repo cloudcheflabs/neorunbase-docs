@@ -645,6 +645,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#extended-query-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extended Query Protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -989,7 +1000,9 @@
 <li><strong>Other</strong>: <code>JSON</code>, <code>UUID</code></li>
 </ul>
 <h2 id="virtual-catalog">Virtual Catalog</h2>
-<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands such as <code>\d</code>, <code>\dt</code>, and <code>\di</code> in <code>psql</code>.</p>
+<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands such as <code>\d</code>, <code>\dt</code>, and <code>\di</code> in <code>psql</code>. The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
+<h2 id="extended-query-protocol">Extended Query Protocol</h2>
+<p>The pg-wire implementation supports the full extended query flow — Parse / Bind / Describe / Execute / Sync — so JDBC clients using <code>PreparedStatement</code> work the same as simple-mode <code>Statement</code>s. Bound parameters are accepted in either text or binary format; the server decodes the binary wire format per the type OID declared in Parse (covering <code>INT2</code>/<code>INT4</code>/<code>INT8</code>, <code>FLOAT4</code>/<code>FLOAT8</code>, <code>BOOL</code>, <code>TEXT</code>/<code>VARCHAR</code>/<code>BPCHAR</code>, <code>BYTEA</code>, <code>UUID</code>, <code>DATE</code>, <code>TIMESTAMP</code>, <code>TIMESTAMPTZ</code>).</p>
 
 
 

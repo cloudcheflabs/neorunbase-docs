@@ -747,6 +747,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bitrot-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bitrot Detection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#transparent-to-clients" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -971,10 +982,20 @@
 </ul>
 <h2 id="what-is-encrypted">What Is Encrypted</h2>
 <ul>
-<li><strong>Shard data</strong>: All table data stored on Data Nodes is encrypted at rest.</li>
-<li><strong>Metadata</strong>: Table schemas and shard maps maintained by the Coordinator are encrypted.</li>
-<li><strong>Write-Ahead Log (WAL)</strong>: WAL segments are encrypted to protect data durability records.</li>
+<li><strong>Row data</strong>: Stored in append-only heap segment files on each Data Node, with AES-256-GCM applied per record using a per-segment Data Encryption Key.</li>
+<li><strong>RocksDB-resident metadata</strong>: Row pointers, secondary indexes, and the change log are encrypted with the per-shard DEK.</li>
+<li><strong>Vector / ANN sidecars</strong>: HNSW graph files use the same envelope-encryption pattern as row data.</li>
+<li><strong>Metadata store</strong>: Table schemas and shard maps maintained by the Coordinator are encrypted.</li>
+<li><strong>Write-Ahead Log (WAL)</strong>: WAL segments are encrypted record-by-record; the inner WAL record carries an additional CRC32 checksum so any tamper or partial decode is caught even before the GCM tag.</li>
 <li><strong>Internal communication</strong>: Data transmitted between Coordinators and Data Nodes is encrypted using AES.</li>
+</ul>
+<h2 id="bitrot-detection">Bitrot Detection</h2>
+<p>Every persistence layer carries strong on-read corruption detection out of the box:</p>
+<ul>
+<li>AES-GCM authentication tags reject any tampered or bit-rotted record on the heap and WAL paths.</li>
+<li>RocksDB's per-block CRC32C catches storage-side corruption on every read.</li>
+<li>An optional <strong>bitrot scrubber</strong> can be enabled per Data Node to proactively walk closed heap segments in the background, throttled to a configurable bytes-per-second budget so it never starves OLTP traffic. Findings are exposed via the Admin API for operator review.</li>
+<li>WAL recovery refuses to silently skip corrupted records: a structured corruption signal halts shard startup so the operator can investigate before any divergent state is created.</li>
 </ul>
 <h2 id="transparent-to-clients">Transparent to Clients</h2>
 <p>Encryption is fully transparent to clients. No changes to queries, connection settings, or application code are required. Data is encrypted when written to disk and decrypted when read, all handled internally by NeorunBase.</p>

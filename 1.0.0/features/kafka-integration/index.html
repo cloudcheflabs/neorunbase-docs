@@ -792,6 +792,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-consumers-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where Consumers Run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -975,6 +986,8 @@
 <p>NeorunBase can consume messages from Kafka topics and automatically insert them into designated tables. This provides a seamless pipeline from event streams to a queryable relational database.</p>
 <h2 id="multiple-consumer-groups">Multiple Consumer Groups</h2>
 <p>You can configure multiple independent Kafka consumer groups, each consuming from different topics and writing to different tables. This allows you to ingest data from various Kafka sources simultaneously.</p>
+<h2 id="where-consumers-run">Where Consumers Run</h2>
+<p>Kafka consumer workers run on <strong>Data Nodes</strong>, not on Coordinators. The leader Coordinator computes a round-robin assignment of consumer groups across the live Data Nodes and broadcasts it via the internal protocol; each Data Node then starts only the workers it has been assigned. Each worker pulls from its Kafka partitions and forwards the parsed INSERT to the leader Coordinator over the internal protocol, so the Coordinator's normal shard routing, replication, and transaction handling apply uniformly to ingested rows. Adding or removing Data Nodes triggers a re-assignment automatically.</p>
 <h2 id="configuration">Configuration</h2>
 <p>Each Kafka consumer group can be configured with:</p>
 <ul>
