@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/architecture/architecture/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/architecture/architecture/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/admin-ui/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/admin-ui/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/distributed-sharding/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/distributed-sharding/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/encryption/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/encryption/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/geospatial/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/geospatial/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/iam/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iam/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/iceberg-integration/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/kafka-integration/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/kafka-integration/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/postgresql-compatibility/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/postgresql-compatibility/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/replication-ha/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/replication-ha/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/transactions/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/transactions/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/features/vector-database/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/vector-database/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
-         <loc>https://cloudcheflabs.github.io/neorunbase-docs/intro/intro/</loc>
+         <loc>https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/intro/intro/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
 </urlset>

@@ -16,10 +16,21 @@ NeorunBase includes a built-in Key Management Service that:
 
 ## What Is Encrypted
 
-- **Shard data**: All table data stored on Data Nodes is encrypted at rest.
-- **Metadata**: Table schemas and shard maps maintained by the Coordinator are encrypted.
-- **Write-Ahead Log (WAL)**: WAL segments are encrypted to protect data durability records.
+- **Row data**: Stored in append-only heap segment files on each Data Node, with AES-256-GCM applied per record using a per-segment Data Encryption Key.
+- **RocksDB-resident metadata**: Row pointers, secondary indexes, and the change log are encrypted with the per-shard DEK.
+- **Vector / ANN sidecars**: HNSW graph files use the same envelope-encryption pattern as row data.
+- **Metadata store**: Table schemas and shard maps maintained by the Coordinator are encrypted.
+- **Write-Ahead Log (WAL)**: WAL segments are encrypted record-by-record; the inner WAL record carries an additional CRC32 checksum so any tamper or partial decode is caught even before the GCM tag.
 - **Internal communication**: Data transmitted between Coordinators and Data Nodes is encrypted using AES.
+
+## Bitrot Detection
+
+Every persistence layer carries strong on-read corruption detection out of the box:
+
+- AES-GCM authentication tags reject any tampered or bit-rotted record on the heap and WAL paths.
+- RocksDB's per-block CRC32C catches storage-side corruption on every read.
+- An optional **bitrot scrubber** can be enabled per Data Node to proactively walk closed heap segments in the background, throttled to a configurable bytes-per-second budget so it never starves OLTP traffic. Findings are exposed via the Admin API for operator review.
+- WAL recovery refuses to silently skip corrupted records: a structured corruption signal halts shard startup so the operator can investigate before any divergent state is created.
 
 ## Transparent to Clients
 
