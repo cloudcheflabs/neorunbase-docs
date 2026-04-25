@@ -26,11 +26,13 @@ The Coordinator is the SQL-facing entry point that clients connect to via the Po
 
 The Data Node is the storage layer of NeorunBase. It is responsible for:
 
-- **Shard Storage**: Each shard is backed by a RocksDB `TransactionDB` instance with per-table column families, supporting data-at-rest encryption via envelope encryption (per-shard DEK).
+- **Shard Storage**: Each shard stores row data in append-only **heap segment files** (`{shardDir}/heap/seg-NNNNN.nrheap`, AES-256-GCM per record with a KMS-wrapped per-segment DEK), built for OLTP read latency at petabyte scale. A per-shard RocksDB `TransactionDB` holds the row → segment-pointer index (16 bytes per row), secondary indexes, and the change log — keeping LSM compaction off the row data path.
 - **Query Execution**: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.
 - **Vector / ANN**: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.
-- **Write-Ahead Log (WAL)**: Maintains encrypted, segmented WAL for durability.
+- **Write-Ahead Log (WAL)**: Maintains encrypted, segmented WAL for durability. Recovery halts on detected corruption (silent skip is treated as a bug, not an option) so the operator can investigate before any divergent state is created.
 - **Change Log**: Records data changes for incremental Iceberg synchronization.
+- **Bitrot Scrubber** (opt-in): A throttled background scanner periodically verifies the AES-GCM auth tag on every closed heap segment record and surfaces findings via the Admin API.
+- **Kafka Consumer Service** (when enabled): Each Data Node hosts its own Kafka consumer worker. The leader Coordinator distributes consumer groups round-robin across Data Nodes; each worker forwards parsed INSERTs to the leader Coordinator over the internal protocol so the Coordinator's normal shard routing still applies.
 
 ### Cluster Coordination
 

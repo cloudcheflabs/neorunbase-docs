@@ -35,4 +35,8 @@ NeorunBase supports a wide range of data types:
 
 ## Virtual Catalog
 
-NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands such as `\d`, `\dt`, and `\di` in `psql`.
+NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands such as `\d`, `\dt`, and `\di` in `psql`. The same catalog patterns also drive JDBC `DatabaseMetaData.getSchemas()` / `getTables()` / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.
+
+## Extended Query Protocol
+
+The pg-wire implementation supports the full extended query flow — Parse / Bind / Describe / Execute / Sync — so JDBC clients using `PreparedStatement` work the same as simple-mode `Statement`s. Bound parameters are accepted in either text or binary format; the server decodes the binary wire format per the type OID declared in Parse (covering `INT2`/`INT4`/`INT8`, `FLOAT4`/`FLOAT8`, `BOOL`, `TEXT`/`VARCHAR`/`BPCHAR`, `BYTEA`, `UUID`, `DATE`, `TIMESTAMP`, `TIMESTAMPTZ`).
