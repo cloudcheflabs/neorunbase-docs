@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/encryption/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/features/encryption/">
       
       
         <link rel="prev" href="../transactions/">
       
       
-        <link rel="next" href="../iceberg-integration/">
+        <link rel="next" href="../pg-wire-tls/">
       
       
         
@@ -912,10 +912,49 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#in-flight-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-Flight Encryption
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pg-wire-tls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pg-wire TLS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1317,6 +1356,8 @@
 </ul>
 <h2 id="transparent-to-clients">Transparent to Clients</h2>
 <p>Encryption is fully transparent to clients. No changes to queries, connection settings, or application code are required. Data is encrypted when written to disk and decrypted when read, all handled internally by NeorunBase.</p>
+<h2 id="in-flight-encryption">In-Flight Encryption</h2>
+<p>The mechanisms above all cover data <strong>at rest</strong> and the always-on internal protocol between Coordinators and Data Nodes. For client → Coordinator (PostgreSQL wire) traffic, NeorunBase exposes a separate, opt-in TLS surface that is enabled by uploading a certificate through the Admin UI and propagated cluster-wide without a restart. See <a href="../pg-wire-tls/">pg-wire TLS</a> for the full feature.</p>
 
 
 

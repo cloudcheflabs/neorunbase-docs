@@ -24,6 +24,7 @@ Real-time metrics and monitoring capabilities:
 The Admin UI allows administrators to perform operational tasks:
 
 - **IAM Management**: Create and manage users, groups, and policies
+- **pg-wire TLS**: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See [pg-wire TLS](pg-wire-tls.md).
 - **Iceberg Sync**: Configure and monitor Iceberg synchronization
 - **Kafka Ingestion**: Manage Kafka consumer groups and monitor ingestion pipelines
 - **Shard Operations**: Monitor shard health, replication status, and repair progress

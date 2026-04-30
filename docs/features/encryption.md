@@ -35,3 +35,7 @@ Every persistence layer carries strong on-read corruption detection out of the b
 ## Transparent to Clients
 
 Encryption is fully transparent to clients. No changes to queries, connection settings, or application code are required. Data is encrypted when written to disk and decrypted when read, all handled internally by NeorunBase.
+
+## In-Flight Encryption
+
+The mechanisms above all cover data **at rest** and the always-on internal protocol between Coordinators and Data Nodes. For client → Coordinator (PostgreSQL wire) traffic, NeorunBase exposes a separate, opt-in TLS surface that is enabled by uploading a certificate through the Admin UI and propagated cluster-wide without a restart. See [pg-wire TLS](pg-wire-tls.md) for the full feature.
