@@ -8,13 +8,11 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/architecture/architecture/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/operations/operations/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../../configuration/configuration/">
       
-      
-        <link rel="next" href="../../installation/installation/">
       
       
         
@@ -25,7 +23,7 @@
     
     
       
-        <title>NeorunBase Architecture - NeorunBase</title>
+        <title>Cluster Operations - NeorunBase</title>
       
     
     
@@ -78,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#architecture" class="md-skip">
+        <a href="#operations" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              NeorunBase Architecture
+              Cluster Operations
             
           </span>
         </div>
@@ -233,13 +231,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
           
   
   
@@ -315,11 +311,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -396,31 +394,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -438,7 +431,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -453,37 +446,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NeorunBase Architecture
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../architecture/architecture/" class="md-nav__link">
         
   
   
@@ -499,98 +465,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#neorunbase-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NeorunBase Architecture
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="NeorunBase Architecture">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#coordinator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coordinator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-node" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data Node
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cluster-coordination" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cluster Coordination
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#iceberg-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Iceberg Integration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kafka-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Kafka Integration
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1204,26 +1078,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -1241,7 +1120,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1256,10 +1135,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../operations/operations/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Operations
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1275,6 +1181,253 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#process-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starting-and-stopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Starting and Stopping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Starting and Stopping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coordinator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zookeeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ZooKeeper
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bringing-up-the-whole-example-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bringing Up the Whole Example Cluster
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-control-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Control &amp; Tuning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Process Control &amp; Tuning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#foreground-vs-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Foreground vs. Background
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#per-instance-overrides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-instance Overrides
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jvm-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JVM Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#master-key-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Master Key Handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-lifecycle-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster Lifecycle Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bitrot-scrubber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bitrot Scrubber
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1304,55 +1457,129 @@
 
 
 
-<h1 id="architecture">Architecture</h1>
-<p>NeorunBase is a distributed, sharded OLTP Lakebase that implements the PostgreSQL wire protocol. Any PostgreSQL-compatible client such as <code>psql</code>, JDBC drivers, or pgAdmin can connect to NeorunBase transparently without any modification.</p>
-<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as a general-purpose vector database, offering a pgvector-compatible <code>VECTOR</code> type and distributed HNSW approximate nearest neighbor search for embedding workloads. It integrates with Apache Iceberg,
-enabling automatic synchronization of transactional data to an open lakehouse format for downstream analytics by engines such as Apache Spark, Trino, and Hive. Additionally, NeorunBase supports streaming ingestion from Apache Kafka, allowing real-time data to flow directly into NeorunBase tables.</p>
-<h2 id="neorunbase-architecture">NeorunBase Architecture</h2>
-<p><img width="1200" src="../../images/architecture/neorunbase-architecture.png" align="center"/></p>
-<p>NeorunBase consists of two main deployable components: <strong>Coordinator</strong> and <strong>Data Node</strong>.</p>
+<h1 id="operations">Operations</h1>
+<p>This page covers running a NeorunBase cluster in steady state: starting and stopping individual roles, controlling JVM and runtime behavior, and observing the cluster through the Admin UI and metrics. For first-time installation see <a href="../../installation/installation/">Installation</a>; for the full property reference see <a href="../../configuration/configuration/">Configuration</a>.</p>
+<h2 id="process-layout">Process Layout</h2>
+<p>A NeorunBase deployment is composed of three process types:</p>
+<ul>
+<li><strong>ZooKeeper ensemble</strong> — used for cluster coordination, service discovery, and leader election. The release archive ships an example single-node ZooKeeper for evaluation; production deployments use a dedicated ensemble (typically three or five nodes).</li>
+<li><strong>Coordinator</strong> — fronts the PostgreSQL wire protocol and the Admin UI. Two or more Coordinators may run for high availability; one is elected leader for metadata and KMS ownership.</li>
+<li><strong>Data Node</strong> — owns shards on local disks. Hosts the heap segment files, RocksDB indexes, WAL, ANN sidecars, and the per-Data-Node Kafka consumer worker (when enabled).</li>
+</ul>
+<p>All three are managed by shell scripts under <code>bin/</code> in the release archive.</p>
+<h2 id="starting-and-stopping">Starting and Stopping</h2>
 <h3 id="coordinator">Coordinator</h3>
-<p>The Coordinator is the SQL-facing entry point that clients connect to via the PostgreSQL wire protocol. It is responsible for:</p>
-<ul>
-<li><strong>SQL Parsing</strong>: Parses incoming SQL statements using Apache Calcite (for DML) and a custom DDL parser.</li>
-<li><strong>Query Routing</strong>: Determines the target shards using Murmur3 hash-based shard routing on the shard key, and prunes shards with Bloom filter caches.</li>
-<li><strong>Distributed Query Execution</strong>: Scatters queries to the relevant Data Nodes in parallel via an internal binary NIO protocol (with Snappy compression and AES encryption), then merges partial results (sort-merge, aggregation, LIMIT).</li>
-<li><strong>Distributed Transactions</strong>: Supports ACID transactions across shards using a two-phase commit protocol (PREPARE + COMMIT).</li>
-<li><strong>Cluster Metadata Management</strong>: The leader Coordinator maintains table schemas and shard maps in an encrypted RocksDB-backed metadata store, and synchronizes them to non-leader Coordinators.</li>
-<li><strong>Admin API</strong>: Exposes a Netty-based REST API and serves the React-based Admin UI for cluster management, IAM, metrics monitoring, and operational tasks.</li>
-</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bin/start-coordinator.sh
+</code></pre></div>
+<p>The script launches <code>com.cloudcheflabs.neorunbase.server.CoordinatorServer</code> with the classpath set to <code>conf:lib/*</code>, applies the JVM options from <code>conf/jvm.conf</code>, and writes its PID to <code>bin/coordinator-&lt;pg-port&gt;.pid</code>. Standard out and err are redirected to <code>logs/coordinator-&lt;pg-port&gt;.out</code>. The Coordinator binds the PG wire port (<code>neorunbase.coordinator.pg.port</code>, default <code>5432</code>) and the Admin HTTP port (<code>neorunbase.admin.http.port</code>, default <code>8080</code>).</p>
+<p>To stop the Coordinator gracefully:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bin/stop-coordinator.sh
+</code></pre></div>
+<p>To stop a specific Coordinator instance running with a non-default port (e.g. when multiple Coordinators are colocated on the same host for testing):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/stop-coordinator.sh &lt;pg-port&gt;
+</code></pre></div>
+<p>The stop script sends <code>SIGTERM</code> and waits up to 30 seconds for the process to exit before falling back to <code>SIGKILL</code>.</p>
 <h3 id="data-node">Data Node</h3>
-<p>The Data Node is the storage layer of NeorunBase. It is responsible for:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>bin/start-datanode.sh
+</code></pre></div>
+<p>This launches <code>com.cloudcheflabs.neorunbase.server.DataNodeServer</code> and writes its PID to <code>bin/datanode-&lt;internal-port&gt;.pid</code> and console output to <code>logs/datanode-&lt;internal-port&gt;.out</code>. The Data Node binds <code>neorunbase.datanode.internal.port</code> (default <code>7000</code>) for the internal protocol from Coordinators.</p>
+<p>Stop with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bin/stop-datanode.sh
+</code></pre></div>
+<p>or, for a specific instance by port:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>bin/stop-datanode.sh &lt;internal-port&gt;
+</code></pre></div>
+<h3 id="zookeeper">ZooKeeper</h3>
+<p>The release ships a single-node example ZooKeeper for evaluation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/start-zk.sh
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>bin/stop-zk.sh
+</code></pre></div>
+<p>Production clusters should point <code>neorunbase.zookeeper.server.list</code> at a dedicated, separately managed ZooKeeper ensemble rather than the bundled example.</p>
+<h3 id="bringing-up-the-whole-example-cluster">Bringing Up the Whole Example Cluster</h3>
+<p>The example launcher boots ZooKeeper, two Data Nodes, and one Coordinator on a single host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bin/start-example-servers.sh
+</code></pre></div>
+<p>The corresponding teardown:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>bin/stop-example-servers.sh
+</code></pre></div>
+<h2 id="process-control-tuning">Process Control &amp; Tuning</h2>
+<h3 id="foreground-vs-background">Foreground vs. Background</h3>
+<p>By default the start scripts daemonize the Java process. Set <code>NEORUNBASE_FOREGROUND=true</code> to run in the foreground instead — required when NeorunBase is supervised by <code>systemd</code>, <code>runit</code>, or another process manager that expects the child to stay attached.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>NEORUNBASE_FOREGROUND=true bin/start-coordinator.sh
+</code></pre></div>
+<h3 id="per-instance-overrides">Per-instance Overrides</h3>
+<p>The start scripts forward every <code>-D</code> and <code>-X</code> argument on the command line to the JVM, and forward any other arguments to the server's main method. This is how <code>start-example-servers.sh</code> runs two Data Nodes from a single config file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>bin/start-datanode.sh \
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    -Dneorunbase.datanode.internal.port=7002 \
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    -Dneorunbase.base.data.dir=data/datanode-1 \
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    -Dneorunbase.log.path=logs/datanode-1
+</code></pre></div>
+<p>Per-instance system properties take precedence over <code>neorunbase.properties</code> and over <code>NEORUNBASE_*</code> environment variables.</p>
+<h3 id="log-path">Log Path</h3>
+<p>The effective log directory is selected with this precedence (highest first):</p>
+<ol>
+<li><code>-Dneorunbase.log.path=...</code> on the command line.</li>
+<li><code>NEORUNBASE_LOG_PATH</code> environment variable.</li>
+<li><code>logs/</code> under the install directory (default).</li>
+</ol>
+<p>Each instance also writes a per-port <code>.out</code> file derived from the role and detected port (e.g. <code>coordinator-5432.out</code>, <code>datanode-7002.out</code>) so that colocated instances do not collide.</p>
+<h3 id="jvm-options">JVM Options</h3>
+<p>Edit <code>conf/jvm.conf</code> to set heap size, direct memory cap, GC flags, and any other JVM tuning. The file is read line-by-line, ignoring comments and blank lines, and prepended to the JVM command line. Per-instance overrides can still be passed on the command line.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>-Xms8g
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>-Xmx8g
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>-XX:MaxDirectMemorySize=4g
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>-XX:+UseG1GC
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>-XX:+UseStringDeduplication
+</code></pre></div>
+<h2 id="master-key-handling">Master Key Handling</h2>
+<p><code>NEORUNBASE_MASTER_KEY</code> must be exported on every NeorunBase host with the same value. In production:</p>
 <ul>
-<li><strong>Shard Storage</strong>: Each shard stores row data in append-only <strong>heap segment files</strong> (<code>{shardDir}/heap/seg-NNNNN.nrheap</code>, AES-256-GCM per record with a KMS-wrapped per-segment DEK), built for OLTP read latency at petabyte scale. A per-shard RocksDB <code>TransactionDB</code> holds the row → segment-pointer index (16 bytes per row), secondary indexes, and the change log — keeping LSM compaction off the row data path.</li>
-<li><strong>Query Execution</strong>: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.</li>
-<li><strong>Vector / ANN</strong>: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.</li>
-<li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability. Recovery halts on detected corruption (silent skip is treated as a bug, not an option) so the operator can investigate before any divergent state is created.</li>
-<li><strong>Change Log</strong>: Records data changes for incremental Iceberg synchronization.</li>
-<li><strong>Bitrot Scrubber</strong> (opt-in): A throttled background scanner periodically verifies the AES-GCM auth tag on every closed heap segment record and surfaces findings via the Admin API.</li>
-<li><strong>Kafka Consumer Service</strong> (when enabled): Each Data Node hosts its own Kafka consumer worker. The leader Coordinator distributes consumer groups round-robin across Data Nodes; each worker forwards parsed INSERTs to the leader Coordinator over the internal protocol so the Coordinator's normal shard routing still applies.</li>
+<li>Inject the master key from a secrets manager into the process environment (for example via <code>systemd</code> <code>EnvironmentFile=</code>, an entrypoint wrapper, or a sidecar that materializes secrets to a tmpfs file).</li>
+<li>Keep the master key out of <code>conf/neorunbase.properties</code> and out of process listings — pass it through the env var only.</li>
+<li>Treat the master key as cluster-critical: losing it makes encrypted on-disk state unrecoverable.</li>
 </ul>
-<h3 id="cluster-coordination">Cluster Coordination</h3>
-<p>NeorunBase uses Apache ZooKeeper (via Curator) for:</p>
+<h2 id="cluster-lifecycle-notes">Cluster Lifecycle Notes</h2>
 <ul>
-<li><strong>Service Discovery</strong>: Coordinators and Data Nodes register as ephemeral nodes, enabling automatic detection of node joins and failures.</li>
-<li><strong>Leader Election</strong>: Two separate leader elections — one for shard assignment (Controller) and one for metadata/KMS ownership (Coordinator Leader).</li>
-<li><strong>Shard Repair &amp; Rebalancing</strong>: Automatically detects dead Data Nodes and replicates shard replicas to healthy nodes; rebalances shards when nodes are added or removed.</li>
+<li><strong>Bootstrap order.</strong> Start ZooKeeper first, then Data Nodes, then Coordinators. The example launcher follows this sequence with brief sleeps; in production, leave Data Nodes time to register in ZooKeeper before bringing up Coordinators so the leader's startup discovery loop completes promptly.</li>
+<li><strong>Coordinator HA.</strong> When more than one Coordinator is running, ZooKeeper elects a leader for metadata and KMS ownership. Non-leader Coordinators forward write-side admin operations to the leader and serve PG wire traffic locally.</li>
+<li><strong>Shard repair &amp; rebalancing.</strong> When a Data Node leaves the cluster, the leader Coordinator detects the absence via ZooKeeper ephemeral nodes and replicates affected shards onto healthy Data Nodes (provided <code>neorunbase.disk.repair.enabled=true</code> for the disk-level case). When new Data Nodes join, the cluster rebalances shards toward them. See <a href="../../features/replication-ha/">Replication &amp; High Availability</a>.</li>
+<li><strong>Iceberg sync.</strong> Set <code>neorunbase.iceberg.catalog.type=rest</code> and <code>neorunbase.iceberg.sync.auto.start=true</code> to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see <a href="../../configuration/configuration/#iceberg-catalog-integration">Configuration</a>.</li>
+<li><strong>Kafka ingestion.</strong> Set <code>neorunbase.kafka.consumer.enabled=true</code> and define one or more consumer groups. The leader Coordinator distributes the configured groups round-robin across Data Nodes; each worker forwards parsed inserts back to the leader Coordinator over the internal protocol so the standard shard routing path applies. See <a href="../../features/kafka-integration/">Kafka Integration</a>.</li>
 </ul>
-<h3 id="iceberg-integration">Iceberg Integration</h3>
-<p>NeorunBase synchronizes table data to Apache Iceberg for open lakehouse analytics:</p>
+<h2 id="observability">Observability</h2>
+<h3 id="admin-ui">Admin UI</h3>
+<p>The Admin UI is the primary operator surface. It is served by every Coordinator at <code>http://&lt;coordinator-host&gt;:&lt;neorunbase.admin.http.port&gt;/admin/</code> (default <code>8080</code>).</p>
+<p>It exposes:</p>
 <ul>
-<li>Connects to an Iceberg REST catalog (e.g., Polaris) with OAuth2 or static token authentication.</li>
-<li>Performs full snapshot sync on initial synchronization, followed by incremental sync via change logs using Iceberg RowDelta (equality deletes + data files).</li>
-<li>Writes Parquet files to S3-compatible object storage.</li>
-<li>Supports reading external Iceberg tables via distributed Parquet/ORC/Avro scan directly from S3.</li>
+<li>Cluster topology (Coordinators, Data Nodes, leader, ZooKeeper, version).</li>
+<li>Tables, columns, indexes, and shard maps including replica placement.</li>
+<li>Live and historical metrics charts driven by the Coordinator's metrics RocksDB store.</li>
+<li>IAM management — users, roles, policies, and STS sessions.</li>
+<li>KMS status and the encrypted-feature toggles (data, WAL, metadata, internal protocol).</li>
+<li>Live log tailing across all Coordinators and Data Nodes.</li>
 </ul>
-<h3 id="kafka-integration">Kafka Integration</h3>
-<p>NeorunBase supports streaming data ingestion from Apache Kafka:</p>
+<p>See <a href="../../features/admin-ui/">Admin UI</a> for the full feature description.</p>
+<h3 id="metrics">Metrics</h3>
+<p>The leader Coordinator scrapes every Coordinator and Data Node every <code>neorunbase.metrics.collector.interval.ms</code> milliseconds (default <code>15000</code>) and persists the rolled-up time series for <code>neorunbase.metrics.retention.days</code> days (default <code>7</code>). The retention sweep runs on the schedule given by <code>neorunbase.metrics.retention.cleanup.*</code>. Both raw metrics and aggregated charts are exposed through the Admin UI and the admin REST API.</p>
+<h3 id="logs">Logs</h3>
+<p>Each NeorunBase process writes:</p>
 <ul>
-<li>Manages multiple Kafka consumer groups, each running as an independent consumer thread.</li>
-<li>Consumes JSON messages from Kafka topics and batch-inserts them into NeorunBase tables.</li>
+<li><code>logs/&lt;role&gt;-&lt;port&gt;.out</code> — JVM stdout / stderr captured by the start script (when running in background mode).</li>
+<li>The Logback-managed log files configured by <code>conf/logback.xml</code>, under <code>neorunbase.log.path</code> (which itself defaults to <code>${neorunbase.base.data.dir}/logs</code>).</li>
 </ul>
+<p>Setting <code>neorunbase.log.mode=RING_BUFFER</code> switches file-based logging off in favor of an in-memory ring buffer of <code>neorunbase.log.ring.buffer.capacity</code> lines, which the Admin UI tails directly. This is the recommended mode for environments where local disk is ephemeral or unavailable.</p>
+<h3 id="bitrot-scrubber">Bitrot Scrubber</h3>
+<p>Setting <code>neorunbase.scrubber.enabled=true</code> turns on a throttled background scanner that re-verifies the AES-GCM auth tag on every record in every closed heap segment file. The scanner paces itself at <code>neorunbase.scrubber.throttle.bytes.per.sec</code> (default 50 MB/s) so it does not interfere with OLTP traffic, and surfaces any corruption findings through the Admin UI and the admin REST API. Bitrot is detected on read regardless of this toggle; the scrubber adds proactive scanning.</p>
+<h2 id="shutdown">Shutdown</h2>
+<p>For a clean shutdown, stop processes in the reverse of startup order:</p>
+<ol>
+<li>Stop Coordinators (<code>bin/stop-coordinator.sh</code>).</li>
+<li>Stop Data Nodes (<code>bin/stop-datanode.sh</code>).</li>
+<li>Stop ZooKeeper (only if you started it via <code>bin/start-zk.sh</code>).</li>
+</ol>
+<p><code>bin/stop-example-servers.sh</code> performs this sequence for the example single-host cluster.</p>
+<p>When the Coordinator's PG wire worker pool is draining, <code>neorunbase.pgwire.worker.shutdown.timeout.seconds</code> (default <code>5</code>) controls how long it waits before forcibly terminating in-flight queries. The Admin HTTP server has its own grace period, <code>neorunbase.admin.shutdown.timeout.seconds</code>. Tune both upward if the cluster is asked to shed long-running analytical queries during planned shutdowns.</p>
 
 
 

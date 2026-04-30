@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/replication-ha/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/installation/installation/">
       
       
-        <link rel="prev" href="../distributed-sharding/">
+        <link rel="prev" href="../../architecture/architecture/">
       
       
-        <link rel="next" href="../transactions/">
+        <link rel="next" href="../getting-started/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Replication & High Availability - NeorunBase</title>
+        <title>Download & Install - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#replication-high-availability" class="md-skip">
+        <a href="#download-install" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Replication & High Availability
+              Download & Install
             
           </span>
         </div>
@@ -253,11 +253,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../installation/installation/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -273,13 +275,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../postgresql-compatibility/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../features/postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -483,26 +483,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -520,7 +525,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -535,10 +540,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../installation/installation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download & Install
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -554,6 +586,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-node-quickstart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single-node Quickstart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-node-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-node Deployment
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -566,7 +662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -594,7 +690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/nginx-proxy/" class="md-nav__link">
+      <a href="../nginx-proxy/" class="md-nav__link">
         
   
   
@@ -626,31 +722,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -668,7 +759,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -686,7 +777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../postgresql-compatibility/" class="md-nav__link">
+      <a href="../../features/postgresql-compatibility/" class="md-nav__link">
         
   
   
@@ -714,7 +805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../distributed-sharding/" class="md-nav__link">
+      <a href="../../features/distributed-sharding/" class="md-nav__link">
         
   
   
@@ -739,37 +830,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Replication & High Availability
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../features/replication-ha/" class="md-nav__link">
         
   
   
@@ -785,81 +849,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#shard-replication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shard Replication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-failure-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Failure Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-shard-repair" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Shard Repair
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shard-rebalancing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shard Rebalancing
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#coordinator-high-availability" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coordinator High Availability
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -872,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../transactions/" class="md-nav__link">
+      <a href="../../features/transactions/" class="md-nav__link">
         
   
   
@@ -900,7 +889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../encryption/" class="md-nav__link">
+      <a href="../../features/encryption/" class="md-nav__link">
         
   
   
@@ -928,7 +917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../iceberg-integration/" class="md-nav__link">
+      <a href="../../features/iceberg-integration/" class="md-nav__link">
         
   
   
@@ -956,7 +945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kafka-integration/" class="md-nav__link">
+      <a href="../../features/kafka-integration/" class="md-nav__link">
         
   
   
@@ -984,7 +973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../vector-database/" class="md-nav__link">
+      <a href="../../features/vector-database/" class="md-nav__link">
         
   
   
@@ -1012,7 +1001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../geospatial/" class="md-nav__link">
+      <a href="../../features/geospatial/" class="md-nav__link">
         
   
   
@@ -1040,7 +1029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../iam/" class="md-nav__link">
+      <a href="../../features/iam/" class="md-nav__link">
         
   
   
@@ -1068,7 +1057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../admin-ui/" class="md-nav__link">
+      <a href="../../features/admin-ui/" class="md-nav__link">
         
   
   
@@ -1287,18 +1276,109 @@
 
 
 
-<h1 id="replication-high-availability">Replication &amp; High Availability</h1>
-<p>NeorunBase provides fault tolerance and high availability through shard replication and automatic failure recovery.</p>
-<h2 id="shard-replication">Shard Replication</h2>
-<p>Each shard can be configured with a replication factor. NeorunBase maintains multiple copies of each shard across different Data Nodes. This ensures that data remains available even if one or more Data Nodes go down.</p>
-<h2 id="automatic-failure-detection">Automatic Failure Detection</h2>
-<p>NeorunBase continuously monitors the health of all Data Nodes. When a Data Node becomes unavailable, the system automatically detects the failure and initiates recovery actions.</p>
-<h2 id="automatic-shard-repair">Automatic Shard Repair</h2>
-<p>When a Data Node failure is detected, NeorunBase automatically replicates the affected shards from surviving replicas to healthy Data Nodes, restoring the desired replication factor without manual intervention.</p>
-<h2 id="shard-rebalancing">Shard Rebalancing</h2>
-<p>When Data Nodes are added to or removed from the cluster, NeorunBase automatically rebalances shards across the cluster to ensure even data distribution and optimal resource utilization.</p>
-<h2 id="coordinator-high-availability">Coordinator High Availability</h2>
-<p>Multiple Coordinators can run simultaneously. NeorunBase uses leader election to designate a primary Coordinator for metadata management, while all Coordinators can serve client queries. If the leader Coordinator fails, a new leader is automatically elected.</p>
+<h1 id="download-install">Download &amp; Install</h1>
+<p>NeorunBase is a distributed, sharded OLTP Lakebase that speaks the PostgreSQL wire protocol. This page covers how to download a NeorunBase release and install it on a single machine for evaluation, and how to lay out a multi-node cluster for production.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>NeorunBase is written in Java and requires:</p>
+<ul>
+<li><strong>Java 17</strong> or later on every Coordinator and Data Node host.</li>
+<li><strong>Apache ZooKeeper 3.6+</strong> for cluster coordination, leader election, and service discovery. The release archive ships with an example ZooKeeper that can be started locally for evaluation.</li>
+<li>A POSIX-compatible filesystem on each Data Node for shard data, WAL, and heap segment files.</li>
+<li><strong>Master key</strong> — every NeorunBase server process requires the <code>NEORUNBASE_MASTER_KEY</code> environment variable to be exported with a value of at least 32 characters. The master key is the root of the envelope-encryption hierarchy used for KMS, WAL, metadata, and at-rest data encryption.</li>
+</ul>
+<h2 id="download">Download</h2>
+<p>Download and extract the latest NeorunBase release archive:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl -L -O https://github.com/cloudcheflabs/neorunbase-pack/releases/download/neorunbase-archive/neorunbase-1.0.0.tar.gz
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>tar zxvf neorunbase-1.0.0.tar.gz
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cd neorunbase-1.0.0
+</code></pre></div>
+<p>The extracted directory contains:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bin/</code></td>
+<td>Start/stop scripts for Coordinator, Data Node, and the bundled example ZooKeeper.</td>
+</tr>
+<tr>
+<td><code>lib/</code></td>
+<td>Server JARs and runtime dependencies.</td>
+</tr>
+<tr>
+<td><code>conf/neorunbase.properties</code></td>
+<td>Main configuration file. See the <a href="../../configuration/configuration/">Configuration</a> reference.</td>
+</tr>
+<tr>
+<td><code>conf/jvm.conf</code></td>
+<td>JVM options applied to every NeorunBase process.</td>
+</tr>
+<tr>
+<td><code>conf/logback.xml</code></td>
+<td>Logback configuration.</td>
+</tr>
+<tr>
+<td><code>conf/zk/</code></td>
+<td>Configuration for the bundled example ZooKeeper.</td>
+</tr>
+<tr>
+<td><code>admin-ui/</code></td>
+<td>Built React SPA served by the Coordinator's admin HTTP server.</td>
+</tr>
+<tr>
+<td><code>examples/example.sql</code></td>
+<td>Sample SQL workload used by the quickstart.</td>
+</tr>
+<tr>
+<td><code>data/</code>, <code>logs/</code></td>
+<td>Default data and log directories (created at first start).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="single-node-quickstart">Single-node Quickstart</h2>
+<p>The quickest way to evaluate NeorunBase is to run one Coordinator and two Data Nodes on a single host alongside the bundled example ZooKeeper. The release ships a script that does this in one step:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bin/start-example-servers.sh
+</code></pre></div>
+<p>This brings up:</p>
+<ul>
+<li>ZooKeeper on <code>localhost:2181</code></li>
+<li>Two Data Nodes on internal ports <code>7002</code> and <code>7003</code></li>
+<li>A Coordinator with PostgreSQL wire protocol on <code>localhost:5432</code> and the Admin UI on <code>http://localhost:8080/admin/</code></li>
+</ul>
+<p>To exercise the cluster end-to-end, follow the <a href="../getting-started/">Getting Started</a> page, which walks through logging in to the Admin UI and running an example SQL workload through <code>psql</code>.</p>
+<p>To stop everything:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/stop-example-servers.sh
+</code></pre></div>
+<h2 id="multi-node-deployment">Multi-node Deployment</h2>
+<p>For production NeorunBase is deployed across multiple hosts. A typical layout is:</p>
+<ul>
+<li><strong>ZooKeeper ensemble</strong> — three or five dedicated nodes running ZooKeeper, separate from NeorunBase processes.</li>
+<li><strong>Coordinators</strong> — two or more Coordinator nodes for high availability. One is elected leader for metadata and KMS; the others serve PG wire traffic and proxy admin operations.</li>
+<li><strong>Data Nodes</strong> — one or more Data Node hosts. Shards are placed across Data Nodes with replication factor <code>neorunbase.default.replication.factor</code> (default <code>2</code>).</li>
+</ul>
+<p>On every NeorunBase host:</p>
+<ol>
+<li>Install Java 17 and unpack the same NeorunBase release archive.</li>
+<li>Edit <code>conf/neorunbase.properties</code> so that <code>neorunbase.zookeeper.server.list</code> points to the production ZooKeeper ensemble, <code>neorunbase.coordinator.advertised.host</code> / <code>neorunbase.datanode.advertised.host</code> are set to the host's reachable hostname, and the cluster id (<code>neorunbase.cluster.id</code>) matches across all nodes.</li>
+<li>Export <code>NEORUNBASE_MASTER_KEY</code> consistently on all nodes — it is the cluster's root encryption key.</li>
+<li>Start each role:<ul>
+<li>Coordinator: <code>bin/start-coordinator.sh</code></li>
+<li>Data Node: <code>bin/start-datanode.sh</code></li>
+</ul>
+</li>
+</ol>
+<p>Process management notes:</p>
+<ul>
+<li><code>bin/start-coordinator.sh</code> and <code>bin/start-datanode.sh</code> accept <code>-D</code> system properties on the command line, which take precedence over <code>conf/neorunbase.properties</code> and <code>NEORUNBASE_*</code> environment variables. This is how the example launcher runs multiple Data Nodes on the same host with different ports.</li>
+<li>Each process writes its PID to <code>bin/&lt;name&gt;-&lt;port&gt;.pid</code> and its console output to <code>logs/&lt;name&gt;-&lt;port&gt;.out</code>. <code>bin/stop-coordinator.sh</code> and <code>bin/stop-datanode.sh</code> use these PID files for graceful shutdown.</li>
+<li>Set <code>NEORUNBASE_FOREGROUND=true</code> to run a server in the foreground (useful under systemd, supervisord, or container runtimes).</li>
+</ul>
+<p>For the full list of tunables — sharding, replication, encryption, Iceberg, Kafka consumer groups, WAL, scrubber, IAM, internal protocol — see the <a href="../../configuration/configuration/">Configuration</a> reference. For starting, stopping, and monitoring a running cluster, see <a href="../../operations/operations/">Operations</a>.</p>
 
 
 
