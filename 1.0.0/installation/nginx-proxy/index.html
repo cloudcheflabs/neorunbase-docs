@@ -956,6 +956,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/pg-wire-tls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pg-wire TLS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/iceberg-integration/" class="md-nav__link">
         
   
@@ -1350,7 +1378,7 @@
 </tbody>
 </table>
 <blockquote>
-<p>NeorunBase's pg-wire server currently responds <code>N</code> to the PostgreSQL <code>SSLRequest</code> startup message — the wire protocol is <strong>unencrypted between client and Coordinator</strong>. NGINX in <code>stream</code> mode therefore cannot terminate TLS on <code>:5432</code>; it can only TCP-load-balance plaintext PG wire. Operate the SQL endpoint over a trusted network (VPC, private subnet, VPN). The Admin UI is plain HTTP and is the appropriate surface for public TLS termination.</p>
+<p>NeorunBase supports pg-wire TLS but the certificate lives on the <strong>Coordinator</strong>, not on NGINX. The TLS handshake is end-to-end between the client and the Coordinator that the proxy routes the connection to — NGINX <code>stream</code> is a transparent TCP passthrough that never decrypts pg-wire traffic. (NGINX <code>stream</code> does not speak the PostgreSQL <code>SSLRequest</code> framing, so it cannot terminate pg-wire TLS even if you wanted it to.) Upload the cert + key once through the Admin UI and every Coordinator behind the proxy picks it up; see <a href="../../features/pg-wire-tls/">pg-wire TLS</a>. When TLS is not yet enabled cluster-wide, the proxy carries plaintext pg-wire — operate that mode over a trusted network (VPC, private subnet, VPN). The Admin UI is plain HTTP and is the appropriate surface for public TLS termination at NGINX.</p>
 </blockquote>
 <h2 id="how-the-load-balancing-works">How the Load Balancing Works</h2>
 <p>PG wire is a connection-stateful binary protocol: a single TCP connection carries one session — its prepared statements, transactions, session variables, and temporary tables — and that session must remain on the Coordinator that opened it. NGINX <code>stream</code> therefore load-balances <strong>per connection</strong>, not per query. Each new TCP connection from a client is placed on a Coordinator (round-robin or <code>least_conn</code>); every query on that connection then runs through the same Coordinator until the client closes it.</p>
@@ -1482,7 +1510,7 @@
 <li><strong>Rolling upgrades.</strong> Drain a Coordinator by marking its line in the <code>upstream</code> block as <code>down</code> and reloading NGINX (<code>nginx -s reload</code>). New PG wire connections and admin requests skip the drained backend; existing PG sessions stay on it until they close. Once the Coordinator is restarted on the new version, remove the <code>down</code> flag and reload again.</li>
 <li><strong>Multiple Admin endpoints.</strong> If you scale beyond two Coordinators, just add more <code>server</code> lines to both <code>upstream</code> blocks. NeorunBase's leader election (metadata + KMS leadership) is independent of which Coordinator a client request lands on; non-leader Coordinators forward write-side admin operations to the leader internally over <code>neorunbase.coordinator.internal.port</code> and proxy log-tail requests via the admin HTTP proxy (<code>neorunbase.admin.http.proxy.read.timeout.ms</code>).</li>
 <li><strong>Connection pooling.</strong> Make sure application clients use a real connection pool with multiple connections — that is what makes <code>least_conn</code> actually spread work. A pool of 1 connection ignores the proxy entirely.</li>
-<li><strong>PG wire encryption.</strong> Until pg-wire TLS is supported by NeorunBase, keep the SQL endpoint on the private network. The internal Coordinator↔Data Node protocol is already KMS-encrypted (<code>neorunbase.kms.encrypt.internal.protocol</code>); the proxy hop only covers client→Coordinator.</li>
+<li><strong>PG wire encryption.</strong> Enable pg-wire TLS by uploading a certificate through the Admin UI; every Coordinator in the cluster picks up the bundle and answers <code>SSLRequest</code> with <code>S</code> on the next connection (see <a href="../../features/pg-wire-tls/">pg-wire TLS</a>). The TLS handshake terminates on the Coordinator, not on NGINX, so the cert covers connections through the proxy as well as direct connections to a Coordinator. Until TLS is enabled cluster-wide, keep the SQL endpoint on a private network. The internal Coordinator↔Data Node protocol is always KMS-encrypted (<code>neorunbase.kms.encrypt.internal.protocol</code>); the proxy hop only ever sees client→Coordinator traffic.</li>
 </ul>
 <h2 id="putting-it-together">Putting It Together</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>                   ┌──────────────────────────────────┐
@@ -1497,7 +1525,7 @@
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>                   ZooKeeper ensemble + Data Nodes
 </code></pre></div>
 <ul>
-<li>Clients (<code>psql</code>, JDBC, pgAdmin, applications) connect to <code>neorunbase.example.com:5432</code> over plaintext PG wire across the trusted network. The proxy spreads new connections across all Coordinators.</li>
+<li>Clients (<code>psql</code>, JDBC, pgAdmin, applications) connect to <code>neorunbase.example.com:5432</code>. When pg-wire TLS is enabled the handshake is end-to-end between the client and whichever Coordinator the proxy lands the connection on; otherwise traffic is plaintext and should stay on a trusted network. Either way, the proxy spreads new connections across all Coordinators.</li>
 <li>Operators reach the Admin UI over HTTPS at <code>https://neorunbase.example.com/</code>. NGINX terminates TLS and load-balances admin requests across all Coordinators.</li>
 <li>NGINX is the only component that needs a public certificate; everything behind it stays on the private network.</li>
 </ul>
