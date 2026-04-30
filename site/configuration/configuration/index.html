@@ -1,0 +1,2464 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/configuration/configuration/">
+      
+      
+        <link rel="prev" href="../../features/admin-ui/">
+      
+      
+        <link rel="next" href="../../operations/operations/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Configuration Reference - NeorunBase</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+      
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NeorunBase
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../installation/installation/" class="md-tabs__link">
+          
+  
+  
+  Installation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../features/postgresql-compatibility/" class="md-tabs__link">
+          
+  
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../operations/operations/" class="md-tabs__link">
+          
+  
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+      
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
+
+    </a>
+    NeorunBase
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NeorunBase Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Installation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download & Install
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/postgresql-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL Compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/distributed-sharding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Sharding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/replication-ha/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication & High Availability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encryption at Rest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/iceberg-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/kafka-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/geospatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geospatial Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/iam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity and Access Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/admin-ui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-sources-precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Sources &amp; Precedence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#master-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Master Key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coordinator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Node
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-table-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Table Settings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging &amp; Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kms-key-management-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KMS (Key Management Service)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#admin-http-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin HTTP Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Collection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metadata-store-coordinator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata Store (Coordinator)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-at-rest-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data At-Rest Encryption
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#internal-protocol-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Protocol Tuning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iceberg-catalog-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg Catalog Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kafka-consumer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kafka Consumer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iam-identity-access-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM (Identity &amp; Access Management)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#write-ahead-log-wal-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write-Ahead Log (WAL) &amp; Encryption
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#row-data-storage-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Row-Data Storage Mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bitrot-scrubber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bitrot Scrubber
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pg-wire-protocol-server-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PG Wire Protocol Server Tuning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-ann-index-maintenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector ANN Index Maintenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coordinator-cluster-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinator Cluster Sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distributed-query-ddl-timeouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed Query / DDL Timeouts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disk-repair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jvm-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JVM Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="configuration">Configuration</h1>
+<p>NeorunBase is configured through <code>conf/neorunbase.properties</code> in the release archive. Every property has a sensible default; you typically only override cluster identity, ZooKeeper connection, advertised hostnames, ports, and whichever feature toggles (Iceberg, Kafka, encryption, scrubber) your deployment uses.</p>
+<h2 id="configuration-sources-precedence">Configuration Sources &amp; Precedence</h2>
+<p>NeorunBase resolves each configuration key from three sources, <strong>in order</strong>:</p>
+<ol>
+<li><strong>JVM system property</strong> — e.g. <code>-Dneorunbase.coordinator.pg.port=5433</code> on the command line.</li>
+<li><strong>Environment variable</strong> — e.g. <code>NEORUNBASE_COORDINATOR_PG_PORT=5433</code>. The mapping is uppercase with dots replaced by underscores.</li>
+<li><strong>Properties file</strong> — <code>conf/neorunbase.properties</code>, the on-disk default.</li>
+</ol>
+<p>A higher source always wins. This lets the start scripts in <code>bin/</code> override individual settings on the command line (the example launcher uses this to start two Data Nodes on different ports from a single config file), and lets containerized or systemd-managed deployments inject ports, hostnames, and key material via environment variables without rewriting the file.</p>
+<p>Property values can reference other properties with <code>${...}</code> substitution. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="na">neorunbase.base.data.dir</span><span class="o">=</span><span class="s">./data</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">neorunbase.datanode.data.dir</span><span class="o">=</span><span class="s">${neorunbase.base.data.dir}/shards</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">neorunbase.wal.directory</span><span class="o">=</span><span class="s">${neorunbase.base.data.dir}/wal</span>
+</code></pre></div>
+<h2 id="master-key">Master Key</h2>
+<p>Every NeorunBase server process reads a master key from the environment variable named by <code>neorunbase.kms.master.key.env</code> (default <code>NEORUNBASE_MASTER_KEY</code>). The master key:</p>
+<ul>
+<li>Must be <strong>at least 32 characters</strong> long.</li>
+<li>Must be <strong>identical across all Coordinators and Data Nodes</strong> in the cluster.</li>
+<li>Is the root of the envelope-encryption hierarchy. PBKDF2 with <code>neorunbase.kms.pbkdf2.iterations</code> iterations (default <code>200000</code>) derives the master encryption key, which wraps the per-key DEKs used for KMS, internal protocol, metadata, WAL, heap segments, and at-rest shard data.</li>
+<li>Is also the secret used to derive the JWT signing key for the admin HTTP server.</li>
+</ul>
+<p>Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unrecoverable. Keep it in a secret manager and rotate per your security policy.</p>
+<h2 id="cluster">Cluster</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.cluster.id</code></td>
+<td><code>neorunbase-cluster</code></td>
+<td>Unique identifier for this NeorunBase cluster. Must match across all nodes.</td>
+</tr>
+<tr>
+<td><code>neorunbase.zookeeper.server.list</code></td>
+<td><code>localhost:2181</code></td>
+<td>ZooKeeper connection string (<code>host1:port1,host2:port2</code>).</td>
+</tr>
+<tr>
+<td><code>neorunbase.zookeeper.root.path</code></td>
+<td><code>/neorunbase</code></td>
+<td>Root znode path under which all NeorunBase znodes are created.</td>
+</tr>
+<tr>
+<td><code>neorunbase.zookeeper.session.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>ZooKeeper session timeout.</td>
+</tr>
+<tr>
+<td><code>neorunbase.zookeeper.connection.timeout.ms</code></td>
+<td><code>10000</code></td>
+<td>ZooKeeper connection timeout.</td>
+</tr>
+<tr>
+<td><code>neorunbase.base.data.dir</code></td>
+<td><code>./data</code></td>
+<td>Base directory for all NeorunBase data. Most other directory properties derive from this.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="coordinator">Coordinator</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.coordinator.host</code></td>
+<td><code>0.0.0.0</code></td>
+<td>Bind address for the PG wire protocol listener.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.pg.port</code></td>
+<td><code>5432</code></td>
+<td>TCP port for PostgreSQL wire protocol connections.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.advertised.host</code></td>
+<td><code>localhost</code></td>
+<td>Hostname advertised to clients and other nodes. Set to a reachable hostname in production.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.worker.threads</code></td>
+<td><code>235</code></td>
+<td>Worker threads handling PG wire protocol connections.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.internal.port</code></td>
+<td><code>7100</code></td>
+<td>TCP port for coordinator-to-coordinator NIO communication (metadata sync, KMS sync).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-node">Data Node</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.datanode.host</code></td>
+<td><code>0.0.0.0</code></td>
+<td>Bind address for the internal protocol listener.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.internal.port</code></td>
+<td><code>7000</code></td>
+<td>TCP port for the internal protocol from Coordinators.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.advertised.host</code></td>
+<td><code>localhost</code></td>
+<td>Hostname advertised to Coordinators. Set to a reachable hostname in production.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.data.dir</code></td>
+<td><code>${neorunbase.base.data.dir}/shards</code></td>
+<td>Local directory for shard data. Multiple comma-separated directories enable multi-disk placement.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.worker.threads</code></td>
+<td><code>256</code></td>
+<td>Worker threads handling internal protocol requests.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.disk.info.refresh.interval.seconds</code></td>
+<td><code>60</code></td>
+<td>How often the Data Node refreshes disk capacity / availability info in ZooKeeper.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.temp.table.cleanup.interval.seconds</code></td>
+<td><code>60</code></td>
+<td>How often the Data Node sweeps for expired intermediate-result temp tables.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.temp.table.ttl.ms</code></td>
+<td><code>600000</code></td>
+<td>Temp-table TTL before cleanup is eligible (10 minutes).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="default-table-settings">Default Table Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.default.num.shards</code></td>
+<td><code>16</code></td>
+<td>Default number of shards when <code>CREATE TABLE</code> does not specify <code>SHARDS</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.default.replication.factor</code></td>
+<td><code>2</code></td>
+<td>Default replication factor for shards.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="authentication">Authentication</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.admin.user</code></td>
+<td><code>admin</code></td>
+<td>Initial admin user for PG wire protocol and Admin UI.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.password</code></td>
+<td><code>admin</code></td>
+<td>Initial admin password. <strong>Change on first login.</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="logging-monitoring">Logging &amp; Monitoring</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.log.mode</code></td>
+<td><code>ASYNC_FILE</code></td>
+<td><code>ASYNC_FILE</code> (rolling files), <code>RING_BUFFER</code> (in-memory ring buffer for container environments), or <code>NOP</code> (console only).</td>
+</tr>
+<tr>
+<td><code>neorunbase.log.path</code></td>
+<td><code>${neorunbase.base.data.dir}/logs</code></td>
+<td>Base directory for log files.</td>
+</tr>
+<tr>
+<td><code>neorunbase.log.level</code></td>
+<td><code>INFO</code></td>
+<td>Log level for NeorunBase application loggers.</td>
+</tr>
+<tr>
+<td><code>neorunbase.log.ring.buffer.capacity</code></td>
+<td><code>1000</code></td>
+<td>Number of log lines retained in the in-memory ring buffer (when <code>RING_BUFFER</code> is selected).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="kms-key-management-service">KMS (Key Management Service)</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.kms.enabled</code></td>
+<td><code>true</code></td>
+<td>Master toggle for the built-in KMS. When enabled the internal protocol is encrypted.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kms.rocksdb.path</code></td>
+<td><code>${neorunbase.base.data.dir}/kms</code></td>
+<td>Local KMS key persistence directory.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kms.master.key.env</code></td>
+<td><code>NEORUNBASE_MASTER_KEY</code></td>
+<td>Name of the env var holding the master key passphrase.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kms.pbkdf2.iterations</code></td>
+<td><code>200000</code></td>
+<td>PBKDF2 iterations for master-key derivation.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kms.encrypt.internal.protocol</code></td>
+<td><code>true</code></td>
+<td>Encrypt internal protocol messages between Coordinator and Data Nodes.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kms.internal.protocol.key.id</code></td>
+<td><code>internal-protocol</code></td>
+<td>Key ID used for internal protocol encryption.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="admin-http-server">Admin HTTP Server</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.admin.http.port</code></td>
+<td><code>8080</code></td>
+<td>HTTP port for the Admin UI and REST API.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.ui.static.path</code></td>
+<td><code>./admin-ui</code></td>
+<td>Path to the React Admin UI build.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.worker.threads</code></td>
+<td><code>256</code></td>
+<td>Worker threads for admin HTTP request handling.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.jwt.expiry.ms</code></td>
+<td><code>86400000</code></td>
+<td>JWT token expiry (24 hours). JWT signing uses SHA-256 of the master key.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.http.max.content.length</code></td>
+<td><code>10485760</code></td>
+<td>Maximum HTTP request body size (10 MB).</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.shutdown.timeout.seconds</code></td>
+<td><code>5</code></td>
+<td>Admin HTTP server shutdown grace period.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.http.proxy.connect.timeout.ms</code></td>
+<td><code>5000</code></td>
+<td>Connect timeout for coordinator-to-coordinator HTTP proxy calls.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.http.proxy.read.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>Read timeout for the same proxy calls. Increase for large log-tail responses.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="metrics-collection">Metrics Collection</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.metrics.collector.interval.ms</code></td>
+<td><code>15000</code></td>
+<td>Interval between metric collection rounds across cluster nodes.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.collector.initial.delay.ms</code></td>
+<td><code>10000</code></td>
+<td>Initial delay before metrics collection starts.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.retention.days</code></td>
+<td><code>7</code></td>
+<td>Number of days to retain historical metrics.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.rocksdb.path</code></td>
+<td><code>${neorunbase.base.data.dir}/metrics</code></td>
+<td>Metrics time-series storage directory.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.collector.connect.timeout.ms</code></td>
+<td><code>3000</code></td>
+<td>HTTP connect timeout for metric scraping.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.collector.read.timeout.ms</code></td>
+<td><code>5000</code></td>
+<td>HTTP read timeout for metric scraping.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.retention.cleanup.initial.delay.minutes</code></td>
+<td><code>60</code></td>
+<td>Initial delay before retention cleanup.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metrics.retention.cleanup.interval.minutes</code></td>
+<td><code>360</code></td>
+<td>Retention cleanup interval.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="metadata-store-coordinator">Metadata Store (Coordinator)</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.metadata.rocksdb.path</code></td>
+<td><code>${neorunbase.base.data.dir}/metadata</code></td>
+<td>Encrypted metadata store on the leader Coordinator. Holds table schemas and shard maps.</td>
+</tr>
+<tr>
+<td><code>neorunbase.metadata.kms.key.id</code></td>
+<td><code>metadata-encryption</code></td>
+<td>KMS key ID for metadata at-rest encryption.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-at-rest-encryption">Data At-Rest Encryption</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.data.encryption.enabled</code></td>
+<td><code>true</code></td>
+<td>Enable at-rest encryption. Each shard uses a per-shard DEK wrapped via the KMS.</td>
+</tr>
+<tr>
+<td><code>neorunbase.data.encryption.kms.key.id</code></td>
+<td><code>data-encryption</code></td>
+<td>KMS key ID used to wrap per-shard DEKs.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="internal-protocol-tuning">Internal Protocol Tuning</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.protocol.compression.enabled</code></td>
+<td><code>true</code></td>
+<td>Snappy compression for internal protocol messages.</td>
+</tr>
+<tr>
+<td><code>neorunbase.protocol.compression.min.bytes</code></td>
+<td><code>256</code></td>
+<td>Minimum payload size to trigger compression.</td>
+</tr>
+<tr>
+<td><code>neorunbase.nio.read.buffer.size</code></td>
+<td><code>65536</code></td>
+<td>NIO read buffer size for internal protocol connections.</td>
+</tr>
+<tr>
+<td><code>neorunbase.nio.selector.timeout.ms</code></td>
+<td><code>1000</code></td>
+<td>NIO selector poll timeout.</td>
+</tr>
+<tr>
+<td><code>neorunbase.internal.rpc.timeout.ms</code></td>
+<td><code>5000</code></td>
+<td>Internal RPC request timeout.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.discovery.poll.interval.ms</code></td>
+<td><code>2000</code></td>
+<td>Coordinator startup poll interval for Data Node discovery.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.discovery.max.retries</code></td>
+<td><code>30</code></td>
+<td>Maximum Data Node discovery retries during startup.</td>
+</tr>
+<tr>
+<td><code>neorunbase.leader.init.poll.interval.ms</code></td>
+<td><code>1000</code></td>
+<td>Non-leader Coordinator initialization poll interval.</td>
+</tr>
+<tr>
+<td><code>neorunbase.leader.init.max.retries</code></td>
+<td><code>15</code></td>
+<td>Non-leader initialization max retries.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="iceberg-catalog-integration">Iceberg Catalog Integration</h2>
+<p>NeorunBase can synchronize tables to an Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iceberg.catalog.type</code></td>
+<td><code>none</code></td>
+<td><code>none</code> (disabled) or <code>rest</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.uri</code></td>
+<td></td>
+<td>REST catalog URI.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.security</code></td>
+<td><code>NONE</code></td>
+<td><code>NONE</code> or <code>OAUTH2</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.token-endpoint</code></td>
+<td></td>
+<td>OAuth2 token endpoint (client credentials flow).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.client-id</code></td>
+<td></td>
+<td>OAuth2 client ID.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.client-secret</code></td>
+<td></td>
+<td>OAuth2 client secret.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.token</code></td>
+<td></td>
+<td>Static bearer token (alternative to OAuth2).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.extra.properties</code></td>
+<td></td>
+<td>Comma-separated <code>key=val</code> pairs forwarded to the REST catalog.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.warehouse</code></td>
+<td><code>s3://warehouse</code></td>
+<td>Warehouse identifier (catalog name for Polaris, S3 path for others).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.endpoint</code></td>
+<td><code>http://localhost:9000</code></td>
+<td>S3 endpoint for Iceberg storage.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.access.key</code></td>
+<td><code>admin</code></td>
+<td>S3 access key.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.secret.key</code></td>
+<td><code>admin123</code></td>
+<td>S3 secret key.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.region</code></td>
+<td><code>us-east-1</code></td>
+<td>S3 region.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.path.style.access</code></td>
+<td><code>true</code></td>
+<td>Path-style access (required for MinIO and similar).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.sse.type</code></td>
+<td><code>none</code></td>
+<td><code>none</code>, <code>s3</code> (SSE-S3), or <code>kms</code> (SSE-KMS) for Parquet objects written by the Iceberg sink.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.s3.sse.key</code></td>
+<td></td>
+<td>KMS key id/ARN when <code>sse.type=kms</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.interval.ms</code></td>
+<td><code>60000</code></td>
+<td>Background sync interval. <code>0</code> disables.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.thread.pool.size</code></td>
+<td><code>4</code></td>
+<td>Thread pool size for parallel table syncs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.auto.start</code></td>
+<td><code>false</code></td>
+<td>Auto-start sync job on server startup.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.table.filters</code></td>
+<td></td>
+<td>Comma-separated table filters (<code>*</code> wildcard supported). Empty = all dirty tables.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.changelog.batch.size</code></td>
+<td><code>500</code></td>
+<td>Batch size for changelog reads during incremental sync.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.sync.task.timeout.ms</code></td>
+<td><code>300000</code></td>
+<td>Per-table sync task timeout.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.default.namespace</code></td>
+<td><code>lakebase</code></td>
+<td>Default Iceberg namespace, auto-created on catalog init.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="kafka-consumer">Kafka Consumer</h2>
+<p>NeorunBase can ingest JSON messages directly from Kafka into target tables. See <a href="../../features/kafka-integration/">Kafka Integration</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.kafka.consumer.enabled</code></td>
+<td><code>false</code></td>
+<td>Master toggle for Kafka consumer integration.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kafka.consumer.groups</code></td>
+<td></td>
+<td>Comma-separated list of consumer group names.</td>
+</tr>
+</tbody>
+</table>
+<p>For each group <code>&lt;name&gt;</code> listed in <code>neorunbase.kafka.consumer.groups</code>, configure a per-group block:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.brokers</span><span class="o">=</span><span class="s">localhost:9092</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.topics</span><span class="o">=</span><span class="s">topic1,topic2</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.group-id</span><span class="o">=</span><span class="s">neorunbase-&lt;name&gt;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.target-table</span><span class="o">=</span><span class="s">my_table</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.id-columns</span><span class="o">=</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.num-shards</span><span class="o">=</span><span class="s">2</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.format</span><span class="o">=</span><span class="s">json</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.batch-size</span><span class="o">=</span><span class="s">100</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.poll-timeout-ms</span><span class="o">=</span><span class="s">1000</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.auto-offset-reset</span><span class="o">=</span><span class="s">latest</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.extra.properties</span><span class="o">=</span><span class="s">max.poll.records=500</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.max-consumers</span><span class="o">=</span><span class="s">3</span>
+</code></pre></div>
+<p>The leader Coordinator distributes consumer groups round-robin across the Data Nodes; each Data Node hosts the consumer worker for the groups assigned to it.</p>
+<h2 id="iam-identity-access-management">IAM (Identity &amp; Access Management)</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iam.rocksdb.path</code></td>
+<td><code>${neorunbase.base.data.dir}/iam</code></td>
+<td>RocksDB path for IAM data persistence.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.sts.cleanup.interval.hours</code></td>
+<td><code>1</code></td>
+<td>Sweep interval for expired STS temporary credentials.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="write-ahead-log-wal-encryption">Write-Ahead Log (WAL) &amp; Encryption</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.wal.encryption.enabled</code></td>
+<td><code>true</code></td>
+<td>Enable WAL envelope encryption.</td>
+</tr>
+<tr>
+<td><code>neorunbase.wal.encryption.kms.key.id</code></td>
+<td><code>wal-encryption</code></td>
+<td>KMS key ID for WAL segment DEKs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.wal.directory</code></td>
+<td><code>${neorunbase.base.data.dir}/wal</code></td>
+<td>Base WAL directory. Per-shard subdirectories are created automatically.</td>
+</tr>
+<tr>
+<td><code>neorunbase.wal.segment.size</code></td>
+<td><code>67108864</code></td>
+<td>WAL segment rotation threshold (64 MB).</td>
+</tr>
+<tr>
+<td><code>neorunbase.wal.sync.interval.ms</code></td>
+<td><code>1000</code></td>
+<td>WAL fsync interval.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="row-data-storage-mode">Row-Data Storage Mode</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.storage.row.data.mode</code></td>
+<td><code>heap</code></td>
+<td><code>heap</code> (default — append-only encrypted heap segments + 16-byte RocksDB pointer per row) or <code>rocksdb</code> (legacy escape hatch; values stored inside RocksDB). Indexes, changelog, and system column families always remain in RocksDB.</td>
+</tr>
+<tr>
+<td><code>neorunbase.heap.segment.size</code></td>
+<td><code>67108864</code></td>
+<td>Heap segment rotation threshold (64 MB).</td>
+</tr>
+<tr>
+<td><code>neorunbase.heap.encryption.kms.key.id</code></td>
+<td><code>heap-encryption</code></td>
+<td>KMS key ID for heap segment DEKs.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="bitrot-scrubber">Bitrot Scrubber</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.scrubber.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable the periodic background scrubber that walks closed heap segments and verifies every record's AES-GCM auth tag. When disabled, bitrot is still detected on read but no proactive scan runs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.scrubber.interval.minutes</code></td>
+<td><code>360</code></td>
+<td>Minutes between scrub passes (6 hours).</td>
+</tr>
+<tr>
+<td><code>neorunbase.scrubber.throttle.bytes.per.sec</code></td>
+<td><code>52428800</code></td>
+<td>Maximum disk throughput the scrubber consumes (50 MB/s).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pg-wire-protocol-server-tuning">PG Wire Protocol Server Tuning</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.pgwire.read.buffer.initial.bytes</code></td>
+<td><code>8192</code></td>
+<td>Initial per-connection read buffer size. Grown on demand up to the cap below.</td>
+</tr>
+<tr>
+<td><code>neorunbase.pgwire.read.buffer.max.bytes</code></td>
+<td><code>67108864</code></td>
+<td>Absolute upper bound on a single inbound pg-wire message (64 MiB). Larger frames receive ErrorResponse and connection close.</td>
+</tr>
+<tr>
+<td><code>neorunbase.pgwire.worker.pool.size</code></td>
+<td><code>0</code></td>
+<td>pg-wire worker pool size. <code>0</code> = auto: <code>max(2, 2 × CPU cores)</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.pgwire.worker.shutdown.timeout.seconds</code></td>
+<td><code>5</code></td>
+<td>Worker pool drain grace period at shutdown.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vector-ann-index-maintenance">Vector ANN Index Maintenance</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.ann.flush.interval.seconds</code></td>
+<td><code>30</code></td>
+<td>Background flush interval for dirty in-memory ANN indexes to encrypted sidecar files. <code>0</code> disables periodic flush — sidecars are only written on shard close. Lower values bound the data-loss window on ungraceful shutdown; higher values amortize the full-graph re-serialize cost.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="coordinator-cluster-sync">Coordinator Cluster Sync</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.coordinator.sync.max.retries</code></td>
+<td><code>3</code></td>
+<td>Maximum retries when the leader broadcasts metadata or IAM snapshots to peer Coordinators over the internal protocol.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.sync.retry.delay.ms</code></td>
+<td><code>1000</code></td>
+<td>Sleep between sync retry attempts.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="distributed-query-ddl-timeouts">Distributed Query / DDL Timeouts</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.query.ann.rebuild.timeout.ms</code></td>
+<td><code>300000</code></td>
+<td>RPC timeout for <code>ANN_REBUILD_REQ</code> (5 minutes). Vector index rebuilds can take minutes on large shards.</td>
+</tr>
+<tr>
+<td><code>neorunbase.query.table.sync.poll.interval.ms</code></td>
+<td><code>100</code></td>
+<td>Non-leader Coordinator wait poll for newly-created tables to propagate from the leader.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reshard.shard.operation.timeout.ms</code></td>
+<td><code>120000</code></td>
+<td>Internal protocol RPC timeout for shard copy / replicate during resharding.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reshard.ddl.operation.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>Internal protocol RPC timeout for DDL fan-out (DROP TABLE, CREATE INDEX) during reshard.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="disk-repair">Disk Repair</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.disk.repair.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable automatic disk repair.</td>
+</tr>
+<tr>
+<td><code>neorunbase.disk.repair.interval.seconds</code></td>
+<td><code>300</code></td>
+<td>Repair cycle interval.</td>
+</tr>
+<tr>
+<td><code>neorunbase.disk.repair.grace.period.seconds</code></td>
+<td><code>600</code></td>
+<td>Grace period before a disk is confirmed dead.</td>
+</tr>
+<tr>
+<td><code>neorunbase.disk.repair.max.concurrent</code></td>
+<td><code>4</code></td>
+<td>Maximum concurrent shard repairs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.disk.repair.min.available.bytes</code></td>
+<td><code>104857600</code></td>
+<td>Minimum free bytes for a disk to be considered healthy (100 MB).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="jvm-options">JVM Options</h2>
+<p>JVM flags applied to every NeorunBase process live in <code>conf/jvm.conf</code>. The shipped defaults enable G1 GC and string deduplication; heap and direct memory sizing are commented out and should be set per-host. Add additional <code>-Xms</code>, <code>-Xmx</code>, <code>-XX:MaxDirectMemorySize</code>, or <code>-XX:+...</code> flags as appropriate for the role and host.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-XX:+UseG1GC
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>-XX:+UseStringDeduplication
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>-XX:+OptimizeStringConcat
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>-XX:+UseCondCardMark
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>-Dio.netty.noPreferDirect=true
+</code></pre></div>
+<p>The start scripts also append any <code>-D</code> and <code>-X</code> flags passed on the command line, so per-instance overrides do not require editing the shared file.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>

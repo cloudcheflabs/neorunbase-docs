@@ -1,57 +1,39 @@
 # Getting Started
 
-This shows how to install NeorunBase on local to experience it quickly.
+This page walks through a complete first session against a freshly started NeorunBase cluster: logging into the Admin UI, connecting with `psql`, and running a small but representative SQL workload that exercises sharding, joins, aggregation, updates, and deletes.
 
-## Prerequisites
-
-Because NeorunBase is written in Java, Java 17 needs to be installed on local.
-
-## Install NeorunBase on Local
-
-NeorunBase distribution can be downloaded like this.
-
-```agsl
-curl -L -O https://github.com/cloudcheflabs/neorunbase-pack/releases/download/neorunbase-archive/neorunbase-1.0.0.tar.gz
-```
-
-And untar the downloaded package.
-```agsl
-tar zxvf neorunbase-1.0.0.tar.gz
-
-cd neorunbase-1.0.0;
-```
-
-Run the example servers which are 1 Coordinator server and 2 Data nodes with Zookeeper on local.
+The instructions below assume you have already installed NeorunBase and started the example cluster as described on [Download & Install](installation.md):
 
 ```agsl
 export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
-bin/start-example-servers.sh;
+bin/start-example-servers.sh
 ```
 
-> Environment variable `NEORUNBASE_MASTER_KEY` that must be at least 32 characters needs to be exported when running NeorunBase servers.
+## 1. Open the Admin UI
 
-
-After a few seconds, visit admin page of NeorunBase.
+After a few seconds the Coordinator's admin HTTP server is reachable at:
 
 ```agsl
 http://localhost:8080/admin
 ```
 
-First initial admin user and password is `admin` / `admin`, after that you need to change the initial password.
+The initial admin user and password is `admin` / `admin`. You will be required to change the password on first login.
 
 <img width="1200" src="../../images/getting-started/dashboard.png"/>
 
+The Admin UI is the entry point for cluster topology, table and shard inspection, IAM (users, roles, policies, STS), encryption / KMS status, metrics, and log inspection. See the [Admin UI](../features/admin-ui.md) feature page for details.
 
-## Run Queries
+## 2. Connect with psql
 
-`psql` will be used to connect to NeorunBase.
+NeorunBase implements the PostgreSQL wire protocol, so any PostgreSQL-compatible client connects without modification. Using `psql`:
 
 ```agsl
 PGPASSWORD="<your-admin-password>" psql -h localhost -p 5432 -U admin -d neorunbase
 ```
 
+## 3. Run the Example Workload
 
-Run several queries like the following.
+The SQL below is also shipped under `examples/example.sql` in the release archive. It defines three sharded tables, inserts sample rows, then exercises filtering, ordering, joins, grouping, aggregation, and DML.
 
 ```agsl
 -- =============================================================================
@@ -211,12 +193,18 @@ SELECT * FROM orders ORDER BY id;
 -- DROP TABLE customers;
 ```
 
+The `SHARD KEY (id) SHARDS 4` clause is a NeorunBase extension to `CREATE TABLE`: it hash-partitions each table into four shards on `id` and places the shards across the available Data Nodes with the configured replication factor. Distributed joins, aggregations, sorts, and DML are executed transparently across shards by the Coordinator. See [Distributed Sharding](../features/distributed-sharding.md) and [Distributed Transactions](../features/transactions.md).
 
-## Stop Example Servers
+## 4. Stop the Cluster
 
-Stop the running example servers.
+When you are done evaluating, stop the example cluster:
 
 ```agsl
 bin/stop-example-servers.sh
 ```
 
+## Next Steps
+
+- [Configuration](../configuration/configuration.md) — every tunable in `neorunbase.properties`.
+- [Operations](../operations/operations.md) — running, monitoring, and shutting down a production cluster.
+- [Features](../features/postgresql-compatibility.md) — PostgreSQL compatibility, replication, encryption, vector search, Iceberg sync, Kafka ingestion, IAM, and the Admin UI.
