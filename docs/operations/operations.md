@@ -1,0 +1,190 @@
+# Operations
+
+This page covers running a NeorunBase cluster in steady state: starting and stopping individual roles, controlling JVM and runtime behavior, and observing the cluster through the Admin UI and metrics. For first-time installation see [Installation](../installation/installation.md); for the full property reference see [Configuration](../configuration/configuration.md).
+
+## Process Layout
+
+A NeorunBase deployment is composed of three process types:
+
+- **ZooKeeper ensemble** — used for cluster coordination, service discovery, and leader election. The release archive ships an example single-node ZooKeeper for evaluation; production deployments use a dedicated ensemble (typically three or five nodes).
+- **Coordinator** — fronts the PostgreSQL wire protocol and the Admin UI. Two or more Coordinators may run for high availability; one is elected leader for metadata and KMS ownership.
+- **Data Node** — owns shards on local disks. Hosts the heap segment files, RocksDB indexes, WAL, ANN sidecars, and the per-Data-Node Kafka consumer worker (when enabled).
+
+All three are managed by shell scripts under `bin/` in the release archive.
+
+## Starting and Stopping
+
+### Coordinator
+
+```agsl
+bin/start-coordinator.sh
+```
+
+The script launches `com.cloudcheflabs.neorunbase.server.CoordinatorServer` with the classpath set to `conf:lib/*`, applies the JVM options from `conf/jvm.conf`, and writes its PID to `bin/coordinator-<pg-port>.pid`. Standard out and err are redirected to `logs/coordinator-<pg-port>.out`. The Coordinator binds the PG wire port (`neorunbase.coordinator.pg.port`, default `5432`) and the Admin HTTP port (`neorunbase.admin.http.port`, default `8080`).
+
+To stop the Coordinator gracefully:
+
+```agsl
+bin/stop-coordinator.sh
+```
+
+To stop a specific Coordinator instance running with a non-default port (e.g. when multiple Coordinators are colocated on the same host for testing):
+
+```agsl
+bin/stop-coordinator.sh <pg-port>
+```
+
+The stop script sends `SIGTERM` and waits up to 30 seconds for the process to exit before falling back to `SIGKILL`.
+
+### Data Node
+
+```agsl
+bin/start-datanode.sh
+```
+
+This launches `com.cloudcheflabs.neorunbase.server.DataNodeServer` and writes its PID to `bin/datanode-<internal-port>.pid` and console output to `logs/datanode-<internal-port>.out`. The Data Node binds `neorunbase.datanode.internal.port` (default `7000`) for the internal protocol from Coordinators.
+
+Stop with:
+
+```agsl
+bin/stop-datanode.sh
+```
+
+or, for a specific instance by port:
+
+```agsl
+bin/stop-datanode.sh <internal-port>
+```
+
+### ZooKeeper
+
+The release ships a single-node example ZooKeeper for evaluation:
+
+```agsl
+bin/start-zk.sh
+bin/stop-zk.sh
+```
+
+Production clusters should point `neorunbase.zookeeper.server.list` at a dedicated, separately managed ZooKeeper ensemble rather than the bundled example.
+
+### Bringing Up the Whole Example Cluster
+
+The example launcher boots ZooKeeper, two Data Nodes, and one Coordinator on a single host:
+
+```agsl
+export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
+bin/start-example-servers.sh
+```
+
+The corresponding teardown:
+
+```agsl
+bin/stop-example-servers.sh
+```
+
+## Process Control & Tuning
+
+### Foreground vs. Background
+
+By default the start scripts daemonize the Java process. Set `NEORUNBASE_FOREGROUND=true` to run in the foreground instead — required when NeorunBase is supervised by `systemd`, `runit`, or another process manager that expects the child to stay attached.
+
+```agsl
+NEORUNBASE_FOREGROUND=true bin/start-coordinator.sh
+```
+
+### Per-instance Overrides
+
+The start scripts forward every `-D` and `-X` argument on the command line to the JVM, and forward any other arguments to the server's main method. This is how `start-example-servers.sh` runs two Data Nodes from a single config file:
+
+```agsl
+bin/start-datanode.sh \
+    -Dneorunbase.datanode.internal.port=7002 \
+    -Dneorunbase.base.data.dir=data/datanode-1 \
+    -Dneorunbase.log.path=logs/datanode-1
+```
+
+Per-instance system properties take precedence over `neorunbase.properties` and over `NEORUNBASE_*` environment variables.
+
+### Log Path
+
+The effective log directory is selected with this precedence (highest first):
+
+1. `-Dneorunbase.log.path=...` on the command line.
+2. `NEORUNBASE_LOG_PATH` environment variable.
+3. `logs/` under the install directory (default).
+
+Each instance also writes a per-port `.out` file derived from the role and detected port (e.g. `coordinator-5432.out`, `datanode-7002.out`) so that colocated instances do not collide.
+
+### JVM Options
+
+Edit `conf/jvm.conf` to set heap size, direct memory cap, GC flags, and any other JVM tuning. The file is read line-by-line, ignoring comments and blank lines, and prepended to the JVM command line. Per-instance overrides can still be passed on the command line.
+
+```text
+-Xms8g
+-Xmx8g
+-XX:MaxDirectMemorySize=4g
+-XX:+UseG1GC
+-XX:+UseStringDeduplication
+```
+
+## Master Key Handling
+
+`NEORUNBASE_MASTER_KEY` must be exported on every NeorunBase host with the same value. In production:
+
+- Inject the master key from a secrets manager into the process environment (for example via `systemd` `EnvironmentFile=`, an entrypoint wrapper, or a sidecar that materializes secrets to a tmpfs file).
+- Keep the master key out of `conf/neorunbase.properties` and out of process listings — pass it through the env var only.
+- Treat the master key as cluster-critical: losing it makes encrypted on-disk state unrecoverable.
+
+## Cluster Lifecycle Notes
+
+- **Bootstrap order.** Start ZooKeeper first, then Data Nodes, then Coordinators. The example launcher follows this sequence with brief sleeps; in production, leave Data Nodes time to register in ZooKeeper before bringing up Coordinators so the leader's startup discovery loop completes promptly.
+- **Coordinator HA.** When more than one Coordinator is running, ZooKeeper elects a leader for metadata and KMS ownership. Non-leader Coordinators forward write-side admin operations to the leader and serve PG wire traffic locally.
+- **Shard repair & rebalancing.** When a Data Node leaves the cluster, the leader Coordinator detects the absence via ZooKeeper ephemeral nodes and replicates affected shards onto healthy Data Nodes (provided `neorunbase.disk.repair.enabled=true` for the disk-level case). When new Data Nodes join, the cluster rebalances shards toward them. See [Replication & High Availability](../features/replication-ha.md).
+- **Iceberg sync.** Set `neorunbase.iceberg.catalog.type=rest` and `neorunbase.iceberg.sync.auto.start=true` to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see [Configuration](../configuration/configuration.md#iceberg-catalog-integration).
+- **Kafka ingestion.** Set `neorunbase.kafka.consumer.enabled=true` and define one or more consumer groups. The leader Coordinator distributes the configured groups round-robin across Data Nodes; each worker forwards parsed inserts back to the leader Coordinator over the internal protocol so the standard shard routing path applies. See [Kafka Integration](../features/kafka-integration.md).
+
+## Observability
+
+### Admin UI
+
+The Admin UI is the primary operator surface. It is served by every Coordinator at `http://<coordinator-host>:<neorunbase.admin.http.port>/admin/` (default `8080`).
+
+It exposes:
+
+- Cluster topology (Coordinators, Data Nodes, leader, ZooKeeper, version).
+- Tables, columns, indexes, and shard maps including replica placement.
+- Live and historical metrics charts driven by the Coordinator's metrics RocksDB store.
+- IAM management — users, roles, policies, and STS sessions.
+- KMS status and the encrypted-feature toggles (data, WAL, metadata, internal protocol).
+- Live log tailing across all Coordinators and Data Nodes.
+
+See [Admin UI](../features/admin-ui.md) for the full feature description.
+
+### Metrics
+
+The leader Coordinator scrapes every Coordinator and Data Node every `neorunbase.metrics.collector.interval.ms` milliseconds (default `15000`) and persists the rolled-up time series for `neorunbase.metrics.retention.days` days (default `7`). The retention sweep runs on the schedule given by `neorunbase.metrics.retention.cleanup.*`. Both raw metrics and aggregated charts are exposed through the Admin UI and the admin REST API.
+
+### Logs
+
+Each NeorunBase process writes:
+
+- `logs/<role>-<port>.out` — JVM stdout / stderr captured by the start script (when running in background mode).
+- The Logback-managed log files configured by `conf/logback.xml`, under `neorunbase.log.path` (which itself defaults to `${neorunbase.base.data.dir}/logs`).
+
+Setting `neorunbase.log.mode=RING_BUFFER` switches file-based logging off in favor of an in-memory ring buffer of `neorunbase.log.ring.buffer.capacity` lines, which the Admin UI tails directly. This is the recommended mode for environments where local disk is ephemeral or unavailable.
+
+### Bitrot Scrubber
+
+Setting `neorunbase.scrubber.enabled=true` turns on a throttled background scanner that re-verifies the AES-GCM auth tag on every record in every closed heap segment file. The scanner paces itself at `neorunbase.scrubber.throttle.bytes.per.sec` (default 50 MB/s) so it does not interfere with OLTP traffic, and surfaces any corruption findings through the Admin UI and the admin REST API. Bitrot is detected on read regardless of this toggle; the scrubber adds proactive scanning.
+
+## Shutdown
+
+For a clean shutdown, stop processes in the reverse of startup order:
+
+1. Stop Coordinators (`bin/stop-coordinator.sh`).
+2. Stop Data Nodes (`bin/stop-datanode.sh`).
+3. Stop ZooKeeper (only if you started it via `bin/start-zk.sh`).
+
+`bin/stop-example-servers.sh` performs this sequence for the example single-host cluster.
+
+When the Coordinator's PG wire worker pool is draining, `neorunbase.pgwire.worker.shutdown.timeout.seconds` (default `5`) controls how long it waits before forcibly terminating in-flight queries. The Admin HTTP server has its own grace period, `neorunbase.admin.shutdown.timeout.seconds`. Tune both upward if the cluster is asked to shed long-running analytical queries during planned shutdowns.

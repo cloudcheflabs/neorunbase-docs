@@ -32,10 +32,13 @@ theme:
 
 
 nav:
+  - "Home": index.md
   - "Architecture":
       - "NeorunBase Architecture": architecture/architecture.md
-  - "Getting Started":
-      - "Getting Started": intro/intro.md
+  - "Installation":
+      - "Download & Install": installation/installation.md
+      - "Getting Started": installation/getting-started.md
+      - "NGINX Reverse Proxy": installation/nginx-proxy.md
   - "Features":
       - "PostgreSQL Compatibility": features/postgresql-compatibility.md
       - "Distributed Sharding": features/distributed-sharding.md
@@ -48,6 +51,10 @@ nav:
       - "Geospatial Support": features/geospatial.md
       - "Identity and Access Management": features/iam.md
       - "Admin UI": features/admin-ui.md
+  - "Configuration":
+      - "Configuration Reference": configuration/configuration.md
+  - "Operations":
+      - "Cluster Operations": operations/operations.md
 
 
 
@@ -56,6 +63,10 @@ extra:
   version:
     provider: mike
     default: 2.2.0
+
+
+extra_css:
+  - stylesheets/extra.css
 
 
 extra_javascript:
