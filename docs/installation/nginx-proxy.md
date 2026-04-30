@@ -11,7 +11,7 @@ NGINX is the recommended proxy. Open-source NGINX is sufficient — the `ngx_str
 | Admin UI / REST API | HTTP/1.1 | `8080` | `neorunbase.admin.http.port` | `http` | Recommended |
 | PostgreSQL wire | Raw TCP (PG wire protocol) | `5432` | `neorunbase.coordinator.pg.port` | `stream` | Pass-through only |
 
-> NeorunBase's pg-wire server currently responds `N` to the PostgreSQL `SSLRequest` startup message — the wire protocol is **unencrypted between client and Coordinator**. NGINX in `stream` mode therefore cannot terminate TLS on `:5432`; it can only TCP-load-balance plaintext PG wire. Operate the SQL endpoint over a trusted network (VPC, private subnet, VPN). The Admin UI is plain HTTP and is the appropriate surface for public TLS termination.
+> NeorunBase supports pg-wire TLS but the certificate lives on the **Coordinator**, not on NGINX. The TLS handshake is end-to-end between the client and the Coordinator that the proxy routes the connection to — NGINX `stream` is a transparent TCP passthrough that never decrypts pg-wire traffic. (NGINX `stream` does not speak the PostgreSQL `SSLRequest` framing, so it cannot terminate pg-wire TLS even if you wanted it to.) Upload the cert + key once through the Admin UI and every Coordinator behind the proxy picks it up; see [pg-wire TLS](../features/pg-wire-tls.md). When TLS is not yet enabled cluster-wide, the proxy carries plaintext pg-wire — operate that mode over a trusted network (VPC, private subnet, VPN). The Admin UI is plain HTTP and is the appropriate surface for public TLS termination at NGINX.
 
 ## How the Load Balancing Works
 
@@ -159,7 +159,7 @@ If you need **active** health probes against an admin liveness endpoint, that is
 - **Rolling upgrades.** Drain a Coordinator by marking its line in the `upstream` block as `down` and reloading NGINX (`nginx -s reload`). New PG wire connections and admin requests skip the drained backend; existing PG sessions stay on it until they close. Once the Coordinator is restarted on the new version, remove the `down` flag and reload again.
 - **Multiple Admin endpoints.** If you scale beyond two Coordinators, just add more `server` lines to both `upstream` blocks. NeorunBase's leader election (metadata + KMS leadership) is independent of which Coordinator a client request lands on; non-leader Coordinators forward write-side admin operations to the leader internally over `neorunbase.coordinator.internal.port` and proxy log-tail requests via the admin HTTP proxy (`neorunbase.admin.http.proxy.read.timeout.ms`).
 - **Connection pooling.** Make sure application clients use a real connection pool with multiple connections — that is what makes `least_conn` actually spread work. A pool of 1 connection ignores the proxy entirely.
-- **PG wire encryption.** Until pg-wire TLS is supported by NeorunBase, keep the SQL endpoint on the private network. The internal Coordinator↔Data Node protocol is already KMS-encrypted (`neorunbase.kms.encrypt.internal.protocol`); the proxy hop only covers client→Coordinator.
+- **PG wire encryption.** Enable pg-wire TLS by uploading a certificate through the Admin UI; every Coordinator in the cluster picks up the bundle and answers `SSLRequest` with `S` on the next connection (see [pg-wire TLS](../features/pg-wire-tls.md)). The TLS handshake terminates on the Coordinator, not on NGINX, so the cert covers connections through the proxy as well as direct connections to a Coordinator. Until TLS is enabled cluster-wide, keep the SQL endpoint on a private network. The internal Coordinator↔Data Node protocol is always KMS-encrypted (`neorunbase.kms.encrypt.internal.protocol`); the proxy hop only ever sees client→Coordinator traffic.
 
 ## Putting It Together
 
@@ -176,6 +176,6 @@ If you need **active** health probes against an admin liveness endpoint, that is
                    ZooKeeper ensemble + Data Nodes
 ```
 
-- Clients (`psql`, JDBC, pgAdmin, applications) connect to `neorunbase.example.com:5432` over plaintext PG wire across the trusted network. The proxy spreads new connections across all Coordinators.
+- Clients (`psql`, JDBC, pgAdmin, applications) connect to `neorunbase.example.com:5432`. When pg-wire TLS is enabled the handshake is end-to-end between the client and whichever Coordinator the proxy lands the connection on; otherwise traffic is plaintext and should stay on a trusted network. Either way, the proxy spreads new connections across all Coordinators.
 - Operators reach the Admin UI over HTTPS at `https://neorunbase.example.com/`. NGINX terminates TLS and load-balances admin requests across all Coordinators.
 - NGINX is the only component that needs a public certificate; everything behind it stays on the private network.
