@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/transactions/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/pg-wire-tls/">
       
       
-        <link rel="prev" href="../replication-ha/">
+        <link rel="prev" href="../encryption/">
       
       
-        <link rel="next" href="../encryption/">
+        <link rel="next" href="../iceberg-integration/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Distributed Transactions - NeorunBase</title>
+        <title>pg-wire TLS - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#distributed-transactions" class="md-skip">
+        <a href="#pg-wire-tls" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Distributed Transactions
+              pg-wire TLS
             
           </span>
         </div>
@@ -767,37 +767,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Distributed Transactions
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../transactions/" class="md-nav__link">
         
   
   
@@ -813,70 +786,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#acid-compliance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ACID Compliance
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cross-shard-transactions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cross-Shard Transactions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transaction-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Transaction Support
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#write-ahead-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write-Ahead Log
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -914,10 +823,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../pg-wire-tls/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pg-wire TLS
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -933,6 +869,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-clients-negotiate-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How clients negotiate TLS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-wide-certificate-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster-wide certificate management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepted-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interaction-with-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interaction with NGINX
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1304,32 +1326,58 @@
 
 
 
-<h1 id="distributed-transactions">Distributed Transactions</h1>
-<p>NeorunBase supports ACID transactions across multiple shards, ensuring data consistency in a distributed environment.</p>
-<h2 id="acid-compliance">ACID Compliance</h2>
-<p>NeorunBase provides full ACID guarantees for transactions:</p>
-<ul>
-<li><strong>Atomicity</strong>: All operations within a transaction either succeed together or are rolled back entirely.</li>
-<li><strong>Consistency</strong>: The database transitions from one valid state to another after each transaction.</li>
-<li><strong>Isolation</strong>: Concurrent transactions do not interfere with each other.</li>
-<li><strong>Durability</strong>: Once a transaction is committed, the changes are permanently stored.</li>
-</ul>
-<h2 id="cross-shard-transactions">Cross-Shard Transactions</h2>
-<p>When a transaction involves data on multiple shards, NeorunBase coordinates the commit across all participating shards using a two-phase commit protocol:</p>
+<h1 id="pg-wire-tls">pg-wire TLS</h1>
+<p>NeorunBase exposes its PostgreSQL wire protocol over a TLS-capable endpoint so that clients can connect with <code>sslmode=require</code> (or stronger) without any change to driver or application code. TLS on the SQL surface is <strong>optional</strong> and <strong>dynamically enabled</strong> — the cluster ships in plaintext mode and turns on TLS the moment an operator uploads a certificate through the Admin UI. Every Coordinator picks up the new bundle without a restart, and existing plaintext connections are not interrupted.</p>
+<h2 id="how-clients-negotiate-tls">How clients negotiate TLS</h2>
+<p>NeorunBase implements the standard PostgreSQL <code>SSLRequest</code> startup negotiation:</p>
 <ol>
-<li><strong>Prepare phase</strong>: All participating shards prepare to commit and confirm readiness.</li>
-<li><strong>Commit phase</strong>: Once all shards confirm, the transaction is committed on all shards simultaneously.</li>
+<li>The client sends a special 8-byte <code>SSLRequest</code> message before the regular <code>StartupMessage</code>.</li>
+<li>The Coordinator replies with a single byte: <code>S</code> if a TLS certificate is installed, <code>N</code> if not.</li>
+<li>On <code>S</code>, the client and the Coordinator perform a TLS 1.2 / 1.3 handshake on the same TCP connection. All subsequent pg-wire traffic — auth, queries, results, terminate — is encrypted.</li>
+<li>On <code>N</code>, the client either downgrades to plaintext (<code>sslmode=prefer</code>) or aborts (<code>sslmode=require</code>).</li>
 </ol>
-<p>If any shard fails to prepare, the entire transaction is rolled back.</p>
-<h2 id="transaction-support">Transaction Support</h2>
-<p>NeorunBase supports standard SQL transaction control statements:</p>
+<p>This is the same flow used by upstream PostgreSQL, CockroachDB, YugabyteDB, and pgvector-compatible servers, so any PostgreSQL-compatible driver works out of the box.</p>
+<h2 id="cluster-wide-certificate-management">Cluster-wide certificate management</h2>
+<p>The TLS certificate and private key live in the Coordinator's encrypted metadata store, not on individual hosts. Operators upload the bundle once and it propagates automatically.</p>
 <ul>
-<li><code>BEGIN</code> — Start a new transaction</li>
-<li><code>COMMIT</code> — Commit the current transaction</li>
-<li><code>ROLLBACK</code> — Roll back the current transaction</li>
+<li><strong>Upload through the Admin UI.</strong> The dedicated "pg-wire TLS" page (Governance section in the sidebar) accepts a PEM-encoded certificate chain plus a PKCS#8 unencrypted private key. The leaf certificate's subject, issuer, validity window, signature algorithm, and SHA-256 fingerprint are displayed for verification before activation.</li>
+<li><strong>Encrypted at rest.</strong> The bundle is envelope-encrypted with a KMS key before being written to the leader's metadata RocksDB. The plaintext private key never touches disk in the clear.</li>
+<li><strong>Synchronous propagation.</strong> The leader broadcasts the metadata snapshot to every non-leader Coordinator over the internal protocol. Each peer receives the new bundle, atomically swaps its in-memory <code>SSLContext</code>, and starts answering <code>SSLRequest</code> with <code>S</code> on every new connection.</li>
+<li><strong>Hot-swappable.</strong> Replacing the certificate is the same upload action with new PEM material. Already-handshaken TLS sessions stay alive on the prior context until they close on their own; new connections use the new context. There is no PG-wire downtime during a rotation.</li>
+<li><strong>Removable.</strong> Clearing the bundle reverts the cluster to plaintext-only — <code>SSLRequest</code> returns <code>N</code> again.</li>
 </ul>
-<h2 id="write-ahead-log">Write-Ahead Log</h2>
-<p>All write operations are recorded in a Write-Ahead Log (WAL) before being applied to the storage engine. This ensures durability even in the event of a crash — uncommitted transactions can be recovered from the WAL upon restart.</p>
+<h2 id="accepted-formats">Accepted formats</h2>
+<p>To keep the operational surface small NeorunBase requires these specific formats:</p>
+<ul>
+<li><strong>Certificate chain</strong> — one or more <code>-----BEGIN CERTIFICATE-----</code> blocks in a single PEM stream. The first block is treated as the leaf; subsequent blocks form the intermediate chain.</li>
+<li><strong>Private key</strong> — unencrypted PKCS#8 (<code>-----BEGIN PRIVATE KEY-----</code>), RSA or EC. Both are routinely produced by the standard ACME clients (Let's Encrypt, certbot, AWS ACM-PCA, internal CAs).</li>
+</ul>
+<p>Older formats are rejected with a clear conversion hint:</p>
+<ul>
+<li><strong>PKCS#1 RSA</strong> (<code>-----BEGIN RSA PRIVATE KEY-----</code>) → convert with <code>openssl pkcs8 -topk8 -nocrypt -in key.pem -out key-pkcs8.pem</code>.</li>
+<li><strong>SEC1 EC</strong> (<code>-----BEGIN EC PRIVATE KEY-----</code>) → same <code>openssl pkcs8 -topk8 -nocrypt</code> conversion.</li>
+<li><strong>Encrypted PKCS#8</strong> (<code>-----BEGIN ENCRYPTED PRIVATE KEY-----</code>) → re-export with <code>-nocrypt</code>.</li>
+</ul>
+<p>The leaf certificate's public key is checked against the uploaded private key before the bundle is accepted, so a mismatched pair fails fast at upload time rather than at the first client handshake.</p>
+<h2 id="security-model">Security model</h2>
+<ul>
+<li><strong>In-flight encryption</strong> — pg-wire TLS encrypts the client → Coordinator hop. It is independent from the cluster's at-rest envelope encryption and the always-on KMS-encrypted internal protocol between Coordinators and Data Nodes.</li>
+<li><strong>Server-side TLS only</strong> — mutual TLS (mTLS) and client-certificate authentication are not yet supported. Authentication on the SQL endpoint continues to use the existing IAM password / access-key flow.</li>
+<li><strong>No <code>require</code> mode yet</strong> — a Coordinator with TLS enabled still accepts plaintext clients. Force-TLS (reject plaintext) is on the roadmap; today this is enforced at the network layer (e.g., listening only on a private subnet).</li>
+<li><strong>Master key dependency</strong> — the bundle's at-rest encryption uses the same KMS hierarchy as every other persisted secret in the cluster. A lost master key makes the on-disk bundle unrecoverable, but the operator can simply re-upload through the Admin UI after rebuilding the cluster.</li>
+</ul>
+<h2 id="operator-checklist">Operator checklist</h2>
+<p>To enable TLS on a running cluster:</p>
+<ol>
+<li>Obtain a certificate for the hostname clients use to connect. For a NeorunBase fleet behind an NGINX reverse proxy that is the public hostname (see <a href="../../installation/nginx-proxy/">NGINX Reverse Proxy</a>). For direct connections, it is each Coordinator's reachable hostname.</li>
+<li>If the private key is not already PKCS#8 unencrypted, convert it: <code>openssl pkcs8 -topk8 -nocrypt -in key.pem -out key-pkcs8.pem</code>.</li>
+<li>Open the Admin UI, sign in as an administrator, and visit the <strong>pg-wire TLS</strong> page.</li>
+<li>Paste the certificate chain into "Certificate (PEM)" and the converted PKCS#8 key into "Private Key", then click <strong>Install</strong>.</li>
+<li>Verify with a TLS-required client: <code>psql "host=&lt;coordinator&gt; port=5432 user=admin dbname=neorunbase sslmode=require" -c "SELECT 1"</code>.</li>
+</ol>
+<p>To rotate, repeat steps 1–4 with new material; existing connections continue undisturbed. To disable TLS cluster-wide, click <strong>Remove</strong> on the same page — <code>SSLRequest</code> reverts to <code>N</code> and clients with <code>sslmode=prefer</code> fall through to plaintext.</p>
+<h2 id="interaction-with-nginx">Interaction with NGINX</h2>
+<p>When NeorunBase sits behind NGINX (or HAProxy) for multi-Coordinator load balancing, the proxy operates in <code>stream</code> (TCP passthrough) mode for the pg-wire port. The TLS handshake is end-to-end between the client and the Coordinator that the proxy routes the new connection to — the proxy never decrypts pg-wire traffic. The certificate therefore lives on the Coordinator (uploaded via the Admin UI), not on NGINX. See <a href="../../installation/nginx-proxy/">NGINX Reverse Proxy</a> for the recommended layout.</p>
 
 
 
