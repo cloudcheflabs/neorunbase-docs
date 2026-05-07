@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/configuration/configuration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/configuration/configuration/">
       
       
         <link rel="prev" href="../../features/admin-ui/">
@@ -877,6 +877,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/backup-restore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup & Restore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/kafka-integration/" class="md-nav__link">
         
   
@@ -1299,6 +1327,17 @@
     <span class="md-ellipsis">
       
         Iceberg Catalog Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s3-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 Backup
       
     </span>
   </a>
@@ -2025,7 +2064,7 @@
 </tbody>
 </table>
 <h2 id="iceberg-catalog-integration">Iceberg Catalog Integration</h2>
-<p>NeorunBase can synchronize tables to an Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
+<p>NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
 <table>
 <thead>
 <tr>
@@ -2038,47 +2077,42 @@
 <tr>
 <td><code>neorunbase.iceberg.catalog.type</code></td>
 <td><code>none</code></td>
-<td><code>none</code> (disabled) or <code>rest</code>.</td>
+<td><code>none</code> (disabled) or <code>polaris</code>.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.uri</code></td>
+<td><code>neorunbase.iceberg.polaris.uri</code></td>
 <td></td>
-<td>REST catalog URI.</td>
+<td>Polaris REST endpoint, e.g. <code>http://shannon-polaris:8181/api/catalog</code>.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.security</code></td>
-<td><code>NONE</code></td>
-<td><code>NONE</code> or <code>OAUTH2</code>.</td>
-</tr>
-<tr>
-<td><code>neorunbase.iceberg.catalog.rest.token-endpoint</code></td>
+<td><code>neorunbase.iceberg.polaris.oauth.token.endpoint</code></td>
 <td></td>
-<td>OAuth2 token endpoint (client credentials flow).</td>
+<td>Polaris OAuth2 token endpoint, e.g. <code>http://shannon-polaris:8181/api/catalog/v1/oauth/tokens</code>.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.client-id</code></td>
+<td><code>neorunbase.iceberg.polaris.catalog.name</code></td>
 <td></td>
-<td>OAuth2 client ID.</td>
+<td>Polaris catalog name (used as Iceberg <code>prefix</code> and <code>?warehouse=</code> parameter).</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.client-secret</code></td>
+<td><code>neorunbase.iceberg.polaris.client.id</code></td>
 <td></td>
-<td>OAuth2 client secret.</td>
+<td>OAuth2 client_credentials principal id.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.token</code></td>
+<td><code>neorunbase.iceberg.polaris.client.secret</code></td>
 <td></td>
-<td>Static bearer token (alternative to OAuth2).</td>
+<td>OAuth2 client_credentials secret.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.extra.properties</code></td>
-<td></td>
-<td>Comma-separated <code>key=val</code> pairs forwarded to the REST catalog.</td>
+<td><code>neorunbase.iceberg.polaris.realm</code></td>
+<td><code>POLARIS</code></td>
+<td>Sent as the <code>Polaris-Realm</code> request header.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.catalog.rest.warehouse</code></td>
-<td><code>s3://warehouse</code></td>
-<td>Warehouse identifier (catalog name for Polaris, S3 path for others).</td>
+<td><code>neorunbase.iceberg.polaris.scope</code></td>
+<td><code>PRINCIPAL_ROLE:ALL</code></td>
+<td>OAuth2 scope on token requests.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.endpoint</code></td>
@@ -2149,6 +2183,69 @@
 <td><code>neorunbase.iceberg.default.namespace</code></td>
 <td><code>lakebase</code></td>
 <td>Default Iceberg namespace, auto-created on catalog init.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s3-backup">S3 Backup</h2>
+<p>Scheduled cluster backup to S3-compatible storage. See <a href="../../features/backup-restore/">Backup &amp; Restore</a> for the full feature description. Most operators configure these from the admin UI rather than from properties; the persisted values are stored encrypted in the metadata store.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.backup.s3.enabled</code></td>
+<td><code>false</code></td>
+<td>Master switch for scheduled backups.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.endpoint</code></td>
+<td></td>
+<td>S3 endpoint URL.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.region</code></td>
+<td><code>us-east-1</code></td>
+<td>S3 region.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.bucket</code></td>
+<td></td>
+<td>Destination bucket.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.prefix</code></td>
+<td><code>neorunbase-backup</code></td>
+<td>Object key prefix under the bucket.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.access.key</code></td>
+<td></td>
+<td>Static access key.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.secret.key</code></td>
+<td></td>
+<td>Static secret key (encrypted at rest).</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.s3.path.style.access</code></td>
+<td><code>true</code></td>
+<td>Path-style addressing (required for ShannonStore / MinIO).</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.interval.minutes</code></td>
+<td><code>60</code></td>
+<td>Scheduled backup interval.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.retention.days</code></td>
+<td><code>30</code></td>
+<td>History retention window for the visible backup list.</td>
 </tr>
 </tbody>
 </table>
