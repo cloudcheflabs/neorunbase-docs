@@ -155,19 +155,18 @@ Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unr
 
 ## Iceberg Catalog Integration
 
-NeorunBase can synchronize tables to an Iceberg REST catalog. See [Iceberg Integration](../features/iceberg-integration.md) for the full feature description.
+NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See [Iceberg Integration](../features/iceberg-integration.md) for the full feature description.
 
 | Property | Default | Description |
 | --- | --- | --- |
-| `neorunbase.iceberg.catalog.type` | `none` | `none` (disabled) or `rest`. |
-| `neorunbase.iceberg.catalog.rest.uri` |  | REST catalog URI. |
-| `neorunbase.iceberg.catalog.rest.security` | `NONE` | `NONE` or `OAUTH2`. |
-| `neorunbase.iceberg.catalog.rest.token-endpoint` |  | OAuth2 token endpoint (client credentials flow). |
-| `neorunbase.iceberg.catalog.rest.client-id` |  | OAuth2 client ID. |
-| `neorunbase.iceberg.catalog.rest.client-secret` |  | OAuth2 client secret. |
-| `neorunbase.iceberg.catalog.rest.token` |  | Static bearer token (alternative to OAuth2). |
-| `neorunbase.iceberg.catalog.rest.extra.properties` |  | Comma-separated `key=val` pairs forwarded to the REST catalog. |
-| `neorunbase.iceberg.catalog.rest.warehouse` | `s3://warehouse` | Warehouse identifier (catalog name for Polaris, S3 path for others). |
+| `neorunbase.iceberg.catalog.type` | `none` | `none` (disabled) or `polaris`. |
+| `neorunbase.iceberg.polaris.uri` |  | Polaris REST endpoint, e.g. `http://shannon-polaris:8181/api/catalog`. |
+| `neorunbase.iceberg.polaris.oauth.token.endpoint` |  | Polaris OAuth2 token endpoint, e.g. `http://shannon-polaris:8181/api/catalog/v1/oauth/tokens`. |
+| `neorunbase.iceberg.polaris.catalog.name` |  | Polaris catalog name (used as Iceberg `prefix` and `?warehouse=` parameter). |
+| `neorunbase.iceberg.polaris.client.id` |  | OAuth2 client_credentials principal id. |
+| `neorunbase.iceberg.polaris.client.secret` |  | OAuth2 client_credentials secret. |
+| `neorunbase.iceberg.polaris.realm` | `POLARIS` | Sent as the `Polaris-Realm` request header. |
+| `neorunbase.iceberg.polaris.scope` | `PRINCIPAL_ROLE:ALL` | OAuth2 scope on token requests. |
 | `neorunbase.iceberg.s3.endpoint` | `http://localhost:9000` | S3 endpoint for Iceberg storage. |
 | `neorunbase.iceberg.s3.access.key` | `admin` | S3 access key. |
 | `neorunbase.iceberg.s3.secret.key` | `admin123` | S3 secret key. |
@@ -182,6 +181,23 @@ NeorunBase can synchronize tables to an Iceberg REST catalog. See [Iceberg Integ
 | `neorunbase.iceberg.sync.changelog.batch.size` | `500` | Batch size for changelog reads during incremental sync. |
 | `neorunbase.iceberg.sync.task.timeout.ms` | `300000` | Per-table sync task timeout. |
 | `neorunbase.iceberg.default.namespace` | `lakebase` | Default Iceberg namespace, auto-created on catalog init. |
+
+## S3 Backup
+
+Scheduled cluster backup to S3-compatible storage. See [Backup & Restore](../features/backup-restore.md) for the full feature description. Most operators configure these from the admin UI rather than from properties; the persisted values are stored encrypted in the metadata store.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.backup.s3.enabled` | `false` | Master switch for scheduled backups. |
+| `neorunbase.backup.s3.endpoint` |  | S3 endpoint URL. |
+| `neorunbase.backup.s3.region` | `us-east-1` | S3 region. |
+| `neorunbase.backup.s3.bucket` |  | Destination bucket. |
+| `neorunbase.backup.s3.prefix` | `neorunbase-backup` | Object key prefix under the bucket. |
+| `neorunbase.backup.s3.access.key` |  | Static access key. |
+| `neorunbase.backup.s3.secret.key` |  | Static secret key (encrypted at rest). |
+| `neorunbase.backup.s3.path.style.access` | `true` | Path-style addressing (required for ShannonStore / MinIO). |
+| `neorunbase.backup.interval.minutes` | `60` | Scheduled backup interval. |
+| `neorunbase.backup.retention.days` | `30` | History retention window for the visible backup list. |
 
 ## Kafka Consumer
 

@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/features/iceberg-integration/">
       
       
         <link rel="prev" href="../pg-wire-tls/">
       
       
-        <link rel="next" href="../kafka-integration/">
+        <link rel="next" href="../backup-restore/">
       
       
         
@@ -914,10 +914,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#automatic-data-synchronization" class="md-nav__link">
+  <a href="#catalog-apache-polaris" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Automatic Data Synchronization
+        Catalog — Apache Polaris
       
     </span>
   </a>
@@ -925,10 +925,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#iceberg-catalog-support" class="md-nav__link">
+  <a href="#automatic-sync-cdc" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Iceberg Catalog Support
+        Automatic Sync (CDC)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-time-column-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in Time Column + Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-evolution-add-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Evolution — ADD COLUMN
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-iceberg-tables-icebergnstable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)
       
     </span>
   </a>
@@ -947,21 +980,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#external-iceberg-table-queries" class="md-nav__link">
+  <a href="#what-is-not-yet-supported" class="md-nav__link">
     <span class="md-ellipsis">
       
-        External Iceberg Table Queries
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#s3-compatible-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        S3-Compatible Storage
+        What Is Not (Yet) Supported
       
     </span>
   </a>
@@ -972,6 +994,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backup-restore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup & Restore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1316,31 +1366,52 @@
 
 
 <h1 id="iceberg-integration">Iceberg Integration</h1>
-<p>NeorunBase integrates with Apache Iceberg, enabling automatic synchronization of transactional data to an open lakehouse format. This allows downstream analytics engines such as Apache Spark, Trino, and Hive to query NeorunBase data directly.</p>
-<h2 id="automatic-data-synchronization">Automatic Data Synchronization</h2>
-<p>NeorunBase automatically syncs table data to Iceberg tables in the background:</p>
+<p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
+<h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
+<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. The connection is configured once in the admin UI:</p>
 <ul>
-<li><strong>Initial sync</strong>: A full snapshot of the table is exported as Parquet files to S3-compatible object storage and registered in the Iceberg catalog.</li>
-<li><strong>Incremental sync</strong>: After the initial sync, only the changes (inserts, updates, deletes) are synchronized incrementally, minimizing the overhead.</li>
+<li>Polaris URI and OAuth token endpoint</li>
+<li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
+<li>OAuth2 client ID / client secret, realm, scope</li>
+<li>S3 endpoint, access key, secret key, region</li>
 </ul>
-<h2 id="iceberg-catalog-support">Iceberg Catalog Support</h2>
-<p>NeorunBase connects to any Iceberg REST catalog (e.g., Polaris, Nessie) with support for:</p>
+<p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
+<h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
+<p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
 <ul>
-<li>OAuth2 client credentials authentication</li>
-<li>Static bearer token authentication</li>
+<li><strong>First sync</strong> writes the full table as a single Iceberg snapshot.</li>
+<li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
 </ul>
+<p>A high-water mark is recorded inside the Iceberg table, so coordinator restarts resume sync exactly where it left off.</p>
+<h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
+<p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
+<p>Tables are also automatically:</p>
+<ul>
+<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
+<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
+</ul>
+<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
+<h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
+<p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
+<p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
+<h2 id="reading-iceberg-tables-icebergnstable">Reading Iceberg Tables (<code>iceberg.&lt;ns&gt;.&lt;table&gt;</code>)</h2>
+<p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
+<ul>
+<li>WHERE-clause and column-projection pushdown to data nodes</li>
+<li>Both <strong>equality deletes</strong> and <strong>position deletes</strong> are applied at read time, so external tools writing into the same table stay compatible</li>
+</ul>
+<p><code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; …</code> is supported as a copy-on-write merge. Direct <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or <code>MERGE INTO</code>.</p>
 <h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
-<p>Once data is synced to Iceberg, it can be queried by any engine that supports the Iceberg table format:</p>
+<p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
+<h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
 <ul>
-<li><strong>Apache Spark</strong>: Batch and streaming analytics</li>
-<li><strong>Trino</strong>: Interactive SQL queries</li>
-<li><strong>Apache Hive</strong>: Data warehousing workloads</li>
-<li><strong>Apache Flink</strong>: Stream processing</li>
+<li>Direct <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> on Iceberg tables (use <code>MERGE INTO</code> or the native table)</li>
+<li><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, type promotion in schema evolution</li>
+<li>Snapshot expiration and small-file / manifest compaction</li>
+<li>Time travel (<code>AS OF SNAPSHOT</code> / <code>AS OF TIMESTAMP</code>)</li>
+<li>Branching and tagging</li>
+<li>Iceberg REST catalogs other than Polaris</li>
 </ul>
-<h2 id="external-iceberg-table-queries">External Iceberg Table Queries</h2>
-<p>NeorunBase can also read data from external Iceberg tables. This allows you to query data stored in Iceberg (Parquet, ORC, Avro formats) directly from NeorunBase using standard SQL, bridging the gap between the transactional and analytical worlds.</p>
-<h2 id="s3-compatible-storage">S3-Compatible Storage</h2>
-<p>Iceberg data files are stored in S3-compatible object storage, supporting AWS S3, MinIO, and other S3-compatible services.</p>
 
 
 
