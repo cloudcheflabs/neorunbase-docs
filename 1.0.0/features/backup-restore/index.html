@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/postgresql-compatibility/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/backup-restore/">
       
       
-        <link rel="prev" href="../../installation/nginx-proxy/">
+        <link rel="prev" href="../iceberg-integration/">
       
       
-        <link rel="next" href="../distributed-sharding/">
+        <link rel="next" href="../kafka-integration/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>PostgreSQL Compatibility - NeorunBase</title>
+        <title>Backup & Restore - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#postgresql-compatibility" class="md-skip">
+        <a href="#backup-restore" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              PostgreSQL Compatibility
+              Backup & Restore
             
           </span>
         </div>
@@ -279,7 +279,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -683,37 +683,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    PostgreSQL Compatibility
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../postgresql-compatibility/" class="md-nav__link">
         
   
   
@@ -729,81 +702,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#supported-clients" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Clients
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sql-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SQL Support
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#virtual-catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Virtual Catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#extended-query-protocol" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Extended Query Protocol
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -981,10 +879,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../backup-restore/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup & Restore
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1000,6 +925,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-gets-backed-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Gets Backed Up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incremental-by-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incremental by Design
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#history-retention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        History Retention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restore
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1343,40 +1354,48 @@
 
 
 
-<h1 id="postgresql-compatibility">PostgreSQL Compatibility</h1>
-<p>NeorunBase implements the PostgreSQL wire protocol (v3), allowing any PostgreSQL-compatible client to connect seamlessly without modification.</p>
-<h2 id="supported-clients">Supported Clients</h2>
-<p>You can connect to NeorunBase using any standard PostgreSQL client, including:</p>
+<h1 id="backup-restore">Backup &amp; Restore</h1>
+<p>NeorunBase backs up its critical state to S3-compatible object storage on a schedule. Backups are incremental, opt-in, and can be restored cluster-wide from the admin UI.</p>
+<h2 id="what-gets-backed-up">What Gets Backed Up</h2>
+<p>Every backup run captures both halves of the cluster's state:</p>
 <ul>
-<li><code>psql</code> command-line tool</li>
-<li>JDBC drivers (PostgreSQL JDBC)</li>
-<li>pgAdmin</li>
-<li>Any application or library that supports the PostgreSQL protocol</li>
+<li><strong>Coordinator state</strong> — KMS keys, IAM users, and cluster metadata.</li>
+<li><strong>Data-node state</strong> — every shard's data and write-ahead log files.</li>
 </ul>
-<h2 id="sql-support">SQL Support</h2>
-<p>NeorunBase supports standard SQL operations with PostgreSQL conformance:</p>
+<p>A single backup run produces a coordinated snapshot — coordinator metadata and data-node shards share the same backup ID, so restore reassembles a consistent point in time.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>S3 Backup</code> page in the admin UI exposes the full configuration:</p>
 <ul>
-<li><strong>DML</strong>: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></li>
-<li><strong>DDL</strong>: <code>CREATE TABLE</code>, <code>DROP TABLE</code>, <code>ALTER TABLE</code>, <code>CREATE INDEX</code>, <code>DROP INDEX</code>, <code>CREATE SCHEMA</code>, <code>DROP SCHEMA</code></li>
-<li><strong>Transactions</strong>: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code></li>
-<li><strong>Queries</strong>: <code>JOIN</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>HAVING</code>, subqueries, aggregation functions, <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
+<li><strong>Enabled</strong> — master switch (default: off).</li>
+<li><strong>S3 endpoint, region, bucket, prefix</strong> — the destination bucket.</li>
+<li><strong>Access key / secret key</strong> — long-lived static credentials.</li>
+<li><strong>Path-style addressing</strong> — required for ShannonStore / MinIO.</li>
+<li><strong>Interval (minutes)</strong> — how often the scheduled backup runs.</li>
+<li><strong>Retention (days)</strong> — how long the visible backup history is kept (default 30 days).</li>
 </ul>
-<h2 id="data-types">Data Types</h2>
-<p>NeorunBase supports a wide range of data types:</p>
+<p>The same page exposes a <strong>Test Connection</strong> button (verifies the bucket is reachable) and a <strong>Backup now</strong> button (runs an immediate backup).</p>
+<h2 id="incremental-by-design">Incremental by Design</h2>
+<p>NeorunBase backs up files only when their content has actually changed:</p>
 <ul>
-<li><strong>Numeric</strong>: <code>INTEGER</code>, <code>BIGINT</code>, <code>SMALLINT</code>, <code>FLOAT</code>, <code>DOUBLE</code>, <code>DECIMAL</code></li>
-<li><strong>String</strong>: <code>VARCHAR</code>, <code>TEXT</code>, <code>CHAR</code></li>
-<li><strong>Temporal</strong>: <code>DATE</code>, <code>TIME</code>, <code>TIMESTAMP</code></li>
-<li><strong>Boolean</strong>: <code>BOOLEAN</code></li>
-<li><strong>Binary</strong>: <code>BYTEA</code></li>
-<li><strong>Geospatial</strong>: <code>POINT</code>, <code>LINESTRING</code>, <code>POLYGON</code>, <code>GEOMETRY</code></li>
-<li><strong>Vector</strong>: <code>VECTOR(dim)</code> (pgvector-compatible; see <a href="../vector-database/">Vector Database</a>)</li>
-<li><strong>Other</strong>: <code>JSON</code>, <code>UUID</code></li>
+<li><strong>First run</strong> uploads everything.</li>
+<li><strong>Subsequent runs</strong> upload only files that differ from prior backups; unchanged files are reused — a re-run with no cluster changes uploads zero bytes.</li>
 </ul>
-<h2 id="virtual-catalog">Virtual Catalog</h2>
-<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands such as <code>\d</code>, <code>\dt</code>, and <code>\di</code> in <code>psql</code>. The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
-<h2 id="extended-query-protocol">Extended Query Protocol</h2>
-<p>The pg-wire implementation supports the full extended query flow — Parse / Bind / Describe / Execute / Sync — so JDBC clients using <code>PreparedStatement</code> work the same as simple-mode <code>Statement</code>s. Bound parameters are accepted in either text or binary format; the server decodes the binary wire format per the type OID declared in Parse (covering <code>INT2</code>/<code>INT4</code>/<code>INT8</code>, <code>FLOAT4</code>/<code>FLOAT8</code>, <code>BOOL</code>, <code>TEXT</code>/<code>VARCHAR</code>/<code>BPCHAR</code>, <code>BYTEA</code>, <code>UUID</code>, <code>DATE</code>, <code>TIMESTAMP</code>, <code>TIMESTAMPTZ</code>).</p>
+<p>Each backup writes a manifest that lists every file alive at backup time, so retention or restore can refer to any single backup ID without re-uploading shared files.</p>
+<h2 id="history-retention">History Retention</h2>
+<p>Past backups are listed in the admin UI and aged out by the <strong>Retention (days)</strong> policy (default 30 days). When an entry passes retention it disappears from the visible history; the underlying objects remain in S3 unless an S3 lifecycle rule removes them. This keeps backup deletes deliberate and reversible — operators decide when to actually reclaim S3 storage.</p>
+<h2 id="restore">Restore</h2>
+<p>Restore is initiated from the admin UI by selecting a backup ID and confirming. The flow is <strong>safe by default</strong>:</p>
+<ol>
+<li>Each node downloads the files referenced by the chosen backup into a <em>staging directory</em> alongside its live data — the running cluster keeps serving traffic and is never touched in place.</li>
+<li>The admin UI confirms the staging is complete and prompts the operator to restart the containers.</li>
+<li>On restart, every node automatically swaps the staged tree into place <strong>before</strong> opening its databases. The previous live data is moved aside (kept on disk as <code>&lt;dir&gt;.pre-restore-&lt;id&gt;</code>, not deleted) so the restore is reversible.</li>
+</ol>
+<p>A failed or partial swap leaves the staging directory intact, so the next restart retries instead of silently considering the restore "applied." Operators can clean up the <code>.pre-restore-&lt;id&gt;</code> directories once they're satisfied with the restored state.</p>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li>Restore requires a coordinated restart of all coordinator and data-node containers — there is no online (in-place) restore.</li>
+<li>Backups capture cluster state only; native PostgreSQL <code>pg_dump</code>-style logical exports are out of scope.</li>
+</ul>
 
 
 
