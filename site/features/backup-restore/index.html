@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/backup-restore/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/features/backup-restore/">
       
       
         <link rel="prev" href="../iceberg-integration/">
@@ -997,6 +997,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#specialised-indexes-hnsw-fts-and-backup-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specialised Indexes (HNSW, FTS) and Backup Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#limitations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1059,6 +1070,34 @@
     
   
     Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../full-text-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full-Text Search
   
 
     
@@ -1391,6 +1430,13 @@
 <li>On restart, every node automatically swaps the staged tree into place <strong>before</strong> opening its databases. The previous live data is moved aside (kept on disk as <code>&lt;dir&gt;.pre-restore-&lt;id&gt;</code>, not deleted) so the restore is reversible.</li>
 </ol>
 <p>A failed or partial swap leaves the staging directory intact, so the next restart retries instead of silently considering the restore "applied." Operators can clean up the <code>.pre-restore-&lt;id&gt;</code> directories once they're satisfied with the restored state.</p>
+<h2 id="specialised-indexes-hnsw-fts-and-backup-safety">Specialised Indexes (HNSW, FTS) and Backup Safety</h2>
+<p>Vector (HNSW) and full-text (FTS) indexes live as encrypted sidecars in each shard's directory, so they ride along with the shard tree on every backup — no separate path. Two safeguards keep them consistent with the row store:</p>
+<ul>
+<li><strong>Periodic flush</strong> — both index types run a background scheduler that flushes the in-memory authoritative state to its sidecar at a configurable interval (default 30 s for ANN and FTS each).</li>
+<li><strong>Pre-backup flush hook</strong> — every backup run triggers an explicit flush on each Data Node <em>before</em> any file is uploaded, so the backup captures the live in-memory state, not the last-flushed snapshot. The window between a write and a backup that doesn't include that write is therefore zero.</li>
+</ul>
+<p>If a sidecar is missing or stale on a restored cluster, the shard rebuilds it from authoritative RocksDB rows on the next mutation (HNSW path) — so a restore that loses sidecar files alone still converges. The FTS rebuild-on-mutation path is on the roadmap; until it lands, FTS sidecars depend on the standard backup → restore round-trip preserving the sidecar files (which it does).</p>
 <h2 id="limitations">Limitations</h2>
 <ul>
 <li>Restore requires a coordinated restart of all coordinator and data-node containers — there is no online (in-place) restore.</li>

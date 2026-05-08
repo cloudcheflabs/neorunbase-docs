@@ -47,6 +47,15 @@ Restore is initiated from the admin UI by selecting a backup ID and confirming. 
 
 A failed or partial swap leaves the staging directory intact, so the next restart retries instead of silently considering the restore "applied." Operators can clean up the `.pre-restore-<id>` directories once they're satisfied with the restored state.
 
+## Specialised Indexes (HNSW, FTS) and Backup Safety
+
+Vector (HNSW) and full-text (FTS) indexes live as encrypted sidecars in each shard's directory, so they ride along with the shard tree on every backup — no separate path. Two safeguards keep them consistent with the row store:
+
+- **Periodic flush** — both index types run a background scheduler that flushes the in-memory authoritative state to its sidecar at a configurable interval (default 30 s for ANN and FTS each).
+- **Pre-backup flush hook** — every backup run triggers an explicit flush on each Data Node *before* any file is uploaded, so the backup captures the live in-memory state, not the last-flushed snapshot. The window between a write and a backup that doesn't include that write is therefore zero.
+
+If a sidecar is missing or stale on a restored cluster, the shard rebuilds it from authoritative RocksDB rows on the next mutation (HNSW path) — so a restore that loses sidecar files alone still converges. The FTS rebuild-on-mutation path is on the roadmap; until it lands, FTS sidecars depend on the standard backup → restore round-trip preserving the sidecar files (which it does).
+
 ## Limitations
 
 - Restore requires a coordinated restart of all coordinator and data-node containers — there is no online (in-place) restore.
