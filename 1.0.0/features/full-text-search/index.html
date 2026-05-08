@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/kafka-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/full-text-search/">
       
       
-        <link rel="prev" href="../backup-restore/">
+        <link rel="prev" href="../vector-database/">
       
       
-        <link rel="next" href="../vector-database/">
+        <link rel="next" href="../geospatial/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Kafka Integration - NeorunBase</title>
+        <title>Full-Text Search - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kafka-integration" class="md-skip">
+        <a href="#full-text-search" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Kafka Integration
+              Full-Text Search
             
           </span>
         </div>
@@ -907,37 +907,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Kafka Integration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../kafka-integration/" class="md-nav__link">
         
   
   
@@ -953,92 +926,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#streaming-ingestion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Streaming Ingestion
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multiple-consumer-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multiple Consumer Groups
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-consumers-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where Consumers Run
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#json-message-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        JSON Message Format
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Management
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1076,10 +963,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../full-text-search/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full-Text Search
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1095,6 +1009,164 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-its-built-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It's Built In
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tsvector-tsquery-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSVECTOR / TSQUERY Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-index-using-fts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CREATE INDEX … USING fts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CREATE INDEX … USING fts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-key-requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Key Requirement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#querying-and-ts_rank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Querying — @@ and ts_rank
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distributed-bm25-across-shards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed BM25 Across Shards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hybrid-retrieval-bm25-vector-in-one-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Retrieval — BM25 + Vector in One SQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage-layout-encrypted-sidecar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage Layout — Encrypted Sidecar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#freshness-flush-and-backup-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Freshness, Flush, and Backup Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1382,29 +1454,114 @@
 
 
 
-<h1 id="kafka-integration">Kafka Integration</h1>
-<p>NeorunBase supports streaming data ingestion from Apache Kafka, enabling real-time data to flow directly into NeorunBase tables.</p>
-<h2 id="streaming-ingestion">Streaming Ingestion</h2>
-<p>NeorunBase can consume messages from Kafka topics and automatically insert them into designated tables. This provides a seamless pipeline from event streams to a queryable relational database.</p>
-<h2 id="multiple-consumer-groups">Multiple Consumer Groups</h2>
-<p>You can configure multiple independent Kafka consumer groups, each consuming from different topics and writing to different tables. This allows you to ingest data from various Kafka sources simultaneously.</p>
-<h2 id="where-consumers-run">Where Consumers Run</h2>
-<p>Kafka consumer workers run on <strong>Data Nodes</strong>, not on Coordinators. The leader Coordinator computes a round-robin assignment of consumer groups across the live Data Nodes and broadcasts it via the internal protocol; each Data Node then starts only the workers it has been assigned. Each worker pulls from its Kafka partitions and forwards the parsed INSERT to the leader Coordinator over the internal protocol, so the Coordinator's normal shard routing, replication, and transaction handling apply uniformly to ingested rows. Adding or removing Data Nodes triggers a re-assignment automatically.</p>
-<h2 id="configuration">Configuration</h2>
-<p>Each Kafka consumer group can be configured with:</p>
+<h1 id="full-text-search">Full-Text Search</h1>
+<p>NeorunBase ships a built-in BM25 full-text search engine alongside its vector and relational paths. The surface is PostgreSQL-compatible — <code>tsvector</code>, <code>tsquery</code>, the <code>@@</code> match operator, and the <code>ts_rank</code> family — so existing client code works unchanged. Underneath, every shard owns its own Lucene-based inverted index, persisted as an encrypted sidecar in the same way the HNSW vector index is.</p>
+<h2 id="why-its-built-in">Why It's Built In</h2>
+<p>Most stacks bolt search onto a separate Elasticsearch / OpenSearch cluster, which forces a synchronisation pipeline (Debezium, Kafka, custom batch jobs) and gives up cross-system ACID. NeorunBase does it inside the same database so:</p>
 <ul>
-<li>Kafka broker addresses</li>
-<li>Topic name</li>
-<li>Consumer group ID</li>
-<li>Target NeorunBase table</li>
-<li>Batch size for efficient bulk inserts</li>
-<li>Auto offset reset policy</li>
-<li>Additional Kafka consumer properties</li>
+<li><strong>One transaction</strong> writes a document and its searchable form atomically.</li>
+<li><strong>One SQL statement</strong> can <code>JOIN</code> searchable text with relational metadata, filter by <code>WHERE</code>, and rank by BM25 — no glue layer.</li>
+<li><strong>One operational surface</strong> — the same backup, replication, IAM, and encryption story already in place for OLTP applies to search.</li>
+<li><strong>Iceberg auto-sync</strong> carries searchable text into the lakehouse with no extra work.</li>
 </ul>
-<h2 id="json-message-format">JSON Message Format</h2>
-<p>NeorunBase consumes JSON-formatted messages from Kafka topics. Messages are parsed and batch-inserted into the target table, matching JSON fields to table columns.</p>
-<h2 id="management">Management</h2>
-<p>Kafka consumer groups can be managed through the NeorunBase Admin API, allowing you to start, stop, and monitor ingestion pipelines at runtime.</p>
+<h2 id="tsvector-tsquery-types">TSVECTOR / TSQUERY Types</h2>
+<p>Two PG-native types are added with their canonical OIDs (<code>3614</code> / <code>3615</code>) so JDBC, psycopg, and ORM clients recognise them without driver changes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- tsvector / tsquery flow as opaque text on the wire; Lucene tokenises</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">-- on the data node when CREATE INDEX is built and when search runs.</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;machine learning fundamentals&#39;</span><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;korean&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>The function set tracks PostgreSQL: <code>to_tsvector</code>, <code>plainto_tsquery</code>, <code>phraseto_tsquery</code>, <code>websearch_to_tsquery</code>, <code>ts_rank</code>, <code>ts_rank_cd</code>. The match operator <code>a @@ b</code> is recognised before the SQL reaches the planner and lowered to <code>tsmatch(a, b)</code> — no driver-side transformation needed.</p>
+<h2 id="create-index-using-fts">CREATE INDEX … USING fts</h2>
+<p>A single DDL line creates the per-shard inverted index. Configuration sits in the standard <code>WITH</code> clause:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">body</span><span class="w"> </span><span class="nb">TEXT</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1">-- English: the default Lucene Standard analyzer.</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_body</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">articles</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="k">USING</span><span class="w"> </span><span class="n">fts</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">);</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1">-- Korean: Lucene&#39;s official Nori morphological analyzer.</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_body_ko</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">articles</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="k">USING</span><span class="w"> </span><span class="n">fts</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">lang</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;korean&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>Supported <code>lang</code> values include <code>english</code> (default), <code>simple</code>, and <code>korean</code>. Adding a new language is one analyzer wiring — the rest of the path is language-agnostic.</p>
+<h3 id="primary-key-requirement">Primary Key Requirement</h3>
+<p>Like HNSW, FTS addresses documents by a numeric primary key (<code>INT</code>, <code>BIGINT</code>, or <code>SMALLINT</code>). This keeps a search hit round-tripping straight back to the row store via PK lookup — no secondary <code>id → pk</code> map.</p>
+<h2 id="querying-and-ts_rank">Querying — <code>@@</code> and <code>ts_rank</code></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Simple match — boolean filter only.</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">body</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="s1">&#39;machine learning&#39;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">-- Ranked retrieval — the planner recognises this shape and routes it</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1">-- through the per-shard FTS scatter-gather, returning the global top-K</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1">-- by BM25 score.</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;machine learning&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">score</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="s1">&#39;machine learning&#39;</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>Lucene query syntax is accepted in the right operand: plain words, <code>AND</code> / <code>OR</code> / <code>NOT</code>, <code>"quoted phrases"</code>, <code>field:term</code>, and <code>+required</code> / <code>-excluded</code> prefixes.</p>
+<h2 id="distributed-bm25-across-shards">Distributed BM25 Across Shards</h2>
+<p>A FTS-indexed table has <strong>one Lucene index per shard</strong>. On a top-K query, the Coordinator scatters an <code>FTS_SEARCH_REQ</code> to each shard owner; every Data Node runs its local Lucene search, applies <code>WHERE</code> pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25.</p>
+<p>NeorunBase uses <strong>shard-local BM25</strong> scoring by default — each shard scores against its own document frequency. This matches OpenSearch's default <code>query_then_fetch</code> mode and trades a small recall hit on heavily-skewed data distributions for one fewer network round-trip. A future <code>dfs_query_then_fetch</code> mode (coordinator collects global df first, then re-scores) is on the roadmap; the wire protocol leaves room for it without breaking changes.</p>
+<h2 id="hybrid-retrieval-bm25-vector-in-one-sql">Hybrid Retrieval — BM25 + Vector in One SQL</h2>
+<p>Because vector search and full-text search are both first-class operations on the same table, hybrid retrieval is just an arithmetic blend in the SELECT:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="n">text_score</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="w">                  </span><span class="k">AS</span><span class="w"> </span><span class="n">vec_distance</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="c1">-- α=0.4 BM25 + β=0.6 vector similarity (1 / (1 + distance))</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="p">)))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">rank</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">tenants</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">tenant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">tenant_id</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">)</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">rank</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>This single statement enforces tenant isolation (<code>JOIN</code> + <code>WHERE</code>), restricts via BM25 (<code>@@</code>), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.</p>
+<h2 id="storage-layout-encrypted-sidecar">Storage Layout — Encrypted Sidecar</h2>
+<p>A Lucene index can't live efficiently inside RocksDB (per-segment file format, frequent random reads). NeorunBase stores each shard's Lucene directory as an <strong>encrypted sidecar</strong> in the shard's <code>sidecars/</code> directory — the same pattern used by HNSW.</p>
+<ul>
+<li>Chunked envelope encryption with per-chunk IV + GCM tag.</li>
+<li>KMS-wrapped Data Encryption Key per sidecar, isolated from the shard's primary DEK.</li>
+<li>On shard open, the sidecar is decrypted into an in-memory Lucene <code>ByteBuffersDirectory</code>.</li>
+<li>Atomic replacement on rebuild follows the standard <code>*.tmp → fsync → rename</code> flow.</li>
+</ul>
+<p>The same mechanics that protect at-rest row data therefore protect the inverted index.</p>
+<h2 id="freshness-flush-and-backup-safety">Freshness, Flush, and Backup Safety</h2>
+<p>Rewriting the sidecar on every row mutation would be ruinous, so NeorunBase keeps the authoritative Lucene state in memory at runtime and flushes back to disk on a schedule.</p>
+<ul>
+<li><strong>Incremental writes</strong> — every INSERT updates the in-memory index as part of regular DML.</li>
+<li><strong>Periodic flush</strong> — <code>FtsFlushScheduler</code> writes dirty sidecars back at a configurable interval (<code>neorunbase.fts.flush.interval.seconds</code>, default 30 s).</li>
+<li><strong>Flush on shard close</strong> — the close path persists every cached entry so a graceful shutdown never loses recent writes.</li>
+<li><strong>Pre-backup flush hook</strong> — every <code>BACKUP_RUN_REQ</code> triggers an explicit <code>flushTick()</code> on the Data Node before the shard tree is uploaded, so the backup captures the live in-memory state, not yesterday's snapshot.</li>
+</ul>
+<p>The result: a backup taken seconds after an INSERT contains that INSERT.</p>
+<h2 id="observability">Observability</h2>
+<p>The same Codahale / Prometheus pipeline used elsewhere in NeorunBase. The admin endpoint <code>GET /admin/fts/status</code> (mirrors <code>/admin/ann/status</code>) returns one row per cached <code>(shard, index)</code> with size, dirty flag, pending WAL seqno, and last flushed seqno.</p>
+<h2 id="current-limitations">Current Limitations</h2>
+<ul>
+<li><strong>MVP is INSERT-only</strong> — UPDATE / DELETE on FTS-indexed tables update the row store but don't tombstone in Lucene yet. Append-only workloads (logs, articles, knowledge bases) are unaffected; row-mutation-heavy schemas should wait for the tombstone follow-up.</li>
+<li><strong>Shard-local BM25</strong> — see the "Distributed BM25" section. Adequate for evenly-distributed data; less precise on heavily skewed shards. <code>dfs_query_then_fetch</code> mode is on the roadmap.</li>
+<li><strong>No phrase positions in scoring</strong> — <code>"quoted phrase"</code> matching works (positional postings are written) but proximity-aware scoring is left to a follow-up.</li>
+</ul>
+<h2 id="compatibility-notes">Compatibility Notes</h2>
+<ul>
+<li><strong>PostgreSQL FTS shape</strong> — <code>tsvector</code> / <code>tsquery</code> types, <code>@@</code> operator, <code>ts_rank</code> family, <code>to_tsvector(config, text)</code> with a per-language <code>config</code> argument. Standard pg JDBC / psycopg / ORM clients see them as native.</li>
+<li><strong>Lucene 9.11</strong> — analyzer + index format. The Nori artifact (<code>lucene-analysis-nori</code>) bundles <code>mecab-ko-dic</code>, so Korean tokenisation works out of the box without external dictionary install.</li>
+<li><strong>CREATE INDEX … USING fts</strong> — internal name. Existing PostgreSQL DDL with <code>USING gin (col tsvector_ops)</code> aliases to the same FTS index path on the roadmap.</li>
+</ul>
 
 
 
