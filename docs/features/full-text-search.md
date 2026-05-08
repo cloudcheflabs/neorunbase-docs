@@ -111,6 +111,35 @@ SELECT id FROM articles WHERE body @@ 'spring';   -- → id 2
 SELECT id FROM articles WHERE body @@ '사용자';   -- → id 2
 ```
 
+### Supported Languages
+
+The bundled analyzers cover the languages listed below. Each name is recognised in long form and as the ISO 639-1 / locale code (e.g. `'korean'`, `'ko'`, `'ko_kr'`).
+
+| Group | Languages |
+|---|---|
+| **CJK morphology** | Korean (Nori), Japanese (Kuromoji), Chinese (SmartCN), generic CJK bigram |
+| **Major European** | English, French, German, Spanish, Italian, Portuguese (incl. Brazilian), Dutch, Russian |
+| **Northern / Eastern European** | Norwegian, Swedish, Danish, Finnish, Latvian, Lithuanian, Czech, Polish (Czech-style fallback), Hungarian, Romanian, Bulgarian, Greek, Galician, Catalan, Basque, Irish, Armenian |
+| **Middle East / South Asia** | Arabic, Persian, Turkish, Hindi, Bengali, Thai, Indonesian |
+
+Each comes with the appropriate stemmer / lemmatiser and stopword list bundled by Apache Lucene — no external dictionary install is required at runtime.
+
+```sql
+-- Japanese — Kuromoji (IPADIC dictionary).
+CREATE INDEX idx_body_ja ON articles USING fts (body) WITH (lang='japanese');
+
+-- Chinese — Smart Chinese (HMM segmenter).
+CREATE INDEX idx_body_zh ON articles USING fts (body) WITH (lang='chinese');
+
+-- German — Snowball stemmer + lower-casing.
+CREATE INDEX idx_body_de ON articles USING fts (body) WITH (lang='german');
+
+-- Arabic — handles RTL + Arabic-specific stopwords.
+CREATE INDEX idx_body_ar ON articles USING fts (body) WITH (lang='arabic');
+```
+
+If `lang` names a configuration the server doesn't know, NeorunBase falls back to the standard analyzer rather than refusing the DDL — same as PostgreSQL's `default_text_search_config` fallback.
+
 ### Default Is English
 
 When `lang` is omitted, the index uses Lucene's `StandardAnalyzer` (English-style tokenisation, lower-casing, light stop words). This matches PostgreSQL's behaviour where `default_text_search_config` is `english` out of the box. For Korean-language content, declare `WITH (lang='korean')` explicitly — the cost of running Nori on a row that happens to be all English is negligible, but the cost of running the English Standard analyzer over Korean text is loss of meaningful tokenisation (no particle decomposition, no compound splitting).
