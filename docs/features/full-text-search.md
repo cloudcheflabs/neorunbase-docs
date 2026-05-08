@@ -185,27 +185,80 @@ LIMIT 10;
 
 This single statement enforces tenant isolation (`JOIN` + `WHERE`), restricts via BM25 (`@@`), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.
 
-## Storage Layout — Encrypted Sidecar
+## Storage Layout — Per-Segment KMS Envelope on Disk
 
-A Lucene index can't live efficiently inside RocksDB (per-segment file format, frequent random reads). NeorunBase stores each shard's Lucene directory as an **encrypted sidecar** in the shard's `sidecars/` directory — the same pattern used by HNSW.
+A Lucene index can't live efficiently inside RocksDB (per-segment file format, hundreds of random hops per query). NeorunBase stores each shard's Lucene index as a tree of **independently KMS-enveloped segment files** under `<shardDir>/sidecars/fts/<index>/`. The unit of encryption is one Lucene file (segment / commit pointer / metadata), not the whole index — so the index can grow to disk capacity while only the hot working set is materialised in heap.
 
-- Chunked envelope encryption with per-chunk IV + GCM tag.
-- KMS-wrapped Data Encryption Key per sidecar, isolated from the shard's primary DEK.
-- On shard open, the sidecar is decrypted into an in-memory Lucene `ByteBuffersDirectory`.
-- Atomic replacement on rebuild follows the standard `*.tmp → fsync → rename` flow.
+```
+shard-N/
+└── sidecars/
+    └── fts/
+        ├── public.articles.idx_body/
+        │   ├── _0.cfe          ← encrypted Lucene segment (chunked AES-GCM,
+        │   ├── _0.cfs              per-file KMS-wrapped DEK in the header)
+        │   ├── _0.si
+        │   ├── _1.cfe
+        │   ├── …
+        │   └── segments_3      ← encrypted commit pointer
+        └── public.articles.idx_title/
+            └── …
+```
 
-The same mechanics that protect at-rest row data therefore protect the inverted index.
+Each file's header carries a fresh AES-256 DEK wrapped by the shard's KMS key. Disk content is therefore always ciphertext; the OS page cache never sees plaintext index pages.
+
+### Why per-segment, not per-page
+
+Two boundary points were rejected on the way to this design:
+
+1. **Whole-index in JVM heap** (the prior MVP) — strong envelope, but the index size ceiling is node RAM. Doesn't scale to PB.
+2. **Standard `MMapDirectory` + OS-level disk encryption (LUKS / EBS)** — Elasticsearch's path. PB scale, but the OS page cache holds plaintext. NeorunBase's "every byte at rest is wrapped by KMS" invariant doesn't hold strictly.
+3. **Per-segment KMS envelope + bounded plaintext LRU** — the chosen path. Snowflake / Databricks micro-partition pattern adapted for Lucene segments. Disk encrypted, hot working set fast, KMS calls scale with file count (segments) not query rate.
+
+### Plaintext LRU cache
+
+A `EncryptedSegmentDirectory` opens with a configurable cap (`neorunbase.fts.plaintext.cache.bytes`, default 256 MiB **per FTS index**). On first access a segment is decrypted in full and pinned in the cache; subsequent reads are memory-speed. When the cap is reached, the oldest segment plaintext is evicted — a future read on the same segment re-decrypts it.
+
+| Access pattern | Latency |
+|---|---|
+| Hot segment (in cache) | memory speed — same as the prior MVP |
+| Cold segment (first hit after eviction) | one decrypt round-trip, ~100 MB/s on commodity AES-GCM hardware |
+| Index-time write | encrypt-on-close; KMS wrap once per new segment |
+
+### Why this scales
+
+KMS interactions are bounded by **file count**, not query rate:
+
+- Segment write: 1 KMS `wrapDek` call.
+- Segment first read: 1 KMS `unwrapDek` call.
+- Subsequent reads of the same segment: 0 KMS calls (plaintext cached).
+- Page faults inside a hot segment: 0 KMS calls.
+
+A 1 TB index with ~10 000 segments produces ~10 000 KMS wrap calls over the lifetime of the index. That's noise compared to the per-INSERT row-encryption traffic the cluster already handles.
+
+### Configuration
+
+```
+# Per-FTS-index plaintext cache cap. Hot working set fits in RAM, cold
+# segments stay encrypted on disk and decrypt on demand.
+neorunbase.fts.plaintext.cache.bytes=268435456    # 256 MiB
+
+# AES-GCM chunk size inside each encrypted segment file. Larger chunks
+# reduce per-tag overhead; smaller chunks cap the per-decrypt memory window.
+neorunbase.fts.chunk.size.bytes=1048576           # 1 MiB
+
+# Reserved for the rare case an operator wants the prior all-in-heap path.
+# Default `encrypted_disk` is what production should use.
+neorunbase.fts.storage.default=encrypted_disk
+```
 
 ## Freshness, Flush, and Backup Safety
 
-Rewriting the sidecar on every row mutation would be ruinous, so NeorunBase keeps the authoritative Lucene state in memory at runtime and flushes back to disk on a schedule.
+The encrypted-disk model removes the prior in-memory authoritative state — Lucene segments hit disk on every commit, already encrypted. There is no "dirty in-heap" window to flush.
 
-- **Incremental writes** — every INSERT updates the in-memory index as part of regular DML.
-- **Periodic flush** — `FtsFlushScheduler` writes dirty sidecars back at a configurable interval (`neorunbase.fts.flush.interval.seconds`, default 30 s).
-- **Flush on shard close** — the close path persists every cached entry so a graceful shutdown never loses recent writes.
-- **Pre-backup flush hook** — every `BACKUP_RUN_REQ` triggers an explicit `flushTick()` on the Data Node before the shard tree is uploaded, so the backup captures the live in-memory state, not yesterday's snapshot.
-
-The result: a backup taken seconds after an INSERT contains that INSERT.
+- **Incremental writes** — every INSERT goes through `IndexWriter.addDocument`. Lucene's standard segment lifecycle picks them up; small flushes happen automatically as the in-progress segment fills.
+- **Periodic commit** — `FtsFlushScheduler` issues a Lucene `commit()` at a configurable interval (`neorunbase.fts.flush.interval.seconds`, default 30 s) so a search opened by a fresh DirectoryReader picks up recently-inserted docs.
+- **Commit on shard close** — the close path commits any pending writes so a graceful shutdown never loses uncommitted documents.
+- **Backup safety** — encrypted segment files on disk are the canonical state. Backups copy them as-is; no re-encrypt step. A backup taken seconds after an INSERT contains that INSERT once the next commit fires (worst case 30 s).
 
 ## Observability
 
