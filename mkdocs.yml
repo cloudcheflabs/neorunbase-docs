@@ -51,6 +51,7 @@ nav:
       - "Kafka Integration": features/kafka-integration.md
       - "Vector Database": features/vector-database.md
       - "Full-Text Search": features/full-text-search.md
+      - "Graph Traversal": features/graph.md
       - "Geospatial Support": features/geospatial.md
       - "Identity and Access Management": features/iam.md
       - "Admin UI": features/admin-ui.md
