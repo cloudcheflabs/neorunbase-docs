@@ -73,6 +73,61 @@ LIMIT 10;
 
 Lucene query syntax is accepted in the right operand: plain words, `AND` / `OR` / `NOT`, `"quoted phrases"`, `field:term`, and `+required` / `-excluded` prefixes.
 
+## Analyzer Lifecycle — Index-Time and Query-Time
+
+The analyzer chosen at `CREATE INDEX` time is **baked into that index** and applied uniformly afterwards:
+
+1. At `CREATE INDEX … WITH (lang='korean')`, the chosen `lang` is recorded in the index definition and travels alongside every shard's sidecar.
+2. Every subsequent `INSERT` that reaches a shard goes through `FtsIndexMaintenance.onInsert`, which loads the same analyzer for that index and tokenises the new document with it before adding to the per-shard Lucene index.
+3. Every `WHERE col @@ q` query on that index parses the right-hand expression through the **same analyzer**. Index-time and query-time tokens always agree by construction — there is no way to mismatch them by accident.
+
+That's why the `lang` choice flows in the index DDL rather than per-INSERT: keeping it on the index means a single decision at CREATE time governs both writes and reads.
+
+### What That Means in Practice
+
+The analyzer doesn't language-detect. A Korean-configured index runs the **Nori morphological analyzer on every input it sees**, whether the text is Korean, English, or mixed:
+
+```sql
+-- Korean-configured index over a TEXT column.
+CREATE INDEX idx_body_ko
+  ON articles
+  USING fts (body)
+  WITH (lang='korean');
+
+-- Korean with a particle (조사) attached. Nori decomposes it.
+INSERT INTO articles VALUES (1, '한국어는 어렵습니다');
+
+-- Bare noun query — matches because Nori split '한국어는' → '한국어' + '는'
+-- on the way in, and lower-cased '한국어' on the query side too.
+SELECT id FROM articles WHERE body @@ '한국어';
+-- → id 1
+
+-- Mixed Korean + English: Nori still tokenises Korean morphemes and
+-- lower-cases the English half. One analyzer, both languages.
+INSERT INTO articles VALUES (2, 'Spring Boot 한국 사용자 모임');
+
+-- Either side matches the same row.
+SELECT id FROM articles WHERE body @@ 'spring';   -- → id 2
+SELECT id FROM articles WHERE body @@ '사용자';   -- → id 2
+```
+
+### Default Is English
+
+When `lang` is omitted, the index uses Lucene's `StandardAnalyzer` (English-style tokenisation, lower-casing, light stop words). This matches PostgreSQL's behaviour where `default_text_search_config` is `english` out of the box. For Korean-language content, declare `WITH (lang='korean')` explicitly — the cost of running Nori on a row that happens to be all English is negligible, but the cost of running the English Standard analyzer over Korean text is loss of meaningful tokenisation (no particle decomposition, no compound splitting).
+
+A typical Korean schema:
+
+```sql
+CREATE TABLE products (
+    id          BIGINT PRIMARY KEY,
+    title       TEXT,
+    description TEXT
+) SHARD KEY (id) SHARDS 16;
+
+CREATE INDEX idx_title_ko ON products USING fts (title)       WITH (lang='korean');
+CREATE INDEX idx_desc_ko  ON products USING fts (description) WITH (lang='korean');
+```
+
 ## Distributed BM25 Across Shards
 
 A FTS-indexed table has **one Lucene index per shard**. On a top-K query, the Coordinator scatters an `FTS_SEARCH_REQ` to each shard owner; every Data Node runs its local Lucene search, applies `WHERE` pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25.
