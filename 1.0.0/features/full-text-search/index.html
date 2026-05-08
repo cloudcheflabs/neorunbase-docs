@@ -1087,6 +1087,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#analyzer-lifecycle-index-time-and-query-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyzer Lifecycle — Index-Time and Query-Time
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzer Lifecycle — Index-Time and Query-Time">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-that-means-in-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What That Means in Practice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-is-english" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Is English
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#distributed-bm25-across-shards" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1510,24 +1549,68 @@
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <p>Lucene query syntax is accepted in the right operand: plain words, <code>AND</code> / <code>OR</code> / <code>NOT</code>, <code>"quoted phrases"</code>, <code>field:term</code>, and <code>+required</code> / <code>-excluded</code> prefixes.</p>
+<h2 id="analyzer-lifecycle-index-time-and-query-time">Analyzer Lifecycle — Index-Time and Query-Time</h2>
+<p>The analyzer chosen at <code>CREATE INDEX</code> time is <strong>baked into that index</strong> and applied uniformly afterwards:</p>
+<ol>
+<li>At <code>CREATE INDEX … WITH (lang='korean')</code>, the chosen <code>lang</code> is recorded in the index definition and travels alongside every shard's sidecar.</li>
+<li>Every subsequent <code>INSERT</code> that reaches a shard goes through <code>FtsIndexMaintenance.onInsert</code>, which loads the same analyzer for that index and tokenises the new document with it before adding to the per-shard Lucene index.</li>
+<li>Every <code>WHERE col @@ q</code> query on that index parses the right-hand expression through the <strong>same analyzer</strong>. Index-time and query-time tokens always agree by construction — there is no way to mismatch them by accident.</li>
+</ol>
+<p>That's why the <code>lang</code> choice flows in the index DDL rather than per-INSERT: keeping it on the index means a single decision at CREATE time governs both writes and reads.</p>
+<h3 id="what-that-means-in-practice">What That Means in Practice</h3>
+<p>The analyzer doesn't language-detect. A Korean-configured index runs the <strong>Nori morphological analyzer on every input it sees</strong>, whether the text is Korean, English, or mixed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Korean-configured index over a TEXT column.</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_body_ko</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">articles</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="k">USING</span><span class="w"> </span><span class="n">fts</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;korean&#39;</span><span class="p">);</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">-- Korean with a particle (조사) attached. Nori decomposes it.</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;한국어는 어렵습니다&#39;</span><span class="p">);</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1">-- Bare noun query — matches because Nori split &#39;한국어는&#39; → &#39;한국어&#39; + &#39;는&#39;</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">-- on the way in, and lower-cased &#39;한국어&#39; on the query side too.</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="s1">&#39;한국어&#39;</span><span class="p">;</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="c1">-- → id 1</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1">-- Mixed Korean + English: Nori still tokenises Korean morphemes and</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="c1">-- lower-cases the English half. One analyzer, both languages.</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Spring Boot 한국 사용자 모임&#39;</span><span class="p">);</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="c1">-- Either side matches the same row.</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="s1">&#39;spring&#39;</span><span class="p">;</span><span class="w">   </span><span class="c1">-- → id 2</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">articles</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="s1">&#39;사용자&#39;</span><span class="p">;</span><span class="w">   </span><span class="c1">-- → id 2</span>
+</code></pre></div>
+<h3 id="default-is-english">Default Is English</h3>
+<p>When <code>lang</code> is omitted, the index uses Lucene's <code>StandardAnalyzer</code> (English-style tokenisation, lower-casing, light stop words). This matches PostgreSQL's behaviour where <code>default_text_search_config</code> is <code>english</code> out of the box. For Korean-language content, declare <code>WITH (lang='korean')</code> explicitly — the cost of running Nori on a row that happens to be all English is negligible, but the cost of running the English Standard analyzer over Korean text is loss of meaningful tokenisation (no particle decomposition, no compound splitting).</p>
+<p>A typical Korean schema:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">title</span><span class="w">       </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_title_ko</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">fts</span><span class="w"> </span><span class="p">(</span><span class="n">title</span><span class="p">)</span><span class="w">       </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;korean&#39;</span><span class="p">);</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_desc_ko</span><span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">fts</span><span class="w"> </span><span class="p">(</span><span class="n">description</span><span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;korean&#39;</span><span class="p">);</span>
+</code></pre></div>
 <h2 id="distributed-bm25-across-shards">Distributed BM25 Across Shards</h2>
 <p>A FTS-indexed table has <strong>one Lucene index per shard</strong>. On a top-K query, the Coordinator scatters an <code>FTS_SEARCH_REQ</code> to each shard owner; every Data Node runs its local Lucene search, applies <code>WHERE</code> pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25.</p>
 <p>NeorunBase uses <strong>shard-local BM25</strong> scoring by default — each shard scores against its own document frequency. This matches OpenSearch's default <code>query_then_fetch</code> mode and trades a small recall hit on heavily-skewed data distributions for one fewer network round-trip. A future <code>dfs_query_then_fetch</code> mode (coordinator collects global df first, then re-scores) is on the roadmap; the wire protocol leaves room for it without breaking changes.</p>
 <h2 id="hybrid-retrieval-bm25-vector-in-one-sql">Hybrid Retrieval — BM25 + Vector in One SQL</h2>
 <p>Because vector search and full-text search are both first-class operations on the same table, hybrid retrieval is just an arithmetic blend in the SELECT:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="n">text_score</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="w">                  </span><span class="k">AS</span><span class="w"> </span><span class="n">vec_distance</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="c1">-- α=0.4 BM25 + β=0.6 vector similarity (1 / (1 + distance))</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="p">)))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">rank</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">tenants</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">tenant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">tenant_id</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">)</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">rank</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w">    </span><span class="k">AS</span><span class="w"> </span><span class="n">text_score</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="w">                  </span><span class="k">AS</span><span class="w"> </span><span class="n">vec_distance</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="c1">-- α=0.4 BM25 + β=0.6 vector similarity (1 / (1 + distance))</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">      </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">query_embedding</span><span class="p">)))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">rank</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">tenants</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">tenant_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">tenant_id</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">)</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">rank</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <p>This single statement enforces tenant isolation (<code>JOIN</code> + <code>WHERE</code>), restricts via BM25 (<code>@@</code>), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.</p>
 <h2 id="storage-layout-encrypted-sidecar">Storage Layout — Encrypted Sidecar</h2>
