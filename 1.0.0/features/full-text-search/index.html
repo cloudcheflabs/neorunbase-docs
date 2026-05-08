@@ -1159,13 +1159,63 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#storage-layout-encrypted-sidecar" class="md-nav__link">
+  <a href="#storage-layout-per-segment-kms-envelope-on-disk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Layout — Encrypted Sidecar
+        Storage Layout — Per-Segment KMS Envelope on Disk
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Storage Layout — Per-Segment KMS Envelope on Disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-per-segment-not-per-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why per-segment, not per-page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plaintext-lru-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plaintext LRU cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1666,24 +1716,83 @@
 <a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <p>This single statement enforces tenant isolation (<code>JOIN</code> + <code>WHERE</code>), restricts via BM25 (<code>@@</code>), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.</p>
-<h2 id="storage-layout-encrypted-sidecar">Storage Layout — Encrypted Sidecar</h2>
-<p>A Lucene index can't live efficiently inside RocksDB (per-segment file format, frequent random reads). NeorunBase stores each shard's Lucene directory as an <strong>encrypted sidecar</strong> in the shard's <code>sidecars/</code> directory — the same pattern used by HNSW.</p>
+<h2 id="storage-layout-per-segment-kms-envelope-on-disk">Storage Layout — Per-Segment KMS Envelope on Disk</h2>
+<p>A Lucene index can't live efficiently inside RocksDB (per-segment file format, hundreds of random hops per query). NeorunBase stores each shard's Lucene index as a tree of <strong>independently KMS-enveloped segment files</strong> under <code>&lt;shardDir&gt;/sidecars/fts/&lt;index&gt;/</code>. The unit of encryption is one Lucene file (segment / commit pointer / metadata), not the whole index — so the index can grow to disk capacity while only the hot working set is materialised in heap.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>shard-N/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>└── sidecars/
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    └── fts/
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        ├── public.articles.idx_body/
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        │   ├── _0.cfe          ← encrypted Lucene segment (chunked AES-GCM,
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        │   ├── _0.cfs              per-file KMS-wrapped DEK in the header)
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        │   ├── _0.si
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        │   ├── _1.cfe
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        │   ├── …
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        │   └── segments_3      ← encrypted commit pointer
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>        └── public.articles.idx_title/
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            └── …
+</code></pre></div>
+<p>Each file's header carries a fresh AES-256 DEK wrapped by the shard's KMS key. Disk content is therefore always ciphertext; the OS page cache never sees plaintext index pages.</p>
+<h3 id="why-per-segment-not-per-page">Why per-segment, not per-page</h3>
+<p>Two boundary points were rejected on the way to this design:</p>
+<ol>
+<li><strong>Whole-index in JVM heap</strong> (the prior MVP) — strong envelope, but the index size ceiling is node RAM. Doesn't scale to PB.</li>
+<li><strong>Standard <code>MMapDirectory</code> + OS-level disk encryption (LUKS / EBS)</strong> — Elasticsearch's path. PB scale, but the OS page cache holds plaintext. NeorunBase's "every byte at rest is wrapped by KMS" invariant doesn't hold strictly.</li>
+<li><strong>Per-segment KMS envelope + bounded plaintext LRU</strong> — the chosen path. Snowflake / Databricks micro-partition pattern adapted for Lucene segments. Disk encrypted, hot working set fast, KMS calls scale with file count (segments) not query rate.</li>
+</ol>
+<h3 id="plaintext-lru-cache">Plaintext LRU cache</h3>
+<p>A <code>EncryptedSegmentDirectory</code> opens with a configurable cap (<code>neorunbase.fts.plaintext.cache.bytes</code>, default 256 MiB <strong>per FTS index</strong>). On first access a segment is decrypted in full and pinned in the cache; subsequent reads are memory-speed. When the cap is reached, the oldest segment plaintext is evicted — a future read on the same segment re-decrypts it.</p>
+<table>
+<thead>
+<tr>
+<th>Access pattern</th>
+<th>Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hot segment (in cache)</td>
+<td>memory speed — same as the prior MVP</td>
+</tr>
+<tr>
+<td>Cold segment (first hit after eviction)</td>
+<td>one decrypt round-trip, ~100 MB/s on commodity AES-GCM hardware</td>
+</tr>
+<tr>
+<td>Index-time write</td>
+<td>encrypt-on-close; KMS wrap once per new segment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-this-scales">Why this scales</h3>
+<p>KMS interactions are bounded by <strong>file count</strong>, not query rate:</p>
 <ul>
-<li>Chunked envelope encryption with per-chunk IV + GCM tag.</li>
-<li>KMS-wrapped Data Encryption Key per sidecar, isolated from the shard's primary DEK.</li>
-<li>On shard open, the sidecar is decrypted into an in-memory Lucene <code>ByteBuffersDirectory</code>.</li>
-<li>Atomic replacement on rebuild follows the standard <code>*.tmp → fsync → rename</code> flow.</li>
+<li>Segment write: 1 KMS <code>wrapDek</code> call.</li>
+<li>Segment first read: 1 KMS <code>unwrapDek</code> call.</li>
+<li>Subsequent reads of the same segment: 0 KMS calls (plaintext cached).</li>
+<li>Page faults inside a hot segment: 0 KMS calls.</li>
 </ul>
-<p>The same mechanics that protect at-rest row data therefore protect the inverted index.</p>
+<p>A 1 TB index with ~10 000 segments produces ~10 000 KMS wrap calls over the lifetime of the index. That's noise compared to the per-INSERT row-encryption traffic the cluster already handles.</p>
+<h3 id="configuration">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Per-FTS-index plaintext cache cap. Hot working set fits in RAM, cold
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a># segments stay encrypted on disk and decrypt on demand.
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>neorunbase.fts.plaintext.cache.bytes=268435456    # 256 MiB
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a># AES-GCM chunk size inside each encrypted segment file. Larger chunks
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a># reduce per-tag overhead; smaller chunks cap the per-decrypt memory window.
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>neorunbase.fts.chunk.size.bytes=1048576           # 1 MiB
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a># Reserved for the rare case an operator wants the prior all-in-heap path.
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a># Default `encrypted_disk` is what production should use.
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>neorunbase.fts.storage.default=encrypted_disk
+</code></pre></div>
 <h2 id="freshness-flush-and-backup-safety">Freshness, Flush, and Backup Safety</h2>
-<p>Rewriting the sidecar on every row mutation would be ruinous, so NeorunBase keeps the authoritative Lucene state in memory at runtime and flushes back to disk on a schedule.</p>
+<p>The encrypted-disk model removes the prior in-memory authoritative state — Lucene segments hit disk on every commit, already encrypted. There is no "dirty in-heap" window to flush.</p>
 <ul>
-<li><strong>Incremental writes</strong> — every INSERT updates the in-memory index as part of regular DML.</li>
-<li><strong>Periodic flush</strong> — <code>FtsFlushScheduler</code> writes dirty sidecars back at a configurable interval (<code>neorunbase.fts.flush.interval.seconds</code>, default 30 s).</li>
-<li><strong>Flush on shard close</strong> — the close path persists every cached entry so a graceful shutdown never loses recent writes.</li>
-<li><strong>Pre-backup flush hook</strong> — every <code>BACKUP_RUN_REQ</code> triggers an explicit <code>flushTick()</code> on the Data Node before the shard tree is uploaded, so the backup captures the live in-memory state, not yesterday's snapshot.</li>
+<li><strong>Incremental writes</strong> — every INSERT goes through <code>IndexWriter.addDocument</code>. Lucene's standard segment lifecycle picks them up; small flushes happen automatically as the in-progress segment fills.</li>
+<li><strong>Periodic commit</strong> — <code>FtsFlushScheduler</code> issues a Lucene <code>commit()</code> at a configurable interval (<code>neorunbase.fts.flush.interval.seconds</code>, default 30 s) so a search opened by a fresh DirectoryReader picks up recently-inserted docs.</li>
+<li><strong>Commit on shard close</strong> — the close path commits any pending writes so a graceful shutdown never loses uncommitted documents.</li>
+<li><strong>Backup safety</strong> — encrypted segment files on disk are the canonical state. Backups copy them as-is; no re-encrypt step. A backup taken seconds after an INSERT contains that INSERT once the next commit fires (worst case 30 s).</li>
 </ul>
-<p>The result: a backup taken seconds after an INSERT contains that INSERT.</p>
 <h2 id="observability">Observability</h2>
 <p>The same Codahale / Prometheus pipeline used elsewhere in NeorunBase. The admin endpoint <code>GET /admin/fts/status</code> (mirrors <code>/admin/ann/status</code>) returns one row per cached <code>(shard, index)</code> with size, dirty flag, pending WAL seqno, and last flushed seqno.</p>
 <h2 id="current-limitations">Current Limitations</h2>
