@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/graph/">
       
       
-        <link rel="prev" href="../full-text-search/">
+        <link rel="prev" href="../hybrid-search/">
       
       
         <link rel="next" href="../geospatial/">
@@ -25,7 +25,7 @@
     
     
       
-        <title>Graph Traversal - NeorunBase</title>
+        <title>Graph Traversal & Analytics - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#graph-traversal" class="md-skip">
+        <a href="#graph-traversal-analytics" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Graph Traversal
+              Graph Traversal & Analytics
             
           </span>
         </div>
@@ -991,6 +991,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1010,7 +1038,7 @@
   <span class="md-ellipsis">
     
   
-    Graph Traversal
+    Graph Traversal & Analytics
   
 
     
@@ -1028,7 +1056,7 @@
   <span class="md-ellipsis">
     
   
-    Graph Traversal
+    Graph Traversal & Analytics
   
 
     
@@ -1087,10 +1115,110 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-runs" class="md-nav__link">
+  <a href="#csr-adjacency-phase-1-acceleration-layer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How It Runs
+        CSR Adjacency — Phase 1 Acceleration Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSR Adjacency — Phase 1 Acceleration Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enabling-csr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling CSR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speedup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-a-csr-accelerated-hop-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How a CSR-Accelerated Hop Runs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagerank-personalized_pagerank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PAGERANK / PERSONALIZED_PAGERANK
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PAGERANK / PERSONALIZED_PAGERANK">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weighted-edges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weighted Edges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#centralised-vs-distributed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Centralised vs. Distributed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph_path_exists-rig-fact-check-primitive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GRAPH_PATH_EXISTS — RIG Fact-Check Primitive
       
     </span>
   </a>
@@ -1165,10 +1293,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-re-ranking-by-ontology-distance" class="md-nav__link">
+  <a href="#2-re-ranking-by-personalised-pagerank" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Re-ranking by ontology distance
+        2. Re-ranking by Personalised PageRank
       
     </span>
   </a>
@@ -1493,23 +1621,24 @@
 
 
 
-<h1 id="graph-traversal">Graph Traversal</h1>
-<p>NeorunBase exposes graph queries — neighbour expansion over a relational edge table — as a first-class part of the engine, so ontology, knowledge-graph, and agent-retrieval workloads compose naturally with BM25 search, vector ANN, and the rest of the relational planner. There is no separate Neo4j or Apache AGE process; an existing edge table answers graph questions from the same SQL surface.</p>
+<h1 id="graph-traversal-analytics">Graph Traversal &amp; Analytics</h1>
+<p>NeorunBase exposes graph queries — neighbour expansion, PageRank, reachability fact-checks, and weighted re-ranking — as first-class parts of the engine, so ontology, knowledge-graph, and Graph-RAG workloads compose naturally with BM25 search, vector ANN, and the rest of the relational planner. There is no separate Neo4j or Apache AGE process; an existing edge table answers graph questions from the same SQL surface.</p>
 <h2 id="why-its-built-in">Why It's Built In</h2>
-<p>Most agent / RAG stacks bolt a graph database next to their analytical store, then need an ETL pipeline to keep the two in sync and a glue layer at query time to join graph hops with vector hits. NeorunBase folds the BFS into the coordinator so:</p>
+<p>Most agent / RAG stacks bolt a graph database next to their analytical store, then need an ETL pipeline to keep the two in sync and a glue layer at query time to join graph hops with vector hits. NeorunBase folds the graph engine into the coordinator so:</p>
 <ul>
-<li><strong>One transaction</strong> writes a relation; the same row is visible to graph traversal, BM25 search, and vector ANN immediately.</li>
-<li><strong>One SQL statement</strong> can walk <code>n</code> hops out from a seed entity, JOIN the result with the entities table, filter by BM25 (<code>@@</code>) or vector similarity (<code>&lt;=&gt;</code>), and rank — no glue layer.</li>
+<li><strong>One transaction</strong> writes a relation; the same row is visible to graph traversal, BM25 search, vector ANN, and PageRank immediately.</li>
+<li><strong>One SQL statement</strong> can walk <em>n</em> hops, run PageRank, JOIN with the entities table, filter by BM25 / vector, and rank — no glue layer.</li>
 <li><strong>One operational surface</strong> — encryption, IAM, replication, and Iceberg auto-sync apply unchanged because the edge table is just a table.</li>
-<li><strong>Bounded blast radius</strong> — every traversal carries explicit <code>max_depth</code> and <code>max_results</code>; the coordinator can't be hung by a hub node.</li>
+<li><strong>Bounded blast radius</strong> — every traversal carries explicit <code>max_depth</code> / <code>max_results</code>; PageRank carries <code>max_iter</code>; the coordinator can't be hung by a hub node.</li>
 </ul>
 <h2 id="edge-table-shape">Edge Table Shape</h2>
-<p>The traversal expects an edge table with three named columns:</p>
+<p>The traversal expects an edge table with three named columns; any other columns become first-class edge properties (Phase 2.1) that ride along into the CSR adjacency view and are available to weighted PageRank and downstream JOINs.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
+<th>Required</th>
 <th>Meaning</th>
 </tr>
 </thead>
@@ -1517,26 +1646,43 @@
 <tr>
 <td><code>src_id</code></td>
 <td>BIGINT</td>
-<td>source node primary key</td>
+<td>✓</td>
+<td>source node primary key (also the shard key)</td>
 </tr>
 <tr>
 <td><code>dst_id</code></td>
 <td>BIGINT</td>
+<td>✓</td>
 <td>destination node primary key</td>
 </tr>
 <tr>
 <td><code>rel_type</code></td>
 <td>TEXT</td>
-<td>optional relationship type (<code>'is_a'</code>, …)</td>
+<td>✓</td>
+<td>optional relationship type (<code>'is_a'</code>, …); per-row may be NULL when the graph is untyped</td>
+</tr>
+<tr>
+<td><code>weight</code></td>
+<td>DOUBLE</td>
+<td>optional</td>
+<td>edge weight consumed by weighted PageRank</td>
+</tr>
+<tr>
+<td><em>anything else</em></td>
+<td>any</td>
+<td>optional</td>
+<td>arbitrary property columns — encoded into the CSR neighbor block alongside <code>rel_type</code></td>
 </tr>
 </tbody>
 </table>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">relations</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">src_id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">dst_id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">rel_type</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">src_id</span><span class="p">,</span><span class="w"> </span><span class="n">dst_id</span><span class="p">,</span><span class="w"> </span><span class="n">rel_type</span><span class="p">)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">src_id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">edge_id</span><span class="w">  </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">src_id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">dst_id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">rel_type</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">weight</span><span class="w">   </span><span class="n">DOUBLE</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">valid_from</span><span class="w"> </span><span class="k">TIMESTAMP</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">src_id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
 </code></pre></div>
 <p>Sharding by <code>src_id</code> lines up with the per-hop expansion query (<code>WHERE src_id IN (…)</code>), so each hop fans out only to the shards that own the current frontier.</p>
 <h2 id="graph_neighbors-sql-table-valued-function">GRAPH_NEIGHBORS — SQL Table-Valued Function</h2>
@@ -1589,130 +1735,317 @@
 </tbody>
 </table>
 <p>Arguments are named (PostgreSQL <code>name =&gt; value</code> form). Positional calls are intentionally rejected so the call site stays readable as the schema evolves.</p>
-<h2 id="how-it-runs">How It Runs</h2>
-<p>The coordinator implements the BFS directly, one hop at a time, against the edge table:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>SELECT DISTINCT dst_id FROM &lt;edge_table&gt;
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>WHERE src_id IN (&lt;frontier&gt;)
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  [AND rel_type = &#39;&lt;edge_filter&gt;&#39;]
+<h2 id="csr-adjacency-phase-1-acceleration-layer">CSR Adjacency — Phase 1 Acceleration Layer</h2>
+<p>A naive BFS hop is <code>WHERE src_id IN (1,2,3,…)</code> — one B-tree lookup per source vertex per hop. For graphs with millions of edges this becomes the dominant cost. NeorunBase materialises a per-shard <strong>Compressed Sparse Row</strong> view of selected edge tables that turns each hop into a sequential neighbor-block read.</p>
+<h3 id="enabling-csr">Enabling CSR</h3>
+<p>CSR is opt-in per table and configured via three properties:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Master toggle.</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">neorunbase.csr.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Comma-separated list of qualified edge tables to materialize.</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="na">neorunbase.csr.enabled.tables</span><span class="o">=</span><span class="s">public.relations,public.eligibility</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Background compaction interval — rebuilds CSR from edge rows.</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="na">neorunbase.csr.compaction.interval.seconds</span><span class="o">=</span><span class="s">3600</span>
 </code></pre></div>
-<p>Each hop reuses the standard distributed planner: shard pruning, encryption, IAM checks, and metrics all apply. There is no new RPC opcode and no external graph database to operate. The <code>GRAPH_NEIGHBORS(...)</code> call is rewritten in place to <code>(VALUES (id, depth), …) AS alias(id, depth)</code> before parsing, so the rest of the query — JOIN, WHERE, ORDER BY, BM25 / vector operators — plans through NeorunBase's normal SQL pipeline.</p>
-<p>Because the result is materialised before the outer query runs, traversal cost is controlled by <code>max_depth</code> and <code>max_results</code>, not by the size of the entities table or the JOIN downstream.</p>
+<p>Enabling CSR for a table does three things:</p>
+<ol>
+<li>Creates a metadata column family <code>_csr.&lt;table&gt;</code> mapping <code>src_id</code> (8-byte BE) to a 16-byte CSR pointer.</li>
+<li>Allocates a per-(shard, table) <code>CsrSegmentManager</code> that owns encrypted segment files under <code>{shardDir}/csr/&lt;table&gt;/seg-NNNNN.nrcsr</code>. Per-segment AES-256-GCM DEKs match the heap layer's envelope encryption — at-rest protection is identical.</li>
+<li>Schedules a leader-gated background compactor that scans edge rows, groups them by <code>src_id</code>, and writes one neighbor block per source. Property columns (anything beyond <code>src_id</code>/<code>dst_id</code>/<code>rel_type</code>/PK) ride into a per-file dictionary so per-edge <code>weight</code>, <code>valid_from</code>, etc. are available to readers without a separate row lookup.</li>
+</ol>
+<h3 id="speedup">Speedup</h3>
+<p>Phase 1 microbenchmark, 100 000 edges across 10 000 source vertices, single shard, BFS-hop frontier of 100 source ids:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>p50 latency</th>
+<th>p99 latency</th>
+<th>Speedup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Row-scan (<code>WHERE src_id IN (...)</code>)</td>
+<td><strong>400 ms</strong></td>
+<td>414 ms</td>
+<td>baseline</td>
+</tr>
+<tr>
+<td>CSR pointer lookup + sequential block read</td>
+<td><strong>1.56 ms</strong></td>
+<td>11.20 ms</td>
+<td><strong>256×</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The same answer set comes back either way (951 distinct destinations) — CSR is purely an acceleration of the existing query path, falling back to row-scan when a <code>src_id</code> is not yet materialised (eg. just-inserted vertices between compaction passes).</p>
+<h3 id="admin-endpoints">Admin Endpoints</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Force a CSR rebuild — useful right after bulk-loading edges.</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">     </span>-X<span class="w"> </span>POST<span class="w"> </span>https://master:8080/admin/graph/csr/compact<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;table&quot;:&quot;public.relations&quot;}&#39;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Snapshot of CSR state across the cluster.</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">     </span>https://master:8080/admin/graph/csr/status
+</code></pre></div>
+<p>The status response lists per-(shard, table) entries with segment count, active segment id, and the number of source vertices currently materialised.</p>
+<h3 id="how-a-csr-accelerated-hop-runs">How a CSR-Accelerated Hop Runs</h3>
+<ol>
+<li>The coordinator's <code>GraphTraversalExecutor</code> checks whether the target table is on <code>csr.enabled.tables</code>. If yes, it dispatches a <code>CSR_NEIGHBORS_REQ</code> per data node holding part of the frontier (scatter-gather, same shape as ANN search).</li>
+<li>Each data node looks up <code>_csr.&lt;table&gt;[src_id]</code>, deref's the pointer through <code>CsrSegmentManager.read</code>, decrypts the neighbor block, and returns the dst-id list (and any requested property values).</li>
+<li>The coordinator merges per-node results into the next BFS frontier. <code>src_id</code> values not present in the CSR view fall back to a single row-scan, so the answer is always complete even mid-compaction.</li>
+</ol>
+<h2 id="pagerank-personalized_pagerank">PAGERANK / PERSONALIZED_PAGERANK</h2>
+<p>Two TVFs expose the relevance signal that "Graph RAG" papers usually call <em>graph-based re-ranking</em>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- Global PageRank — every node gets a rank reflecting its overall centrality.</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">node_id</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.relations&#39;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">              </span><span class="n">damping</span><span class="w">   </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">85</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">              </span><span class="n">max_iter</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">              </span><span class="n">k</span><span class="w">         </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="n">p</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">rank</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1">-- Personalized PageRank — random walk teleports to a query-specific seed.</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1">-- Use this to rank &quot;everything else by relevance to entity X&quot;.</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">rank</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PERSONALIZED_PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w">   </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.relations&#39;</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">                           </span><span class="n">seed</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">company_id</span><span class="p">,</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">                           </span><span class="n">damping</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">85</span><span class="p">,</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">                           </span><span class="n">max_iter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">                           </span><span class="n">k</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="n">p</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">entities</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">node_id</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">rank</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div>
+<p>Both functions return <code>(node_id BIGINT, rank DOUBLE)</code>. The TVF rewriter runs the algorithm at parse time and inlines the result as a derived table, so JOINs and ORDER BY downstream plan through NeorunBase's standard SQL pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Required</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>yes</td>
+<td>Fully qualified edge table</td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td>personalised only</td>
+<td>Seed node id — random walk teleports here</td>
+</tr>
+<tr>
+<td><code>damping</code></td>
+<td>no (0.85)</td>
+<td>Damping factor in (0, 1)</td>
+</tr>
+<tr>
+<td><code>max_iter</code></td>
+<td>no (20)</td>
+<td>Power-iteration cap</td>
+</tr>
+<tr>
+<td><code>epsilon</code></td>
+<td>no (1e-6)</td>
+<td>L1 convergence threshold — algorithm exits early on convergence</td>
+</tr>
+<tr>
+<td><code>k</code></td>
+<td>no (100)</td>
+<td>Top-K results returned</td>
+</tr>
+<tr>
+<td><code>weight_col</code></td>
+<td>no</td>
+<td>Column name to use as edge weight; absent = uniform</td>
+</tr>
+<tr>
+<td><code>distributed</code></td>
+<td>no (<code>auto</code>)</td>
+<td><code>true</code> forces BSP distributed; <code>false</code> / <code>auto</code> use centralised in-memory</td>
+</tr>
+</tbody>
+</table>
+<h3 id="weighted-edges">Weighted Edges</h3>
+<p>When <code>weight_col</code> is set, contribution along an edge <code>u → v</code> scales by <code>weight(u, v) / Σ weights leaving u</code> instead of the uniform <code>1 / outdegree(u)</code>. With every weight equal to 1.0 the algorithm collapses to the textbook unweighted form, so adding a <code>weight</code> column is non-breaking.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">node_id</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w">      </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.relations&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">              </span><span class="n">weight_col</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;weight&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">              </span><span class="n">k</span><span class="w">          </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="centralised-vs-distributed">Centralised vs. Distributed</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>When to use</th>
+<th>How it runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Centralised</td>
+<td>Edge count fits in coordinator memory (~10 M edges typical)</td>
+<td>Coordinator fetches all edges via <code>SELECT src_id, dst_id, weight FROM table</code>, builds in-memory adjacency, runs power iteration</td>
+</tr>
+<tr>
+<td>Distributed</td>
+<td>Larger graphs; multi-shard parallelism</td>
+<td>BSP / Pregel-lite — coordinator broadcasts the rank vector, each data node walks its local CSR adjacency, returns a sparse contribution map; the coordinator applies teleport + dangling redistribution and converges</td>
+</tr>
+</tbody>
+</table>
+<p>The distributed mode produces ranks that match the centralised result within <code>1e-6</code> (max abs diff) on identical edge sets — the algorithm is mathematically the same, only the data movement changes. Subsequent supersteps send only <strong>deltas</strong> (entries that moved by more than <code>1e-3 × epsilon</code> since the last broadcast), which collapses the wire footprint as ranks converge.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- Forces the BSP distributed path.</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">node_id</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.relations&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">              </span><span class="n">distributed</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">true</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">              </span><span class="n">weight_col</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;weight&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">              </span><span class="n">k</span><span class="w">           </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+</code></pre></div>
+<p>The distributed path requires CSR to be enabled on the target table; tables without CSR fall back to centralised with a logged warning.</p>
+<h2 id="graph_path_exists-rig-fact-check-primitive">GRAPH_PATH_EXISTS — RIG Fact-Check Primitive</h2>
+<p>Retrieval-Interleaved Generation (RIG) needs a fast "does this claim hold against the graph?" check so an agent can decide whether to ground or block a generated answer. <code>GRAPH_PATH_EXISTS</code> answers it in one TVF call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- Did the agent&#39;s claim &quot;company X is eligible for program Y within 2 hops via &#39;eligible_for&#39; edges&quot; hold?</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">path_exists</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_PATH_EXISTS</span><span class="p">(</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">edge_table</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.eligibility&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">src</span><span class="w">         </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">company_id</span><span class="p">,</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="n">dst</span><span class="w">         </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">program_id</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">max_depth</span><span class="w">   </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;eligible_for&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">v</span><span class="p">;</span>
+</code></pre></div>
+<p>Returns a single-row, single-column <code>BOOLEAN</code>. The function reuses the same BFS engine as <code>GRAPH_NEIGHBORS</code>, so cycle detection / depth bound / <code>max_results</code> cap all apply. Because the rewriter materialises the result inline (<code>(SELECT TRUE AS path_exists) AS v</code> or <code>… FALSE …</code>), it composes naturally inside <code>WHERE EXISTS (…)</code>, scalar subqueries, or alongside other TVFs.</p>
 <h2 id="hybrid-retrieval-graph-bm25-vector">Hybrid Retrieval — Graph + BM25 + Vector</h2>
-<p>Knowledge-graph agents typically need three retrieval signals at once: ontology proximity, lexical match, and semantic similarity. A single SQL statement covers all three:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">       </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">       </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">description</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;korean&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">lex</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">       </span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">q</span><span class="p">))</span><span class="w">                              </span><span class="k">AS</span><span class="w"> </span><span class="n">sem</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">       </span><span class="n">n</span><span class="p">.</span><span class="n">depth</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.relations&#39;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">                     </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">                     </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">                     </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;is_a&#39;</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">                     </span><span class="n">max_results</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="n">n</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">entities</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">id</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">description</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;korean&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">)</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">lex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sem</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">depth</span><span class="p">))</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<p>The SMBA Graph-RAG specification calls for a single SELECT that runs Hard Filtering (SQL <code>WHERE</code>), semantic+keyword retrieval, knowledge-graph re-ranking, and RIG fact-check together. Each component is a TVF or a standard SQL clause; combined they look like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">       </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">rank</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">final_score</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">HYBRID_SEARCH</span><span class="p">(</span><span class="k">table</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.programs&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">                   </span><span class="n">ts_query</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;AI R&amp;D&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">                   </span><span class="n">ts_index</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_programs_text&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">                   </span><span class="n">vec_query</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">user_query_embedding</span><span class="p">,</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">                   </span><span class="n">vec_index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_programs_emb&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">                   </span><span class="n">alpha</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="n">h</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">PERSONALIZED_PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.eligibility&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">                            </span><span class="n">seed</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">company_id</span><span class="p">,</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">                            </span><span class="n">k</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">node_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">programs</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">companies</span><span class="w"> </span><span class="k">c</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">company_id</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;경기도&#39;</span><span class="w">                       </span><span class="c1">-- Hard Filter</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">revenue</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">100000000000</span><span class="w">                  </span><span class="c1">-- Hard Filter</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;open&#39;</span><span class="w">                          </span><span class="c1">-- Hard Filter</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">path_exists</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_PATH_EXISTS</span><span class="p">(</span><span class="w">  </span><span class="c1">-- RIG fact-check</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">         </span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.eligibility&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">         </span><span class="n">src</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">company_id</span><span class="p">,</span><span class="w"> </span><span class="n">dst</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">         </span><span class="n">max_depth</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;eligible_for&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">v</span><span class="p">)</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">final_score</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
-<p>No CDC, no extra service, no eventual consistency window — the ontology, the BM25 index, and the vector index see the same row at the same time.</p>
+<p><code>HYBRID_SEARCH</code> is documented on its own page — see <a href="../hybrid-search/">Hybrid Search</a>. The combination here is what folds Graph RAG into a single SELECT.</p>
 <h2 id="admin-rest-post-admingraphneighbors">Admin REST — <code>POST /admin/graph/neighbors</code></h2>
-<p>For SDK and agent paths that don't want to embed the TVF in a SELECT, the same BFS is exposed over the admin HTTP surface:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">     </span>-X<span class="w"> </span>POST<span class="w"> </span>https://master:8080/admin/graph/neighbors<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="s1">           &quot;edgeTable&quot;:   &quot;public.relations&quot;,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="s1">           &quot;seed&quot;:        42,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="s1">           &quot;maxDepth&quot;:    3,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="s1">           &quot;edgeFilter&quot;:  &quot;is_a&quot;,</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="s1">           &quot;maxResults&quot;:  200</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="s1">         }&#39;</span>
+<p>For SDK and agent paths that don't want to embed the TVF in a SELECT, the BFS is exposed over the admin HTTP surface:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">     </span>-X<span class="w"> </span>POST<span class="w"> </span>https://master:8080/admin/graph/neighbors<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="s1">           &quot;edgeTable&quot;:   &quot;public.relations&quot;,</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="s1">           &quot;seed&quot;:        42,</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="s1">           &quot;maxDepth&quot;:    3,</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="s1">           &quot;edgeFilter&quot;:  &quot;is_a&quot;,</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="s1">           &quot;maxResults&quot;:  200</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="s1">         }&#39;</span>
 </code></pre></div>
 <p>Response:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">&quot;count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;depth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nt">&quot;count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
 </code></pre></div>
 <p>Validation errors return <code>400</code>; anything else returns the same <code>(id, depth)</code> shape the TVF produces.</p>
 <h2 id="java-helper-neorungraphclient">Java Helper — <code>NeorunGraphClient</code></h2>
 <p><code>neorunbase-common</code> ships a thin HTTP wrapper for Java callers (Mium, ad-hoc tools) that don't want to assemble JSON by hand:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">NeorunGraphClient</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">NeorunGraphClient</span><span class="p">(</span><span class="s">&quot;https://master:8080&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">jwtToken</span><span class="p">);</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">NeorunGraphClient</span><span class="p">.</span><span class="na">Hit</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hits</span><span class="w"> </span><span class="o">=</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="n">g</span><span class="p">.</span><span class="na">neighbors</span><span class="p">(</span><span class="s">&quot;public.relations&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">42L</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;is_a&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">);</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NeorunGraphClient</span><span class="p">.</span><span class="na">Hit</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hits</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ depth &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="na">depth</span><span class="p">);</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">NeorunGraphClient</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">NeorunGraphClient</span><span class="p">(</span><span class="s">&quot;https://master:8080&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">jwtToken</span><span class="p">);</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">NeorunGraphClient</span><span class="p">.</span><span class="na">Hit</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hits</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">        </span><span class="n">g</span><span class="p">.</span><span class="na">neighbors</span><span class="p">(</span><span class="s">&quot;public.relations&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">42L</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;is_a&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">);</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NeorunGraphClient</span><span class="p">.</span><span class="na">Hit</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hits</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ depth &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="na">depth</span><span class="p">);</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">}</span>
 </code></pre></div>
 <p>The class only depends on <code>java.net.http</code> and Jackson — no extra runtime to deploy.</p>
 <h2 id="bounds-and-safety">Bounds and Safety</h2>
 <ul>
 <li><strong><code>max_depth</code> is required and must be ≥ 1.</strong> A traversal with no upper bound is an outage waiting to happen, so the API refuses the call.</li>
 <li><strong><code>max_results</code> is required-with-default (<code>1000</code>) and capped at the call site.</strong> The visited set lives in coordinator memory; the cap is a guardrail, not a recommendation.</li>
+<li><strong>PageRank <code>max_iter</code> defaults to 20</strong> — sufficient for damping = 0.85 to converge within <code>1e-6</code> on most graphs. Distributed mode will still exit early on convergence even when <code>max_iter</code> is generous.</li>
 <li><strong>Cycles are broken by a visited set</strong> — back-edges and self-loops can't grow the frontier indefinitely.</li>
 <li><strong><code>edge_filter</code> is single-quote escaped</strong> before it hits the per-hop SQL, so a malicious filter value can't break out of the string literal.</li>
-<li><strong>The TVF is rewritten on the coordinator side</strong> <em>before</em> the planner runs. Quoted strings and SQL comments are skipped verbatim, so a literal like <code>'GRAPH_NEIGHBORS(...)'</code> inside a column value is left alone.</li>
+<li><strong>All TVFs are rewritten on the coordinator side</strong> <em>before</em> the planner runs. Quoted strings and SQL comments are skipped verbatim, so a literal like <code>'GRAPH_NEIGHBORS(...)'</code> inside a column value is left alone.</li>
+<li><strong>CSR fallback is automatic</strong> — a <code>src_id</code> not yet materialised (added between compaction passes) is served by the original row-scan path, so traversals never miss freshly inserted edges.</li>
 </ul>
 <h2 id="ontology-agent-cookbook">Ontology Agent Cookbook</h2>
-<p>Agents over a domain ontology benefit from a few standard moves on top of the TVF:</p>
+<p>Agents over a domain ontology benefit from a few standard moves on top of the TVFs:</p>
 <h3 id="1-concept-expansion-before-a-search">1. Concept expansion before a search</h3>
 <p>When the user says "find me documents about <em>neural network</em>", expand the concept node along <code>is_a</code> and <code>synonym</code> edges before doing BM25 — so a doc tagged <code>transformer</code> still matches:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">WITH</span><span class="w"> </span><span class="n">expanded</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">                                   </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">                                   </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">                                   </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;is_a&#39;</span><span class="p">,</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">                                   </span><span class="n">max_results</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="k">UNION</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">                                   </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">                                   </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">                                   </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;synonym&#39;</span><span class="p">,</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">                                   </span><span class="n">max_results</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">)</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="o">*</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="k">FROM</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">document_concepts</span><span class="w"> </span><span class="n">dc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">doc_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">concept_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">expanded</span><span class="p">)</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">query</span><span class="p">)</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">query</span><span class="p">))</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">WITH</span><span class="w"> </span><span class="n">expanded</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">                                   </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">                                   </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">                                   </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;is_a&#39;</span><span class="p">,</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">                                   </span><span class="n">max_results</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="k">UNION</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">                                   </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">                                   </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">                                   </span><span class="n">edge_filter</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;synonym&#39;</span><span class="p">,</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">                                   </span><span class="n">max_results</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="p">)</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="o">*</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="k">FROM</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">document_concepts</span><span class="w"> </span><span class="n">dc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">doc_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">concept_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">expanded</span><span class="p">)</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">query</span><span class="p">)</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">query</span><span class="p">))</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
 </code></pre></div>
-<h3 id="2-re-ranking-by-ontology-distance">2. Re-ranking by ontology distance</h3>
-<p>When two documents tie on BM25 / vector score, prefer the one closer in the ontology — a strong signal that the agent is on topic:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">       </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(:</span><span class="n">q</span><span class="p">))</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">     </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">emb</span><span class="p">)))</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">     </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">depth</span><span class="p">)</span><span class="w">                            </span><span class="k">AS</span><span class="w"> </span><span class="n">score</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(</span><span class="n">edge_table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">                     </span><span class="n">seed</span><span class="w">       </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">                     </span><span class="n">max_depth</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="n">n</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">document_concepts</span><span class="w"> </span><span class="n">dc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">concept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">id</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span><span class="w">           </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dc</span><span class="p">.</span><span class="n">doc_id</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(:</span><span class="n">q</span><span class="p">)</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<h3 id="2-re-ranking-by-personalised-pagerank">2. Re-ranking by Personalised PageRank</h3>
+<p>Start with the user's anchor entity, score every other entity by graph proximity, and use that score as one term in the final ranking — the SMBA pattern in miniature:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">       </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ts_rank</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(:</span><span class="n">q</span><span class="p">))</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">     </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">emb</span><span class="p">)))</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">     </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">rank</span><span class="w">                                </span><span class="k">AS</span><span class="w"> </span><span class="n">score</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">PERSONALIZED_PAGERANK</span><span class="p">(</span><span class="k">table</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.ontology&#39;</span><span class="p">,</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">                            </span><span class="n">seed</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">concept_id</span><span class="p">,</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">                            </span><span class="n">k</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="n">p</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">node_id</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">body</span><span class="w"> </span><span class="o">@@</span><span class="w"> </span><span class="n">plainto_tsquery</span><span class="p">(:</span><span class="n">q</span><span class="p">)</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="3-multi-seed-fan-out">3. Multi-seed fan-out</h3>
-<p>The TVF takes one seed; for multiple seeds, run several calls and <code>UNION</code> (or <code>UNION ALL</code> if you want depth weighting per seed):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">WITH</span><span class="w"> </span><span class="n">n1</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(...</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">a</span><span class="w"> </span><span class="p">...)),</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">     </span><span class="n">n2</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(...</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">b</span><span class="w"> </span><span class="p">...))</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">MIN</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">n1</span><span class="w"> </span><span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">n2</span><span class="p">)</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+<p><code>GRAPH_NEIGHBORS</code> takes one seed; for multiple seeds, run several calls and <code>UNION</code> (or <code>UNION ALL</code> if you want depth weighting per seed):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">WITH</span><span class="w"> </span><span class="n">n1</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(...</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">a</span><span class="w"> </span><span class="p">...)),</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">     </span><span class="n">n2</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">GRAPH_NEIGHBORS</span><span class="p">(...</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">b</span><span class="w"> </span><span class="p">...))</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">MIN</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">n1</span><span class="w"> </span><span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">n2</span><span class="p">)</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
 </code></pre></div>
 <p>The shortest distance to <em>any</em> seed is usually a better relevance signal than per-seed depth.</p>
 <h2 id="limits-and-roadmap">Limits and Roadmap</h2>
 <ul>
 <li><strong>Edges are directional.</strong> If your ontology is undirected (<code>synonym</code>), insert both <code>(a, b)</code> and <code>(b, a)</code> rows. A symmetric edge type is on the roadmap.</li>
 <li><strong>No path enumeration yet.</strong> <code>GRAPH_NEIGHBORS</code> returns reachable nodes and their hop count; it does not return the path. A <code>GRAPH_PATH</code> TVF that returns explicit edge sequences is planned.</li>
-<li><strong>No Cypher dialect.</strong> The current surface is SQL-only. A Cypher front-end (similar to Apache AGE) is demand-driven; raise an issue if you need it.</li>
-<li><strong>Single-column edge filter.</strong> Only <code>rel_type</code> is filtered today. Property-graph filters (e.g. edge weight thresholds) can be added once a use case lands.</li>
+<li><strong>No Cypher dialect.</strong> The current surface is SQL-only. A Cypher front-end is demand-driven; raise an issue if you need it.</li>
+<li><strong>Distributed PageRank bootstraps the node set via SQL.</strong> A one-time <code>SELECT DISTINCT src_id ∪ dst_id</code> runs before the BSP loop. For multi-billion-edge graphs this becomes the dominant cost; a follow-up will push node-set discovery down to the data nodes.</li>
+<li><strong>Single-edge-type filter.</strong> <code>GRAPH_NEIGHBORS</code> filters on one <code>rel_type</code> value at a time. Multi-type filtering (<code>IN (…)</code>) is a small extension on the roadmap.</li>
 </ul>
 
 
