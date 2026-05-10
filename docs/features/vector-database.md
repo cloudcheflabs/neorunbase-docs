@@ -108,6 +108,25 @@ HNSW nodes are addressed by a numeric id. To keep search hits round-tripping dir
 
 Vector search is instrumented alongside the rest of NeorunBase in the built-in Codahale/Prometheus metrics pipeline. Exposed metrics include search / insert / update / delete / flush / rebuild meters, an error counter, and latency timers for search, flush, and rebuild (p50 / p99 / max). The admin endpoint `GET /admin/ann/status` fans out across all Data Nodes and returns one row per cached `(shard, index)` pair with size, dirty flag, pending WAL seqno, and last flushed seqno — enough to tell at a glance which sidecars are behind.
 
+## Hybrid Search — Combining Vector with BM25
+
+A vector signal alone is rarely the strongest retrieval. NeorunBase exposes `HYBRID_SEARCH(...)` — a single-SQL TVF that runs an FTS scatter and an ANN scatter in parallel and blends the two top-K lists by min-max + linear combination or by Reciprocal Rank Fusion. The result composes naturally with `WHERE` (Hard Filter), `JOIN` (metadata enrichment), and other graph TVFs (re-ranking, fact-check):
+
+```sql
+SELECT d.*, h.score
+FROM HYBRID_SEARCH(table     => 'public.docs',
+                   ts_query  => 'AI R&D',
+                   ts_index  => 'idx_docs_text',
+                   vec_query => '[0.9, 0.1, 0.0, 0.0]',
+                   vec_index => 'idx_docs_emb',
+                   alpha     => 0.4, beta => 0.6, k => 50) h
+JOIN docs d ON d.id = h.id
+ORDER BY h.score DESC
+LIMIT 10;
+```
+
+See [Hybrid Search](hybrid-search.md) for arguments, blending strategies, and the SMBA Graph-RAG composition pattern (hybrid retrieval + Personalized PageRank re-ranking + RIG fact-check, all in one SELECT).
+
 ## Compatibility Notes
 
 - **pgvector parity**: the type literal, operators, functions, opclasses, and `CREATE INDEX ... USING hnsw (col opclass) WITH (...)` syntax match pgvector, so JDBC / psycopg / pgvector client libraries work without changes.

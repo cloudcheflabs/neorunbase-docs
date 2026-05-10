@@ -275,6 +275,25 @@ The leader Coordinator distributes consumer groups round-robin across the Data N
 | --- | --- | --- |
 | `neorunbase.ann.flush.interval.seconds` | `30` | Background flush interval for dirty in-memory ANN indexes to encrypted sidecar files. `0` disables periodic flush — sidecars are only written on shard close. Lower values bound the data-loss window on ungraceful shutdown; higher values amortize the full-graph re-serialize cost. |
 
+## Graph Traversal
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.graph.default.max.results` | `1000` | Default cap on the visited set when `GRAPH_NEIGHBORS` / `POST /admin/graph/neighbors` omit `max_results`. Bounds Coordinator memory on hub-node queries; per-call values always win. |
+
+## CSR Adjacency (Graph Acceleration)
+
+CSR (Compressed Sparse Row) materialises a per-shard adjacency-list view of selected edge tables so that BFS expansion becomes a sequential neighbor-block read instead of a B-tree IN-list lookup. Edge rows remain primary; CSR is a derived view rebuilt by background compaction (write-back / LSM style). Disabled by default — turn on per table once the edge schema (`src_id BIGINT`, `dst_id BIGINT`, `rel_type TEXT`) is in place. See [Graph Traversal & Analytics](../features/graph.md) for the full surface.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.csr.enabled` | `false` | Master switch. When `false` the original row-scan traversal path is unchanged. |
+| `neorunbase.csr.enabled.tables` | (empty) | Comma-separated list of qualified edge tables to materialise (e.g. `public.relations,public.eligibility`). |
+| `neorunbase.csr.compaction.interval.seconds` | `3600` | Per-shard background interval at which the CSR compactor scans for new edge rows and rebuilds the affected adjacency blocks. |
+| `neorunbase.csr.max.delta.rows.before.compaction` | `100000` | Trigger an out-of-band compaction when delta rows since the last CSR build cross this threshold. Bounds CSR staleness under heavy ingest. |
+| `neorunbase.csr.segment.size` | `67108864` | CSR segment file rollover (64 MiB). Mirrors `neorunbase.heap.segment.size` for the heap layer. |
+| `neorunbase.csr.neighbor.timeout.ms` | `30000` | Per-node RPC timeout for one BFS-hop neighbor expansion through CSR. The hop fans out to every Data Node holding part of the frontier; this is the wall-clock budget per node. |
+
 ## Coordinator Cluster Sync
 
 | Property | Default | Description |
