@@ -185,6 +185,25 @@ LIMIT 10;
 
 This single statement enforces tenant isolation (`JOIN` + `WHERE`), restricts via BM25 (`@@`), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.
 
+For workloads where the application doesn't want to manage the score-blending arithmetic by hand — and especially when the blending strategy needs to switch between min-max and Reciprocal Rank Fusion at the call site — NeorunBase exposes the same retrieval as a `HYBRID_SEARCH(...)` table-valued function. It runs the FTS and ANN scatter-gathers in parallel inside the engine and returns a single sorted `(id, score)` list ready to JOIN against the row store:
+
+```sql
+SELECT d.*, h.score
+FROM HYBRID_SEARCH(table     => 'public.documents',
+                   ts_query  => '한국어 검색',
+                   ts_index  => 'idx_doc_body',
+                   vec_query => :embedding_literal,
+                   vec_index => 'idx_doc_embedding',
+                   alpha => 0.4, beta => 0.6, k => 50,
+                   blend => 'minmax')      -- or 'rrf' for rank fusion
+       h
+JOIN documents d ON d.id = h.id
+ORDER BY h.score DESC
+LIMIT 10;
+```
+
+See [Hybrid Search](hybrid-search.md) for the full argument reference and the SMBA-style composition with `PERSONALIZED_PAGERANK` + `GRAPH_PATH_EXISTS`.
+
 ## Storage Layout — Per-Segment KMS Envelope on Disk
 
 A Lucene index can't live efficiently inside RocksDB (per-segment file format, hundreds of random hops per query). NeorunBase stores each shard's Lucene index as a tree of **independently KMS-enveloped segment files** under `<shardDir>/sidecars/fts/<index>/`. The unit of encryption is one Lucene file (segment / commit pointer / metadata), not the whole index — so the index can grow to disk capacity while only the hot working set is materialised in heap.

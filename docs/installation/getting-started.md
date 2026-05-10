@@ -207,4 +207,8 @@ bin/stop-example-servers.sh
 
 - [Configuration](../configuration/configuration.md) — every tunable in `neorunbase.properties`.
 - [Operations](../operations/operations.md) — running, monitoring, and shutting down a production cluster.
-- [Features](../features/postgresql-compatibility.md) — PostgreSQL compatibility, replication, encryption, vector search, Iceberg sync, Kafka ingestion, IAM, and the Admin UI.
+- [Vector Database](../features/vector-database.md) — pgvector-compatible `VECTOR` type and distributed HNSW search.
+- [Full-Text Search](../features/full-text-search.md) — Lucene-backed BM25 with per-shard inverted indexes.
+- [Graph Traversal & Analytics](../features/graph.md) — `GRAPH_NEIGHBORS`, `PAGERANK`, `PERSONALIZED_PAGERANK`, `GRAPH_PATH_EXISTS` TVFs and the CSR adjacency layer.
+- [Hybrid Search](../features/hybrid-search.md) — `HYBRID_SEARCH` TVF blending BM25 + vector ANN in one SQL call.
+- [Features overview](../features/postgresql-compatibility.md) — PostgreSQL compatibility, sharding, replication, encryption, transactions, Iceberg sync, Kafka ingestion, IAM, and the Admin UI.
