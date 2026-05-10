@@ -1125,6 +1125,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hybrid-search-combining-vector-with-bm25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Search — Combining Vector with BM25
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#compatibility-notes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1628,6 +1639,20 @@
 <p>HNSW nodes are addressed by a numeric id. To keep search hits round-tripping directly through the primary key store without a secondary id→pk map, NeorunBase requires HNSW-indexed tables to have a single-column numeric primary key (<code>INT</code>, <code>BIGINT</code>, or <code>SMALLINT</code>). Attempts to create an HNSW index on a table with a non-numeric or composite primary key are rejected at DDL time.</p>
 <h2 id="observability">Observability</h2>
 <p>Vector search is instrumented alongside the rest of NeorunBase in the built-in Codahale/Prometheus metrics pipeline. Exposed metrics include search / insert / update / delete / flush / rebuild meters, an error counter, and latency timers for search, flush, and rebuild (p50 / p99 / max). The admin endpoint <code>GET /admin/ann/status</code> fans out across all Data Nodes and returns one row per cached <code>(shard, index)</code> pair with size, dirty flag, pending WAL seqno, and last flushed seqno — enough to tell at a glance which sidecars are behind.</p>
+<h2 id="hybrid-search-combining-vector-with-bm25">Hybrid Search — Combining Vector with BM25</h2>
+<p>A vector signal alone is rarely the strongest retrieval. NeorunBase exposes <code>HYBRID_SEARCH(...)</code> — a single-SQL TVF that runs an FTS scatter and an ANN scatter in parallel and blends the two top-K lists by min-max + linear combination or by Reciprocal Rank Fusion. The result composes naturally with <code>WHERE</code> (Hard Filter), <code>JOIN</code> (metadata enrichment), and other graph TVFs (re-ranking, fact-check):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">HYBRID_SEARCH</span><span class="p">(</span><span class="k">table</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.docs&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">                   </span><span class="n">ts_query</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;AI R&amp;D&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">                   </span><span class="n">ts_index</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_docs_text&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">                   </span><span class="n">vec_query</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;[0.9, 0.1, 0.0, 0.0]&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">                   </span><span class="n">vec_index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_docs_emb&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">                   </span><span class="n">alpha</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="n">h</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">docs</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>See <a href="../hybrid-search/">Hybrid Search</a> for arguments, blending strategies, and the SMBA Graph-RAG composition pattern (hybrid retrieval + Personalized PageRank re-ranking + RIG fact-check, all in one SELECT).</p>
 <h2 id="compatibility-notes">Compatibility Notes</h2>
 <ul>
 <li><strong>pgvector parity</strong>: the type literal, operators, functions, opclasses, and <code>CREATE INDEX ... USING hnsw (col opclass) WITH (...)</code> syntax match pgvector, so JDBC / psycopg / pgvector client libraries work without changes.</li>

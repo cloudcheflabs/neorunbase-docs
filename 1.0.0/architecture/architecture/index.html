@@ -561,6 +561,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#graph-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#iceberg-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1446,7 +1457,13 @@
 
 <h1 id="architecture">Architecture</h1>
 <p>NeorunBase is a distributed, sharded OLTP Lakebase that implements the PostgreSQL wire protocol. Any PostgreSQL-compatible client such as <code>psql</code>, JDBC drivers, or pgAdmin can connect to NeorunBase transparently without any modification.</p>
-<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as a general-purpose vector database, offering a pgvector-compatible <code>VECTOR</code> type and distributed HNSW approximate nearest neighbor search for embedding workloads. It integrates with Apache Iceberg,
+<p>NeorunBase provides horizontal scalability through hash-based sharding across multiple Data Nodes, fault tolerance via shard replication, and encryption at rest using envelope encryption with a built-in KMS. It also serves as:</p>
+<ul>
+<li>a <strong>general-purpose vector database</strong> with a pgvector-compatible <code>VECTOR</code> type and distributed HNSW approximate-nearest-neighbor search;</li>
+<li>a <strong>distributed BM25 full-text search engine</strong> with Lucene-backed per-shard inverted indexes;</li>
+<li>a <strong>graph database</strong> with a Compressed-Sparse-Row adjacency layer, PageRank / Personalized-PageRank, multi-hop reachability primitives, and single-SQL hybrid retrieval that blends BM25, vector, and graph signals.</li>
+</ul>
+<p>It integrates with Apache Iceberg,
 enabling automatic synchronization of transactional data to an open lakehouse format for downstream analytics by engines such as Apache Spark, Trino, and Hive. Additionally, NeorunBase supports streaming ingestion from Apache Kafka, allowing real-time data to flow directly into NeorunBase tables.</p>
 <h2 id="neorunbase-architecture">NeorunBase Architecture</h2>
 <p><img width="1200" src="../../images/architecture/neorunbase-architecture.png" align="center"/></p>
@@ -1467,6 +1484,8 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 <li><strong>Shard Storage</strong>: Each shard stores row data in append-only <strong>heap segment files</strong> (<code>{shardDir}/heap/seg-NNNNN.nrheap</code>, AES-256-GCM per record with a KMS-wrapped per-segment DEK), built for OLTP read latency at petabyte scale. A per-shard RocksDB <code>TransactionDB</code> holds the row → segment-pointer index (16 bytes per row), secondary indexes, and the change log — keeping LSM compaction off the row data path.</li>
 <li><strong>Query Execution</strong>: Processes DML operations (INSERT, UPDATE, DELETE, SELECT) on local shards, including index scans and predicate pushdown.</li>
 <li><strong>Vector / ANN</strong>: Each shard hosts per-table HNSW graphs as envelope-encrypted sidecar files outside RocksDB, serving local top-K vector search for the Coordinator to merge.</li>
+<li><strong>Full-Text Search</strong>: Each shard owns a per-table Lucene inverted index, persisted as encrypted sidecar segments. BM25 search is scattered across shards and merged on the Coordinator.</li>
+<li><strong>Graph (CSR adjacency)</strong>: For edge tables on the CSR enable list, each shard materialises a Compressed-Sparse-Row view of its local adjacency in encrypted segment files (<code>{shardDir}/csr/&lt;table&gt;/seg-NNNNN.nrcsr</code>). Per-<code>src_id</code> neighbor lookup is an O(1) pointer hop instead of a B-tree IN-list — the substrate for fast BFS and the BSP-distributed PageRank algorithm.</li>
 <li><strong>Write-Ahead Log (WAL)</strong>: Maintains encrypted, segmented WAL for durability. Recovery halts on detected corruption (silent skip is treated as a bug, not an option) so the operator can investigate before any divergent state is created.</li>
 <li><strong>Change Log</strong>: Records data changes for incremental Iceberg synchronization.</li>
 <li><strong>Bitrot Scrubber</strong> (opt-in): A throttled background scanner periodically verifies the AES-GCM auth tag on every closed heap segment record and surfaces findings via the Admin API.</li>
@@ -1479,6 +1498,15 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 <li><strong>Leader Election</strong>: Two separate leader elections — one for shard assignment (Controller) and one for metadata/KMS ownership (Coordinator Leader).</li>
 <li><strong>Shard Repair &amp; Rebalancing</strong>: Automatically detects dead Data Nodes and replicates shard replicas to healthy nodes; rebalances shards when nodes are added or removed.</li>
 </ul>
+<h3 id="graph-engine">Graph Engine</h3>
+<p>NeorunBase folds graph traversal and analytics into the same SQL engine that owns relational, vector, and full-text data:</p>
+<ul>
+<li><strong>TVFs in <code>FROM</code></strong>: <code>GRAPH_NEIGHBORS</code>, <code>GRAPH_PATH_EXISTS</code>, <code>PAGERANK</code>, <code>PERSONALIZED_PAGERANK</code>, and <code>HYBRID_SEARCH</code> are exposed as table-valued functions. The Coordinator rewrites each call to a derived table at parse time, so JOIN / WHERE / ORDER BY / LIMIT downstream plan through the standard SQL pipeline.</li>
+<li><strong>CSR fast path</strong>: Edge tables opted in via <code>neorunbase.csr.enabled.tables</code> get a per-shard adjacency view materialised by a leader-gated background compactor. CSR turns a BFS hop from a B-tree IN-list lookup into a sequential neighbor-block read — measured 256× speedup at 100 K edges in the Phase 1 microbenchmark.</li>
+<li><strong>Distributed PageRank (BSP)</strong>: For graphs that don't fit in Coordinator memory, <code>PAGERANK(... distributed =&gt; true)</code> switches on a Pregel-lite superstep loop. The Coordinator broadcasts the rank vector (delta-only after the first iter), each Data Node walks its local CSR adjacency and returns sparse contribution maps, and the Coordinator applies teleport + dangling redistribution. Numerically equivalent to the centralised executor within <code>1e-6</code>.</li>
+<li><strong>Hybrid retrieval</strong>: <code>HYBRID_SEARCH(...)</code> runs an FTS scatter and an ANN scatter in parallel and blends the two top-K lists either by min-max normalisation + linear combination or by Reciprocal Rank Fusion. JOINing its result with <code>PERSONALIZED_PAGERANK</code> and applying a <code>WHERE</code> Hard Filter is the SMBA Graph-RAG pipeline expressed in one SELECT.</li>
+</ul>
+<p>See <a href="../../features/graph/">Graph Traversal &amp; Analytics</a> and <a href="../../features/hybrid-search/">Hybrid Search</a> for the full TVF surface and example SQL.</p>
 <h3 id="iceberg-integration">Iceberg Integration</h3>
 <p>NeorunBase synchronizes table data to Apache Iceberg for open lakehouse analytics:</p>
 <ul>

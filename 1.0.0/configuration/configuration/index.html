@@ -1506,6 +1506,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#graph-traversal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph Traversal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#csr-adjacency-graph-acceleration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSR Adjacency (Graph Acceleration)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#coordinator-cluster-sync" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2530,6 +2552,66 @@
 <td><code>neorunbase.ann.flush.interval.seconds</code></td>
 <td><code>30</code></td>
 <td>Background flush interval for dirty in-memory ANN indexes to encrypted sidecar files. <code>0</code> disables periodic flush — sidecars are only written on shard close. Lower values bound the data-loss window on ungraceful shutdown; higher values amortize the full-graph re-serialize cost.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="graph-traversal">Graph Traversal</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.graph.default.max.results</code></td>
+<td><code>1000</code></td>
+<td>Default cap on the visited set when <code>GRAPH_NEIGHBORS</code> / <code>POST /admin/graph/neighbors</code> omit <code>max_results</code>. Bounds Coordinator memory on hub-node queries; per-call values always win.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="csr-adjacency-graph-acceleration">CSR Adjacency (Graph Acceleration)</h2>
+<p>CSR (Compressed Sparse Row) materialises a per-shard adjacency-list view of selected edge tables so that BFS expansion becomes a sequential neighbor-block read instead of a B-tree IN-list lookup. Edge rows remain primary; CSR is a derived view rebuilt by background compaction (write-back / LSM style). Disabled by default — turn on per table once the edge schema (<code>src_id BIGINT</code>, <code>dst_id BIGINT</code>, <code>rel_type TEXT</code>) is in place. See <a href="../../features/graph/">Graph Traversal &amp; Analytics</a> for the full surface.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.csr.enabled</code></td>
+<td><code>false</code></td>
+<td>Master switch. When <code>false</code> the original row-scan traversal path is unchanged.</td>
+</tr>
+<tr>
+<td><code>neorunbase.csr.enabled.tables</code></td>
+<td>(empty)</td>
+<td>Comma-separated list of qualified edge tables to materialise (e.g. <code>public.relations,public.eligibility</code>).</td>
+</tr>
+<tr>
+<td><code>neorunbase.csr.compaction.interval.seconds</code></td>
+<td><code>3600</code></td>
+<td>Per-shard background interval at which the CSR compactor scans for new edge rows and rebuilds the affected adjacency blocks.</td>
+</tr>
+<tr>
+<td><code>neorunbase.csr.max.delta.rows.before.compaction</code></td>
+<td><code>100000</code></td>
+<td>Trigger an out-of-band compaction when delta rows since the last CSR build cross this threshold. Bounds CSR staleness under heavy ingest.</td>
+</tr>
+<tr>
+<td><code>neorunbase.csr.segment.size</code></td>
+<td><code>67108864</code></td>
+<td>CSR segment file rollover (64 MiB). Mirrors <code>neorunbase.heap.segment.size</code> for the heap layer.</td>
+</tr>
+<tr>
+<td><code>neorunbase.csr.neighbor.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>Per-node RPC timeout for one BFS-hop neighbor expansion through CSR. The hop fans out to every Data Node holding part of the frontier; this is the wall-clock budget per node.</td>
 </tr>
 </tbody>
 </table>

@@ -1772,20 +1772,35 @@
 <a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <p>This single statement enforces tenant isolation (<code>JOIN</code> + <code>WHERE</code>), restricts via BM25 (<code>@@</code>), and ranks by a hybrid of BM25 score and vector similarity — all in one ACID transaction over the same indexes.</p>
+<p>For workloads where the application doesn't want to manage the score-blending arithmetic by hand — and especially when the blending strategy needs to switch between min-max and Reciprocal Rank Fusion at the call site — NeorunBase exposes the same retrieval as a <code>HYBRID_SEARCH(...)</code> table-valued function. It runs the FTS and ANN scatter-gathers in parallel inside the engine and returns a single sorted <code>(id, score)</code> list ready to JOIN against the row store:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">HYBRID_SEARCH</span><span class="p">(</span><span class="k">table</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;public.documents&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">                   </span><span class="n">ts_query</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;한국어 검색&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">                   </span><span class="n">ts_index</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_doc_body&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">                   </span><span class="n">vec_query</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">:</span><span class="n">embedding_literal</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">                   </span><span class="n">vec_index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;idx_doc_embedding&#39;</span><span class="p">,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">                   </span><span class="n">alpha</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">                   </span><span class="n">blend</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">&#39;minmax&#39;</span><span class="p">)</span><span class="w">      </span><span class="c1">-- or &#39;rrf&#39; for rank fusion</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">       </span><span class="n">h</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">documents</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>See <a href="../hybrid-search/">Hybrid Search</a> for the full argument reference and the SMBA-style composition with <code>PERSONALIZED_PAGERANK</code> + <code>GRAPH_PATH_EXISTS</code>.</p>
 <h2 id="storage-layout-per-segment-kms-envelope-on-disk">Storage Layout — Per-Segment KMS Envelope on Disk</h2>
 <p>A Lucene index can't live efficiently inside RocksDB (per-segment file format, hundreds of random hops per query). NeorunBase stores each shard's Lucene index as a tree of <strong>independently KMS-enveloped segment files</strong> under <code>&lt;shardDir&gt;/sidecars/fts/&lt;index&gt;/</code>. The unit of encryption is one Lucene file (segment / commit pointer / metadata), not the whole index — so the index can grow to disk capacity while only the hot working set is materialised in heap.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>shard-N/
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>└── sidecars/
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    └── fts/
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        ├── public.articles.idx_body/
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        │   ├── _0.cfe          ← encrypted Lucene segment (chunked AES-GCM,
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        │   ├── _0.cfs              per-file KMS-wrapped DEK in the header)
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        │   ├── _0.si
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        │   ├── _1.cfe
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        │   ├── …
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        │   └── segments_3      ← encrypted commit pointer
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>        └── public.articles.idx_title/
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            └── …
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>shard-N/
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>└── sidecars/
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    └── fts/
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        ├── public.articles.idx_body/
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        │   ├── _0.cfe          ← encrypted Lucene segment (chunked AES-GCM,
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        │   ├── _0.cfs              per-file KMS-wrapped DEK in the header)
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        │   ├── _0.si
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        │   ├── _1.cfe
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        │   ├── …
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        │   └── segments_3      ← encrypted commit pointer
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>        └── public.articles.idx_title/
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            └── …
 </code></pre></div>
 <p>Each file's header carries a fresh AES-256 DEK wrapped by the shard's KMS key. Disk content is therefore always ciphertext; the OS page cache never sees plaintext index pages.</p>
 <h3 id="why-per-segment-not-per-page">Why per-segment, not per-page</h3>
@@ -1829,17 +1844,17 @@
 </ul>
 <p>A 1 TB index with ~10 000 segments produces ~10 000 KMS wrap calls over the lifetime of the index. That's noise compared to the per-INSERT row-encryption traffic the cluster already handles.</p>
 <h3 id="configuration">Configuration</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Per-FTS-index plaintext cache cap. Hot working set fits in RAM, cold
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a># segments stay encrypted on disk and decrypt on demand.
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>neorunbase.fts.plaintext.cache.bytes=268435456    # 256 MiB
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a># AES-GCM chunk size inside each encrypted segment file. Larger chunks
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a># reduce per-tag overhead; smaller chunks cap the per-decrypt memory window.
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>neorunbase.fts.chunk.size.bytes=1048576           # 1 MiB
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a># Reserved for the rare case an operator wants the prior all-in-heap path.
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a># Default `encrypted_disk` is what production should use.
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>neorunbase.fts.storage.default=encrypted_disk
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a># Per-FTS-index plaintext cache cap. Hot working set fits in RAM, cold
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a># segments stay encrypted on disk and decrypt on demand.
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>neorunbase.fts.plaintext.cache.bytes=268435456    # 256 MiB
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a># AES-GCM chunk size inside each encrypted segment file. Larger chunks
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a># reduce per-tag overhead; smaller chunks cap the per-decrypt memory window.
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>neorunbase.fts.chunk.size.bytes=1048576           # 1 MiB
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a># Reserved for the rare case an operator wants the prior all-in-heap path.
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a># Default `encrypted_disk` is what production should use.
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>neorunbase.fts.storage.default=encrypted_disk
 </code></pre></div>
 <h2 id="freshness-flush-and-backup-safety">Freshness, Flush, and Backup Safety</h2>
 <p>The encrypted-disk model removes the prior in-memory authoritative state — Lucene segments hit disk on every commit, already encrypted. There is no "dirty in-heap" window to flush.</p>

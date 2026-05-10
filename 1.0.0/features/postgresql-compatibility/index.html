@@ -779,6 +779,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#table-valued-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table-Valued Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#virtual-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1457,6 +1468,45 @@
 <li><strong>Vector</strong>: <code>VECTOR(dim)</code> (pgvector-compatible; see <a href="../vector-database/">Vector Database</a>)</li>
 <li><strong>Other</strong>: <code>JSON</code>, <code>UUID</code></li>
 </ul>
+<h2 id="table-valued-functions">Table-Valued Functions</h2>
+<p>NeorunBase ships a small set of table-valued functions (TVFs) that are usable anywhere a table reference is legal — typically inside <code>FROM</code> and JOINed against entity / metadata tables. Each one is rewritten on the Coordinator before SQL parsing so the rest of the query (JOINs, <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code>) plans through the standard pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GRAPH_NEIGHBORS(...)</code></td>
+<td><code>(id, depth)</code></td>
+<td>Multi-hop BFS over an edge table; cycles broken by visited set</td>
+</tr>
+<tr>
+<td><code>GRAPH_PATH_EXISTS(...)</code></td>
+<td><code>(path_exists)</code></td>
+<td>Single-row BOOLEAN — does a path exist from <code>src</code> to <code>dst</code> within <code>max_depth</code>? RIG fact-check primitive</td>
+</tr>
+<tr>
+<td><code>PAGERANK(...)</code></td>
+<td><code>(node_id, rank)</code></td>
+<td>PageRank with optional edge-weight column and centralised / BSP-distributed mode</td>
+</tr>
+<tr>
+<td><code>PERSONALIZED_PAGERANK(...)</code></td>
+<td><code>(node_id, rank)</code></td>
+<td>Personalised PageRank seeded on a query-specific entity</td>
+</tr>
+<tr>
+<td><code>HYBRID_SEARCH(...)</code></td>
+<td><code>(id, score)</code></td>
+<td>Parallel BM25 + vector ANN scatter, blended into a single top-K (min-max or RRF)</td>
+</tr>
+</tbody>
+</table>
+<p>All five take named arguments (PostgreSQL <code>name =&gt; value</code> form). See <a href="../graph/">Graph Traversal &amp; Analytics</a> and <a href="../hybrid-search/">Hybrid Search</a> for argument reference and example SQL.</p>
 <h2 id="virtual-catalog">Virtual Catalog</h2>
 <p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands such as <code>\d</code>, <code>\dt</code>, and <code>\di</code> in <code>psql</code>. The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
 <h2 id="extended-query-protocol">Extended Query Protocol</h2>
