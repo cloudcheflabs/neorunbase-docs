@@ -55,6 +55,7 @@ nav:
       - "Graph Traversal & Analytics": features/graph.md
       - "Geospatial Support": features/geospatial.md
       - "Identity and Access Management": features/iam.md
+      - "IAM Policy Reference": features/iam-policy.md
       - "Admin UI": features/admin-ui.md
   - "Configuration":
       - "Configuration Reference": configuration/configuration.md
