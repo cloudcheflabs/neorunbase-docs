@@ -55,16 +55,6 @@ set automatically).
 ```bash
 # Inside the coordinator host or container:
 bin/neorunbase-cli.sh iam:reset-password
-
-# Or with the packaged docker image:
-docker exec neorunbase-coordinator /app/bin/neorunbase-cli.sh iam:reset-password
-```
-
-When stdout is piped or redirected, the password alone is printed — suitable
-for capturing in automation:
-
-```bash
-NEW_PW=$(docker exec neorunbase-coordinator /app/bin/neorunbase-cli.sh iam:reset-password)
 ```
 
 ## Input modes
