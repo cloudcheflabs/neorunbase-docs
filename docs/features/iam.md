@@ -25,3 +25,5 @@ NeorunBase uses policy-based access control to manage permissions:
 ## Admin API
 
 User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the Admin UI.
+
+For the full policy JSON schema, resource format, action catalog, column- and row-level ACL, and worked examples, see the [IAM Policy Reference](iam-policy.md).
