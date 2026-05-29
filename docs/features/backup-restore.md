@@ -20,9 +20,19 @@ The `S3 Backup` page in the admin UI exposes the full configuration:
 - **Access key / secret key** — long-lived static credentials.
 - **Path-style addressing** — required for ShannonStore / MinIO.
 - **Interval (minutes)** — how often the scheduled backup runs.
+- **Cron** — optional 5-field UNIX cron expression for wall-clock schedules (e.g. `0 2 * * *` daily at 02:00). Coexists with the interval rule; whichever comes due first fires the backup.
 - **Retention (days)** — how long the visible backup history is kept (default 30 days).
 
 The same page exposes a **Test Connection** button (verifies the bucket is reachable) and a **Backup now** button (runs an immediate backup).
+
+### Cron vs. Interval
+
+The two automatic rules are independent and share the same coordinator tick loop:
+
+- **Interval** is a relative "at least N minutes since the last successful backup" timer. Use it as a safety-net cadence.
+- **Cron** is wall-clock based. Use it for predictable schedules like nightly or weekly runs.
+
+The cron expression is evaluated in the leader coordinator's local time zone. The first sighting after the cron is set, or after a leader handoff, **arms from "now"** — NeorunBase does not back-fire missed cron times on startup. An invalid cron is rejected with HTTP 400 at config-save time rather than being persisted and silently skipped.
 
 ## Incremental by Design
 
