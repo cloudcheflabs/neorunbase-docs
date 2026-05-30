@@ -18,9 +18,11 @@ Users can be organized into IAM groups. Policies attached to a group apply to al
 
 NeorunBase uses policy-based access control to manage permissions:
 
-- Policies define what actions are allowed or denied on specific resources (schemas, tables).
+- Policies define what actions are allowed or denied on specific resources (catalogs, schemas, tables).
 - Policies can be attached to users or groups.
 - Multiple policies can be combined, with deny rules taking precedence over allow rules.
+- Fine-grained controls include column-level allow/deny, **column masking** (return a SQL expression instead of the raw value), and row-level filters.
+- Catalog management (`CREATE` / `ALTER` / `DROP CATALOG`) is gated by catalog-level resources (`db:catalog:<name>`).
 
 ## Admin API
 

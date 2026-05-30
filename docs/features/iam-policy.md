@@ -33,6 +33,7 @@ A policy is a JSON object with a `Version` and a list of `Statement` objects.
 | `Statement[].Action` | Yes | A single action string or list. Wildcards (`*`, `?`) supported. |
 | `Statement[].Resource` | Yes | A single resource string or list. Wildcards supported. |
 | `Statement[].Columns` | No | Column-level whitelist (on Allow) or blacklist (on Deny). See [Column-Level ACL](#column-level-acl). |
+| `Statement[].MaskedColumns` | No | Map of column → SQL mask expression applied on `SELECT`. See [Column Masking](#column-masking). |
 | `Statement[].Condition` | No | SQL `WHERE` fragment for row-level filtering. See [Row-Level ACL](#row-level-acl). |
 
 ---
@@ -49,6 +50,7 @@ db:<resource-type>:<id>
 |---------------|---------|----------|
 | `table` | `db:table:public.orders` | All DML and table-level DDL |
 | `schema` | `db:schema:analytics` | `CREATE SCHEMA`, `DROP SCHEMA` |
+| `catalog` | `db:catalog:iceberg-east` | `CREATE CATALOG`, `ALTER CATALOG`, `DROP CATALOG` |
 
 ### How resources are computed at runtime
 
@@ -60,6 +62,7 @@ NeorunBase parses the SQL statement and constructs the resource string before ev
 | `INSERT INTO users …` (no schema qualifier) | `db:table:public.users` |
 | `MERGE INTO target USING source …` | `db:table:<target>` (primary) **and** `db:table:<source>` (dual `pg:Select` check) |
 | `CREATE SCHEMA analytics` | `db:schema:analytics` |
+| `CREATE CATALOG "iceberg-east" …` | `db:catalog:iceberg-east` |
 
 When a table reference is unqualified (no `schema.` prefix), NeorunBase uses the connection's current database, falling back to `public` when none is set. Always match this in your policies — a policy granting `db:table:analytics.users` will **not** match a query against `users` from a connection whose default schema is `public`.
 
@@ -78,6 +81,7 @@ Common patterns:
 | `db:table:*.audit_*` | Every table whose name starts with `audit_` in any schema |
 | `db:table:iceberg.*.*` | Tables under the Iceberg catalog namespace (3-part names) |
 | `db:schema:team_*` | Every schema whose name starts with `team_` |
+| `db:catalog:*` | Every catalog (gates who may manage catalogs) |
 | `*` | Everything |
 
 ---
@@ -111,6 +115,16 @@ All actions live under the `pg:` namespace. Wildcards work at any depth (`pg:*`,
 |--------|--------------|---------------|
 | `pg:CreateSchema` | `CREATE SCHEMA` | `db:schema:` |
 | `pg:DropSchema` | `DROP SCHEMA` | `db:schema:` |
+
+### DDL — Catalogs
+
+Catalog DDL manages named [catalogs](catalogs.md) (the built-in `lakebase` plus external Iceberg catalogs).
+
+| Action | Triggered by | Resource type |
+|--------|--------------|---------------|
+| `pg:CreateCatalog` | `CREATE CATALOG` | `db:catalog:` |
+| `pg:AlterCatalog` | `ALTER CATALOG` | `db:catalog:` |
+| `pg:DropCatalog` | `DROP CATALOG` | `db:catalog:` |
 
 ### Statements that bypass authorization
 
@@ -173,6 +187,64 @@ Block reading the `salary` column even if other policies grant the row:
     "Action": "pg:Select",
     "Resource": "db:table:hr.*",
     "Columns": ["salary"]
+  }]
+}
+```
+
+---
+
+## Column Masking
+
+Where `Columns` removes a column entirely, **`MaskedColumns`** keeps the column in the result but replaces its value with the output of a SQL expression. A statement may carry a `MaskedColumns` object mapping each column name to a SQL mask expression:
+
+```json
+"MaskedColumns": {
+  "salary": "0",
+  "ssn": "'REDACTED'"
+}
+```
+
+On `SELECT`, each masked column returns the **evaluated expression** instead of the raw value. Masking applies both to explicit column lists and to `SELECT *`.
+
+Mask expressions are ordinary SQL — a literal, a function call, or a partial mask. For example:
+
+| Mask expression | Effect |
+|-----------------|--------|
+| `0` | Returns the constant `0` for every row. |
+| `'REDACTED'` | Returns the string `REDACTED`. |
+| `'***-**-' \|\| right(ssn, 4)` | Partial mask keeping only the last four characters. |
+
+### Precedence
+
+- **Deny beats Mask.** A column that is explicitly **Denied** (via a `Columns` blacklist) is never masked — it is simply not accessible.
+- **Higher `Sid` wins.** When two statements mask the *same* column, the statement with the **larger `Sid`** wins, so the outcome is deterministic.
+
+### Principal substitution
+
+Mask expressions may reference the current principal and have these tokens substituted before evaluation:
+
+| Token | Substituted with |
+|-------|------------------|
+| `${user.userId}` | The authenticated user's id. |
+| `${user.id}` | The authenticated user's id. |
+| `${user.groups}` | The principal's groups. |
+
+### Example
+
+Allow reading `hr.employees`, but mask `salary` to `0` and `ssn` to a redacted literal:
+
+```json
+{
+  "Version": "2024-01-01",
+  "Statement": [{
+    "Sid": "MaskSensitiveHR",
+    "Effect": "Allow",
+    "Action": "pg:Select",
+    "Resource": "db:table:hr.employees",
+    "MaskedColumns": {
+      "salary": "0",
+      "ssn": "'REDACTED'"
+    }
   }]
 }
 ```
@@ -337,6 +409,46 @@ The Iceberg catalog namespace uses three-segment table names (`iceberg.<namespac
 }
 ```
 
+### Catalog-level resources
+
+Catalog DDL is authorized on `db:catalog:<name>` resources, so an Allow/Deny on `db:catalog:*` (or a specific catalog) gates who may manage [catalogs](catalogs.md).
+
+Full access everywhere, but no one may create or manage catalogs (a broad Allow carved out by a Deny — explicit Deny wins):
+
+```json
+{
+  "Version": "2024-01-01",
+  "Statement": [
+    {
+      "Sid": "FullAccess",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "NoCatalogManagement",
+      "Effect": "Deny",
+      "Action": ["pg:CreateCatalog", "pg:AlterCatalog", "pg:DropCatalog"],
+      "Resource": "db:catalog:*"
+    }
+  ]
+}
+```
+
+Grant catalog management on a single catalog only:
+
+```json
+{
+  "Version": "2024-01-01",
+  "Statement": [{
+    "Sid": "ManageEastCatalog",
+    "Effect": "Allow",
+    "Action": ["pg:CreateCatalog", "pg:AlterCatalog", "pg:DropCatalog"],
+    "Resource": "db:catalog:iceberg-east"
+  }]
+}
+```
+
 ### Merge with read-only source
 
 `MERGE INTO target USING source` triggers two checks: `pg:Merge` on the target and `pg:Select` on the source. Both must pass.
@@ -369,5 +481,7 @@ The Iceberg catalog namespace uses three-segment table names (`iceberg.<namespac
 - **Wildcard matching is case-insensitive.** `Resource: "DB:TABLE:Public.Users"` matches `db:table:public.users`.
 - **Row filters are OR-ed.** Multiple Allow statements with conditions widen access, they don't narrow it.
 - **A Deny with `Columns` is not a resource deny.** It only restricts the listed columns — the row itself can still be returned by another Allow.
+- **Masking yields to Deny.** A column denied via a `Columns` blacklist is never masked; it is simply inaccessible. When two statements mask the same column, the larger `Sid` wins.
+- **Catalog DDL is authorized.** `CREATE`/`ALTER`/`DROP CATALOG` require `pg:CreateCatalog` / `pg:AlterCatalog` / `pg:DropCatalog` on `db:catalog:<name>`.
 - **MERGE has dual authorization.** A user able to merge into a table must also be able to `pg:Select` on the source table.
 - **`SET` and transaction control bypass authorization.** Use this in mind when designing policies for session-level features.

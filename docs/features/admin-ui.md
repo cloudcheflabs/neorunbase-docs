@@ -25,6 +25,7 @@ The Admin UI allows administrators to perform operational tasks:
 
 - **IAM Management**: Create and manage users, groups, and policies
 - **pg-wire TLS**: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See [pg-wire TLS](pg-wire-tls.md).
+- **Catalogs**: List, create, edit, and drop catalogs (the built-in `lakebase` plus external Iceberg catalogs). Drop is refused for a non-empty catalog and `lakebase` cannot be removed. See [Catalogs](catalogs.md).
 - **Iceberg**: Configure the Apache Polaris connection (URI, OAuth client credentials, S3 access/secret key) and monitor sync status. See [Iceberg Integration](iceberg-integration.md).
 - **S3 Backup**: Configure scheduled cluster backups, view backup history, and trigger restore. See [Backup & Restore](backup-restore.md).
 - **Kafka Ingestion**: Manage Kafka consumer groups and monitor ingestion pipelines
