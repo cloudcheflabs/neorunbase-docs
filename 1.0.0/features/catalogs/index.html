@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/replication-ha/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/catalogs/">
       
       
-        <link rel="prev" href="../distributed-sharding/">
+        <link rel="prev" href="../pg-wire-tls/">
       
       
-        <link rel="next" href="../transactions/">
+        <link rel="next" href="../iceberg-integration/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Replication & High Availability - NeorunBase</title>
+        <title>Catalogs - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#replication-high-availability" class="md-skip">
+        <a href="#catalogs" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Replication & High Availability
+              Catalogs
             
           </span>
         </div>
@@ -739,37 +739,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Replication & High Availability
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../replication-ha/" class="md-nav__link">
         
   
   
@@ -785,81 +758,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#shard-replication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shard Replication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-failure-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Failure Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-shard-repair" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Shard Repair
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shard-rebalancing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shard Rebalancing
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#coordinator-high-availability" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coordinator High Availability
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -953,10 +851,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../catalogs/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogs
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -972,6 +897,153 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-built-in-lakebase-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Built-in lakebase Catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-iceberg-catalogs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Iceberg Catalogs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-catalogs-with-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing Catalogs with SQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Catalogs with SQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CREATE CATALOG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alter-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ALTER CATALOG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drop-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DROP CATALOG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspecting-catalogs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspecting Catalogs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#startup-default-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Startup Default Catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#admin-rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin REST API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1511,18 +1583,179 @@
 
 
 
-<h1 id="replication-high-availability">Replication &amp; High Availability</h1>
-<p>NeorunBase provides fault tolerance and high availability through shard replication and automatic failure recovery.</p>
-<h2 id="shard-replication">Shard Replication</h2>
-<p>Each shard can be configured with a replication factor. NeorunBase maintains multiple copies of each shard across different Data Nodes. This ensures that data remains available even if one or more Data Nodes go down.</p>
-<h2 id="automatic-failure-detection">Automatic Failure Detection</h2>
-<p>NeorunBase continuously monitors the health of all Data Nodes. When a Data Node becomes unavailable, the system automatically detects the failure and initiates recovery actions.</p>
-<h2 id="automatic-shard-repair">Automatic Shard Repair</h2>
-<p>When a Data Node failure is detected, NeorunBase automatically replicates the affected shards from surviving replicas to healthy Data Nodes, restoring the desired replication factor without manual intervention.</p>
-<h2 id="shard-rebalancing">Shard Rebalancing</h2>
-<p>When Data Nodes are added to or removed from the cluster, NeorunBase automatically rebalances shards across the cluster to ensure even data distribution and optimal resource utilization.</p>
-<h2 id="coordinator-high-availability">Coordinator High Availability</h2>
-<p>Multiple Coordinators can run simultaneously. NeorunBase uses leader election to designate a primary Coordinator for metadata management, while all Coordinators can serve client queries. If the leader Coordinator fails, a new leader is automatically elected.</p>
+<h1 id="catalogs">Catalogs</h1>
+<p>NeorunBase organizes all tables under named <strong>catalogs</strong>. The built-in catalog is the cluster's native distributed store; additional catalogs connect to external Apache Iceberg catalogs, so one SQL surface reaches both NeorunBase-native tables and lakehouse tables managed elsewhere.</p>
+<h2 id="the-built-in-lakebase-catalog">The Built-in <code>lakebase</code> Catalog</h2>
+<p><code>lakebase</code> is NeorunBase's own distributed store. It is <strong>always present</strong> and <strong>cannot be created or dropped</strong>. Native tables are addressed with a two-part name:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">analytics</span><span class="p">.</span><span class="n">orders</span><span class="p">;</span><span class="w">          </span><span class="c1">-- schema.table</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">lakebase</span><span class="p">.</span><span class="n">analytics</span><span class="p">.</span><span class="n">orders</span><span class="p">;</span><span class="w"> </span><span class="c1">-- catalog.schema.table (equivalent)</span>
+</code></pre></div>
+<p>When a table reference omits the catalog, NeorunBase resolves it against <code>lakebase</code>. The two forms above are equivalent.</p>
+<h2 id="external-iceberg-catalogs">External Iceberg Catalogs</h2>
+<p>In addition to <code>lakebase</code> you can register any number of external Iceberg catalogs by name (for example <code>iceberg-east</code>, <code>iceberg-west</code>). A catalog is a connection to a REST/Polaris Iceberg catalog plus its own S3 backend. Tables in a registered catalog use a three-part name:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="p">.</span><span class="n">sales</span><span class="p">.</span><span class="n">events</span><span class="p">;</span><span class="w">  </span><span class="c1">-- &lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Connectors today</p>
+<p>Only the <strong>Iceberg</strong> connector exists today (<code>'type'='rest'</code>, talking to a REST/Polaris catalog). The catalog layer is built so more connector types can be added later without changing how catalogs are addressed in SQL.</p>
+</div>
+<h2 id="managing-catalogs-with-sql">Managing Catalogs with SQL</h2>
+<p>Catalog DDL is <strong>leader-forwarded</strong>: it runs on the leader coordinator, is persisted in the cluster metadata store, and is replicated to every coordinator (leader + followers), so every node resolves the same set of catalogs.</p>
+<h3 id="create-catalog"><code>CREATE CATALOG</code></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">CATALOG</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="s1">&#39;type&#39;</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;rest&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="s1">&#39;uri&#39;</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;http://polaris:8181/api/catalog&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="s1">&#39;warehouse&#39;</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;my_catalog&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="s1">&#39;security&#39;</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;OAUTH2&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="s1">&#39;client-id&#39;</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="s1">&#39;client-secret&#39;</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="s1">&#39;extra-properties&#39;</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;prefix=my_catalog,header.Polaris-Realm=POLARIS,scope=PRINCIPAL_ROLE:ALL&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="s1">&#39;s3.endpoint&#39;</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;http://minio:9000&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="s1">&#39;s3.access-key&#39;</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="s1">&#39;s3.secret-key&#39;</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span><span class="s1">&#39;s3.region&#39;</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;us-east-1&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="s1">&#39;s3.path-style-access&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;true&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="s1">&#39;default-namespace&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lakebase&#39;</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">);</span>
+</code></pre></div>
+<p>Option keys may be <strong>bare or quoted</strong> (Trino-style), and values may use single or double quotes. The parser is <strong>comma-safe</strong>, so values such as <code>extra-properties</code> can themselves contain commas.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>Connector type. Currently <code>rest</code> (REST/Polaris Iceberg catalog).</td>
+</tr>
+<tr>
+<td><code>uri</code></td>
+<td>Iceberg REST catalog base URI (the <code>/api/catalog</code> path).</td>
+</tr>
+<tr>
+<td><code>warehouse</code></td>
+<td>Iceberg warehouse / catalog name.</td>
+</tr>
+<tr>
+<td><code>security</code></td>
+<td><code>OAUTH2</code> for the client-credentials flow.</td>
+</tr>
+<tr>
+<td><code>client-id</code> / <code>client-secret</code></td>
+<td>OAuth2 client credentials.</td>
+</tr>
+<tr>
+<td><code>extra-properties</code></td>
+<td>Free-form extra REST-catalog properties (comma-separated <code>key=value</code>), e.g. <code>prefix</code>, <code>header.Polaris-Realm</code>, <code>scope</code>.</td>
+</tr>
+<tr>
+<td><code>s3.endpoint</code></td>
+<td>S3 (or S3-compatible) endpoint for the catalog's data files.</td>
+</tr>
+<tr>
+<td><code>s3.access-key</code> / <code>s3.secret-key</code></td>
+<td>Static S3 credentials.</td>
+</tr>
+<tr>
+<td><code>s3.region</code></td>
+<td>S3 region string.</td>
+</tr>
+<tr>
+<td><code>s3.path-style-access</code></td>
+<td><code>true</code> for MinIO/ShannonStore and most S3-compatible gateways.</td>
+</tr>
+<tr>
+<td><code>default-namespace</code></td>
+<td>Namespace used when one is not given.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alter-catalog"><code>ALTER CATALOG</code></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">CATALOG</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s1">&#39;s3.endpoint&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;http://minio-new:9000&#39;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">);</span>
+</code></pre></div>
+<p><code>ALTER CATALOG … SET</code> <strong>patches only the named options</strong> and leaves the rest of the definition intact. You can change one field without re-supplying secrets such as <code>client-secret</code> or <code>s3.secret-key</code>.</p>
+<h3 id="drop-catalog"><code>DROP CATALOG</code></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">DROP</span><span class="w"> </span><span class="k">CATALOG</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="p">;</span>
+</code></pre></div>
+<p>A <code>DROP CATALOG</code> is <strong>refused if the catalog still contains any namespace with tables</strong> — empty the catalog first. The built-in <code>lakebase</code> catalog <strong>cannot be dropped</strong>.</p>
+<h3 id="inspecting-catalogs">Inspecting Catalogs</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">CATALOGS</span><span class="p">;</span><span class="w">                              </span><span class="c1">-- lakebase + every registered catalog</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">SCHEMAS</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">TABLES</span><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="p">.</span><span class="n">sales</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">SHOW</span><span class="w"> </span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="ss">&quot;iceberg-east&quot;</span><span class="p">.</span><span class="n">sales</span><span class="p">.</span><span class="n">events</span><span class="p">;</span>
+</code></pre></div>
+<h2 id="startup-default-catalog">Startup Default Catalog</h2>
+<p>The startup properties <code>neorunbase.iceberg.*</code> (<code>catalog.type=polaris</code>/<code>rest</code> plus the <code>polaris.*</code> / <code>s3.*</code> fields) <strong>seed a DEFAULT catalog at boot</strong>. Additional catalogs are then created at runtime via <code>CREATE CATALOG</code> or the Admin UI. See <a href="../../configuration/configuration/#iceberg-catalog-integration">Configuration</a> for the property reference.</p>
+<h2 id="admin-rest-api">Admin REST API</h2>
+<p>Catalog management is also available through the admin REST API. All endpoints are JWT-authenticated and <strong>leader-forwarded</strong> (non-leaders proxy the call to the leader). Secrets are <strong>masked</strong> in responses.</p>
+<table>
+<thead>
+<tr>
+<th>Method &amp; Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /admin/api/catalogs</code></td>
+<td>List catalogs (<code>lakebase</code> + registered; secrets masked).</td>
+</tr>
+<tr>
+<td><code>GET /admin/api/catalogs/&lt;name&gt;</code></td>
+<td>Fetch one catalog (secrets masked).</td>
+</tr>
+<tr>
+<td><code>POST /admin/api/catalogs</code></td>
+<td>Create a catalog.</td>
+</tr>
+<tr>
+<td><code>PUT /admin/api/catalogs/&lt;name&gt;</code></td>
+<td>Alter (patch) a catalog's options.</td>
+</tr>
+<tr>
+<td><code>DELETE /admin/api/catalogs/&lt;name&gt;</code></td>
+<td>Drop a catalog. Returns <strong>HTTP 409</strong> if it is non-empty.</td>
+</tr>
+</tbody>
+</table>
+<p>Create a catalog:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="err">POST</span><span class="w"> </span><span class="err">/admi</span><span class="kc">n</span><span class="err">/api/ca</span><span class="kc">tal</span><span class="err">ogs</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iceberg-east&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;options&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rest&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://polaris:8181/api/catalog&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">&quot;warehouse&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my_catalog&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">&quot;security&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OAUTH2&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="nt">&quot;client-id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="nt">&quot;client-secret&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="nt">&quot;extra-properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prefix=my_catalog,header.Polaris-Realm=POLARIS,scope=PRINCIPAL_ROLE:ALL&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="nt">&quot;s3.endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://minio:9000&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="nt">&quot;s3.access-key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">&quot;s3.secret-key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="nt">&quot;s3.region&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="nt">&quot;s3.path-style-access&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="nt">&quot;default-namespace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;lakebase&quot;</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}</span>
+</code></pre></div>
+<p>Alter a catalog (patch — unspecified options are preserved):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="err">PUT</span><span class="w"> </span><span class="err">/admi</span><span class="kc">n</span><span class="err">/api/ca</span><span class="kc">tal</span><span class="err">ogs/iceberg</span><span class="mf">-e</span><span class="err">as</span><span class="kc">t</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;options&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">&quot;s3.endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://minio-new:9000&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="admin-ui">Admin UI</h2>
+<p>The Admin UI includes a <strong>Catalogs</strong> page in the sidebar. It lists every catalog and lets you create, edit, and drop them through a form. As with the SQL and REST paths, a drop is <strong>refused for a non-empty catalog</strong>, and <code>lakebase</code> cannot be removed.</p>
+<h2 id="authorization">Authorization</h2>
+<p>Catalog DDL is gated by IAM. <code>CREATE CATALOG</code>, <code>DROP CATALOG</code>, and <code>ALTER CATALOG</code> are authorized as the actions <code>pg:CreateCatalog</code>, <code>pg:DropCatalog</code>, and <code>pg:AlterCatalog</code> on the resource <code>db:catalog:&lt;name&gt;</code>. See the <a href="../iam-policy/#catalog-level-resources">IAM Policy Reference</a> for examples.</p>
 
 
 

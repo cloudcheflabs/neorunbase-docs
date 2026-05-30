@@ -854,6 +854,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../catalogs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../iceberg-integration/" class="md-nav__link">
         
   
@@ -1486,9 +1514,11 @@
 <h2 id="policies">Policies</h2>
 <p>NeorunBase uses policy-based access control to manage permissions:</p>
 <ul>
-<li>Policies define what actions are allowed or denied on specific resources (schemas, tables).</li>
+<li>Policies define what actions are allowed or denied on specific resources (catalogs, schemas, tables).</li>
 <li>Policies can be attached to users or groups.</li>
 <li>Multiple policies can be combined, with deny rules taking precedence over allow rules.</li>
+<li>Fine-grained controls include column-level allow/deny, <strong>column masking</strong> (return a SQL expression instead of the raw value), and row-level filters.</li>
+<li>Catalog management (<code>CREATE</code> / <code>ALTER</code> / <code>DROP CATALOG</code>) is gated by catalog-level resources (<code>db:catalog:&lt;name&gt;</code>).</li>
 </ul>
 <h2 id="admin-api">Admin API</h2>
 <p>User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the Admin UI.</p>

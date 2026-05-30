@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
       
       
-        <link rel="prev" href="../pg-wire-tls/">
+        <link rel="prev" href="../catalogs/">
       
       
         <link rel="next" href="../backup-restore/">
@@ -851,6 +851,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../catalogs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -965,6 +993,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Format Data Files (Parquet, ORC, Avro)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1507,14 +1552,19 @@
 
 <h1 id="iceberg-integration">Iceberg Integration</h1>
 <p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
+<div class="admonition note">
+<p class="admonition-title">Iceberg catalogs are first-class</p>
+<p>An Iceberg connection is registered as a named <a href="../catalogs/">catalog</a>. You can register more than one (e.g. <code>iceberg-east</code>, <code>iceberg-west</code>); tables in each are addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>. This page uses <code>iceberg</code> as the example catalog name.</p>
+</div>
 <h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
-<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. The connection is configured once in the admin UI:</p>
+<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via <code>CREATE CATALOG</code> SQL, or seeded at startup from <code>neorunbase.iceberg.*</code>. Each catalog supplies:</p>
 <ul>
 <li>Polaris URI and OAuth token endpoint</li>
 <li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
 <li>OAuth2 client ID / client secret, realm, scope</li>
 <li>S3 endpoint, access key, secret key, region</li>
 </ul>
+<p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
 <p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
 <h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
 <p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
@@ -1540,6 +1590,15 @@
 <li>WHERE-clause and column-projection pushdown to data nodes</li>
 <li>Both <strong>equality deletes</strong> and <strong>position deletes</strong> are applied at read time, so external tools writing into the same table stay compatible</li>
 </ul>
+<h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
+<p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
+<p>Multi-format read applies everywhere an external Iceberg table is read:</p>
+<ul>
+<li>The distributed data-node scan</li>
+<li>The coordinator-local scan</li>
+<li>Loading an external Iceberg table into LakeBase</li>
+</ul>
+<p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
 <p><code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; …</code> is supported as a copy-on-write merge. Direct <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or <code>MERGE INTO</code>.</p>
 <h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
 <p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>

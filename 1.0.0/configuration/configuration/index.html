@@ -849,6 +849,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/catalogs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/iceberg-integration/" class="md-nav__link">
         
   
@@ -2249,7 +2277,7 @@
 <p>NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
 <div class="admonition note">
 <p class="admonition-title">Catalog backend support</p>
-<p><code>neorunbase.iceberg.catalog.type</code> accepts only <strong><code>none</code></strong> (disabled) or <strong><code>polaris</code></strong>. The generic <code>neorunbase.iceberg.catalog.rest.*</code> security/OAuth keys below are <strong>legacy and ignored</strong> under the polaris path; the admin UI hides them. Polaris runtime config is normally set from the admin UI (persisted in the metadata store), not from this file. Other Iceberg-REST flavors are intentionally not supported.</p>
+<p><code>neorunbase.iceberg.catalog.type</code> accepts only <strong><code>none</code></strong> (disabled) or <strong><code>polaris</code></strong>. The <code>neorunbase.iceberg.polaris.*</code> fields below configure the startup <strong>default catalog</strong>; additional catalogs are created with <code>CREATE CATALOG</code> / the admin UI <strong>Catalogs</strong> page (persisted in the metadata store and snapshot-replicated). See <a href="../../features/catalogs/">Catalogs</a>. The generic <code>neorunbase.iceberg.catalog.rest.*</code> security/OAuth keys are <strong>legacy and ignored</strong> under the polaris path; the admin UI hides them. Other Iceberg-REST flavors are intentionally not supported.</p>
 </div>
 <table>
 <thead>
@@ -2264,6 +2292,41 @@
 <td><code>neorunbase.iceberg.catalog.type</code></td>
 <td><code>none</code></td>
 <td>Catalog backend selector. <code>none</code> disables all Iceberg integration; <code>polaris</code> enables the Apache Polaris REST-catalog bootstrap.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.uri</code></td>
+<td>(empty)</td>
+<td>Polaris REST catalog base URI (the <code>/api/catalog</code> path), e.g. <code>http://shannon-polaris:8181/api/catalog</code>. Seeds the startup default catalog.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.oauth.token.endpoint</code></td>
+<td>(empty)</td>
+<td>Polaris OAuth2 token endpoint for the client-credentials grant (often the catalog URI plus <code>/v1/oauth/tokens</code>). Blank lets the client derive it.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.catalog.name</code></td>
+<td>(empty)</td>
+<td>Polaris catalog name. Sent as the Iceberg <code>prefix</code> / warehouse query param so Polaris resolves the target catalog by name (not a storage path).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.client.id</code></td>
+<td>(empty)</td>
+<td>OAuth2 <code>client_credentials</code> principal id (the Polaris client id). Credential.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.client.secret</code></td>
+<td>(empty)</td>
+<td>OAuth2 <code>client_credentials</code> secret for the principal above. Credential.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.realm</code></td>
+<td><code>POLARIS</code></td>
+<td>Value of the <code>Polaris-Realm</code> HTTP header sent on every catalog request (selects the Polaris realm/tenant).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.polaris.scope</code></td>
+<td><code>PRINCIPAL_ROLE:ALL</code></td>
+<td>OAuth2 scope requested on the token call. For full catalog access Polaris uses the principal-role wildcard.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.catalog.rest.uri</code></td>
@@ -2557,6 +2620,11 @@
 <td><code>neorunbase.iam.rocksdb.path</code></td>
 <td><code>${neorunbase.base.data.dir}/iam</code></td>
 <td>RocksDB store for IAM state (users, roles, grants, policies, STS temp credentials). Owned by the leader, replicated to peers. Must be durable.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.kms.key.id</code></td>
+<td><code>iam-encryption</code></td>
+<td>Logical KMS key id used to envelope-encrypt the IAM RocksDB store at rest (users, password hashes, access keys, policies, STS credentials). A plaintext IAM DB from an older build is auto-migrated on first save. Changing it after data exists makes the existing IAM store unreadable — set it once at provisioning time.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iam.sts.cleanup.interval.hours</code></td>
