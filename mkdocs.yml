@@ -46,6 +46,7 @@ nav:
       - "Distributed Transactions": features/transactions.md
       - "Encryption at Rest": features/encryption.md
       - "pg-wire TLS": features/pg-wire-tls.md
+      - "Catalogs": features/catalogs.md
       - "Iceberg Integration": features/iceberg-integration.md
       - "Backup & Restore": features/backup-restore.md
       - "Kafka Integration": features/kafka-integration.md

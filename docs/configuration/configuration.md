@@ -151,11 +151,18 @@ Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unr
 NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See [Iceberg Integration](../features/iceberg-integration.md) for the full feature description.
 
 !!! note "Catalog backend support"
-    `neorunbase.iceberg.catalog.type` accepts only **`none`** (disabled) or **`polaris`**. The generic `neorunbase.iceberg.catalog.rest.*` security/OAuth keys below are **legacy and ignored** under the polaris path; the admin UI hides them. Polaris runtime config is normally set from the admin UI (persisted in the metadata store), not from this file. Other Iceberg-REST flavors are intentionally not supported.
+    `neorunbase.iceberg.catalog.type` accepts only **`none`** (disabled) or **`polaris`**. The `neorunbase.iceberg.polaris.*` fields below configure the startup **default catalog**; additional catalogs are created with `CREATE CATALOG` / the admin UI **Catalogs** page (persisted in the metadata store and snapshot-replicated). See [Catalogs](../features/catalogs.md). The generic `neorunbase.iceberg.catalog.rest.*` security/OAuth keys are **legacy and ignored** under the polaris path; the admin UI hides them. Other Iceberg-REST flavors are intentionally not supported.
 
 | Property | Default | Description |
 | --- | --- | --- |
 | `neorunbase.iceberg.catalog.type` | `none` | Catalog backend selector. `none` disables all Iceberg integration; `polaris` enables the Apache Polaris REST-catalog bootstrap. |
+| `neorunbase.iceberg.polaris.uri` | (empty) | Polaris REST catalog base URI (the `/api/catalog` path), e.g. `http://shannon-polaris:8181/api/catalog`. Seeds the startup default catalog. |
+| `neorunbase.iceberg.polaris.oauth.token.endpoint` | (empty) | Polaris OAuth2 token endpoint for the client-credentials grant (often the catalog URI plus `/v1/oauth/tokens`). Blank lets the client derive it. |
+| `neorunbase.iceberg.polaris.catalog.name` | (empty) | Polaris catalog name. Sent as the Iceberg `prefix` / warehouse query param so Polaris resolves the target catalog by name (not a storage path). |
+| `neorunbase.iceberg.polaris.client.id` | (empty) | OAuth2 `client_credentials` principal id (the Polaris client id). Credential. |
+| `neorunbase.iceberg.polaris.client.secret` | (empty) | OAuth2 `client_credentials` secret for the principal above. Credential. |
+| `neorunbase.iceberg.polaris.realm` | `POLARIS` | Value of the `Polaris-Realm` HTTP header sent on every catalog request (selects the Polaris realm/tenant). |
+| `neorunbase.iceberg.polaris.scope` | `PRINCIPAL_ROLE:ALL` | OAuth2 scope requested on the token call. For full catalog access Polaris uses the principal-role wildcard. |
 | `neorunbase.iceberg.catalog.rest.uri` | (empty) | *(legacy, ignored under polaris)* Generic REST catalog base URI. |
 | `neorunbase.iceberg.catalog.rest.security` | `NONE` | *(legacy, ignored under polaris)* REST catalog auth mode: `NONE` or `OAUTH2`. |
 | `neorunbase.iceberg.catalog.rest.token-endpoint` | (empty) | *(legacy, ignored under polaris)* OAuth2 token endpoint for client-credentials flow. |
@@ -245,6 +252,7 @@ The leader Coordinator distributes consumer groups round-robin across the Data N
 | Property | Default | Description |
 | --- | --- | --- |
 | `neorunbase.iam.rocksdb.path` | `${neorunbase.base.data.dir}/iam` | RocksDB store for IAM state (users, roles, grants, policies, STS temp credentials). Owned by the leader, replicated to peers. Must be durable. |
+| `neorunbase.iam.kms.key.id` | `iam-encryption` | Logical KMS key id used to envelope-encrypt the IAM RocksDB store at rest (users, password hashes, access keys, policies, STS credentials). A plaintext IAM DB from an older build is auto-migrated on first save. Changing it after data exists makes the existing IAM store unreadable — set it once at provisioning time. |
 | `neorunbase.iam.sts.cleanup.interval.hours` | `1` | How often to sweep expired STS temporary credentials from the AuthManager keystore. |
 
 ## Write-Ahead Log (WAL) & Encryption

@@ -2,14 +2,19 @@
 
 NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.
 
+!!! note "Iceberg catalogs are first-class"
+    An Iceberg connection is registered as a named [catalog](catalogs.md). You can register more than one (e.g. `iceberg-east`, `iceberg-west`); tables in each are addressed as `<catalog>.<namespace>.<table>`. This page uses `iceberg` as the example catalog name.
+
 ## Catalog — Apache Polaris
 
-NeorunBase currently supports **Apache Polaris** as the Iceberg REST catalog. The connection is configured once in the admin UI:
+NeorunBase currently supports **Apache Polaris** as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via `CREATE CATALOG` SQL, or seeded at startup from `neorunbase.iceberg.*`. Each catalog supplies:
 
 - Polaris URI and OAuth token endpoint
 - Catalog name (used as the Iceberg `prefix` and `warehouse` parameter)
 - OAuth2 client ID / client secret, realm, scope
 - S3 endpoint, access key, secret key, region
+
+You can register more than one Iceberg catalog. See [Catalogs](catalogs.md) for the full create/alter/drop surface.
 
 S3 access uses the **static access key / secret key** set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.
 
@@ -45,6 +50,18 @@ Adding a column to a NeorunBase table (`ALTER TABLE … ADD COLUMN …`) is prop
 
 - WHERE-clause and column-projection pushdown to data nodes
 - Both **equality deletes** and **position deletes** are applied at read time, so external tools writing into the same table stay compatible
+
+### Multi-Format Data Files (Parquet, ORC, Avro)
+
+NeorunBase reads Iceberg data files in all three formats — **PARQUET**, **ORC**, and **AVRO** — including tables written by other engines such as Trino and Spark. The format is detected **per file** from the `DataFile` format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.
+
+Multi-format read applies everywhere an external Iceberg table is read:
+
+- The distributed data-node scan
+- The coordinator-local scan
+- Loading an external Iceberg table into LakeBase
+
+NeorunBase still **writes Parquet** for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.
 
 `MERGE INTO iceberg.<ns>.<target> USING <source> …` is supported as a copy-on-write merge. Direct `INSERT`, `UPDATE`, `DELETE` against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or `MERGE INTO`.
 
