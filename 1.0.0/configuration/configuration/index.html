@@ -1331,10 +1331,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster" class="md-nav__link">
+  <a href="#common-cluster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cluster
+        Common Cluster
       
     </span>
   </a>
@@ -1342,10 +1342,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coordinator" class="md-nav__link">
+  <a href="#coordinator-node" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Coordinator
+        Coordinator Node
       
     </span>
   </a>
@@ -1364,10 +1364,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#default-table-settings" class="md-nav__link">
+  <a href="#default-settings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Default Table Settings
+        Default Settings
       
     </span>
   </a>
@@ -1452,10 +1452,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#internal-protocol-tuning" class="md-nav__link">
+  <a href="#protocol-compression" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Internal Protocol Tuning
+        Protocol Compression
       
     </span>
   </a>
@@ -1540,6 +1540,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#internal-protocol-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Protocol Tuning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-node-periodic-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Node Periodic Tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pg-wire-protocol-server-tuning" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1551,10 +1573,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#vector-ann-index-maintenance" class="md-nav__link">
+  <a href="#vector-ann-fts-index-maintenance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Vector ANN Index Maintenance
+        Vector ANN &amp; FTS Index Maintenance
       
     </span>
   </a>
@@ -1584,10 +1606,54 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#distributed-search-scatter-fts-vector-hybrid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed Search Scatter (FTS / Vector / Hybrid)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distributed-pagerank-bsp-pregel-lite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed PageRank (BSP / Pregel-lite)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#coordinator-cluster-sync" class="md-nav__link">
     <span class="md-ellipsis">
       
         Coordinator Cluster Sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-bootstrap-fetch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster Bootstrap Fetch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sticky-leader-election" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sticky Leader Election
       
     </span>
   </a>
@@ -1753,7 +1819,7 @@
 <p>NeorunBase resolves each configuration key from three sources, <strong>in order</strong>:</p>
 <ol>
 <li><strong>JVM system property</strong> — e.g. <code>-Dneorunbase.coordinator.pg.port=5433</code> on the command line.</li>
-<li><strong>Environment variable</strong> — e.g. <code>NEORUNBASE_COORDINATOR_PG_PORT=5433</code>. The mapping is uppercase with dots replaced by underscores.</li>
+<li><strong>Environment variable</strong> — e.g. <code>NEORUNBASE_COORDINATOR_PG_PORT=5433</code>. The mapping is <strong>uppercase with dots replaced by underscores</strong>.</li>
 <li><strong>Properties file</strong> — <code>conf/neorunbase.properties</code>, the on-disk default.</li>
 </ol>
 <p>A higher source always wins. This lets the start scripts in <code>bin/</code> override individual settings on the command line (the example launcher uses this to start two Data Nodes on different ports from a single config file), and lets containerized or systemd-managed deployments inject ports, hostnames, and key material via environment variables without rewriting the file.</p>
@@ -1762,16 +1828,20 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">neorunbase.datanode.data.dir</span><span class="o">=</span><span class="s">${neorunbase.base.data.dir}/shards</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">neorunbase.wal.directory</span><span class="o">=</span><span class="s">${neorunbase.base.data.dir}/wal</span>
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Container persistence</p>
+<p><code>neorunbase.base.data.dir</code> is the root of all on-disk state (shards, WAL, KMS, IAM, metadata, logs, metrics). In containers it <strong>must</strong> be a persistent mount, otherwise all cluster state is lost on restart.</p>
+</div>
 <h2 id="master-key">Master Key</h2>
 <p>Every NeorunBase server process reads a master key from the environment variable named by <code>neorunbase.kms.master.key.env</code> (default <code>NEORUNBASE_MASTER_KEY</code>). The master key:</p>
 <ul>
 <li>Must be <strong>at least 32 characters</strong> long.</li>
 <li>Must be <strong>identical across all Coordinators and Data Nodes</strong> in the cluster.</li>
 <li>Is the root of the envelope-encryption hierarchy. PBKDF2 with <code>neorunbase.kms.pbkdf2.iterations</code> iterations (default <code>200000</code>) derives the master encryption key, which wraps the per-key DEKs used for KMS, internal protocol, metadata, WAL, heap segments, and at-rest shard data.</li>
-<li>Is also the secret used to derive the JWT signing key for the admin HTTP server.</li>
+<li>Is also the secret used to derive the JWT signing key for the admin HTTP server (SHA-256 of the master key); rotating the master key invalidates outstanding admin tokens.</li>
 </ul>
 <p>Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unrecoverable. Keep it in a secret manager and rotate per your security policy.</p>
-<h2 id="cluster">Cluster</h2>
+<h2 id="common-cluster">Common Cluster</h2>
 <table>
 <thead>
 <tr>
@@ -1784,36 +1854,36 @@
 <tr>
 <td><code>neorunbase.cluster.id</code></td>
 <td><code>neorunbase-cluster</code></td>
-<td>Unique identifier for this NeorunBase cluster. Must match across all nodes.</td>
+<td>Logical name of this cluster. All nodes that form one cluster share the same id; it tags the cluster's ZooKeeper namespace so two clusters can share a ZK ensemble.</td>
 </tr>
 <tr>
 <td><code>neorunbase.zookeeper.server.list</code></td>
 <td><code>localhost:2181</code></td>
-<td>ZooKeeper connection string (<code>host1:port1,host2:port2</code>).</td>
+<td>ZooKeeper ensemble used for leader election, node discovery, and coordination. Comma-separated <code>host:port</code> list reachable from every node.</td>
 </tr>
 <tr>
 <td><code>neorunbase.zookeeper.root.path</code></td>
 <td><code>/neorunbase</code></td>
-<td>Root znode path under which all NeorunBase znodes are created.</td>
+<td>Chroot/root znode under which all NeorunBase znodes are created. Must start with <code>/</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.zookeeper.session.timeout.ms</code></td>
 <td><code>30000</code></td>
-<td>ZooKeeper session timeout.</td>
+<td>ZooKeeper session timeout. Too low triggers spurious failovers on GC pauses; too high slows failure detection.</td>
 </tr>
 <tr>
 <td><code>neorunbase.zookeeper.connection.timeout.ms</code></td>
 <td><code>10000</code></td>
-<td>ZooKeeper connection timeout.</td>
+<td>Maximum time to wait when first establishing a TCP connection to a ZooKeeper server before trying another endpoint.</td>
 </tr>
 <tr>
 <td><code>neorunbase.base.data.dir</code></td>
 <td><code>./data</code></td>
-<td>Base directory for all NeorunBase data. Most other directory properties derive from this.</td>
+<td>Root directory for all on-disk state. Most other path properties derive from this. Must be a persistent mount in containers.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="coordinator">Coordinator</h2>
+<h2 id="coordinator-node">Coordinator Node</h2>
 <table>
 <thead>
 <tr>
@@ -1826,27 +1896,27 @@
 <tr>
 <td><code>neorunbase.coordinator.host</code></td>
 <td><code>0.0.0.0</code></td>
-<td>Bind address for the PG wire protocol listener.</td>
+<td>Bind address for the PG-wire server and the coordinator internal NIO server. <code>0.0.0.0</code> binds all interfaces.</td>
 </tr>
 <tr>
 <td><code>neorunbase.coordinator.pg.port</code></td>
 <td><code>5432</code></td>
-<td>TCP port for PostgreSQL wire protocol connections.</td>
+<td>TCP port for PostgreSQL wire protocol clients (psql, JDBC). The primary SQL endpoint.</td>
 </tr>
 <tr>
 <td><code>neorunbase.coordinator.advertised.host</code></td>
 <td><code>localhost</code></td>
-<td>Hostname advertised to clients and other nodes. Set to a reachable hostname in production.</td>
+<td>Hostname/IP this coordinator publishes to ZooKeeper. Must be resolvable/reachable by peers and clients even when the bind host is <code>0.0.0.0</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.coordinator.worker.threads</code></td>
 <td><code>235</code></td>
-<td>Worker threads handling PG wire protocol connections.</td>
+<td>NIO worker pool backing the coordinator internal server and the query scatter pool. Code default is <code>8</code> if unset.</td>
 </tr>
 <tr>
 <td><code>neorunbase.coordinator.internal.port</code></td>
 <td><code>7100</code></td>
-<td>TCP port for coordinator-to-coordinator NIO communication (metadata sync, KMS sync).</td>
+<td>TCP port for coordinator-to-coordinator RPC (metadata/IAM/KMS broadcast, bootstrap fetch). Distinct from the data-node port (7000) and PG-wire port (5432).</td>
 </tr>
 </tbody>
 </table>
@@ -1863,46 +1933,31 @@
 <tr>
 <td><code>neorunbase.datanode.host</code></td>
 <td><code>0.0.0.0</code></td>
-<td>Bind address for the internal protocol listener.</td>
+<td>Bind address for the data node's internal NIO server. <code>0.0.0.0</code> binds all interfaces.</td>
 </tr>
 <tr>
 <td><code>neorunbase.datanode.internal.port</code></td>
 <td><code>7000</code></td>
-<td>TCP port for the internal protocol from Coordinators.</td>
+<td>TCP port for the internal binary protocol (shard reads/writes, scatter, DDL fan-out). Not client-facing.</td>
 </tr>
 <tr>
 <td><code>neorunbase.datanode.advertised.host</code></td>
 <td><code>localhost</code></td>
-<td>Hostname advertised to Coordinators. Set to a reachable hostname in production.</td>
+<td>Hostname/IP this data node publishes to ZooKeeper. Must be reachable by coordinators.</td>
 </tr>
 <tr>
 <td><code>neorunbase.datanode.data.dir</code></td>
 <td><code>${neorunbase.base.data.dir}/shards</code></td>
-<td>Local directory for shard data. Multiple comma-separated directories enable multi-disk placement.</td>
+<td>Directory (or comma-separated directories) holding this node's RocksDB shard data. Multiple entries spread shards across physical disks.</td>
 </tr>
 <tr>
 <td><code>neorunbase.datanode.worker.threads</code></td>
 <td><code>256</code></td>
-<td>Worker threads handling internal protocol requests.</td>
-</tr>
-<tr>
-<td><code>neorunbase.datanode.disk.info.refresh.interval.seconds</code></td>
-<td><code>60</code></td>
-<td>How often the Data Node refreshes disk capacity / availability info in ZooKeeper.</td>
-</tr>
-<tr>
-<td><code>neorunbase.datanode.temp.table.cleanup.interval.seconds</code></td>
-<td><code>60</code></td>
-<td>How often the Data Node sweeps for expired intermediate-result temp tables.</td>
-</tr>
-<tr>
-<td><code>neorunbase.datanode.temp.table.ttl.ms</code></td>
-<td><code>600000</code></td>
-<td>Temp-table TTL before cleanup is eligible (10 minutes).</td>
+<td>NIO worker pool servicing inbound shard read/write/scatter work. Code default is <code>8</code> if unset.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="default-table-settings">Default Table Settings</h2>
+<h2 id="default-settings">Default Settings</h2>
 <table>
 <thead>
 <tr>
@@ -1915,12 +1970,12 @@
 <tr>
 <td><code>neorunbase.default.num.shards</code></td>
 <td><code>16</code></td>
-<td>Default number of shards when <code>CREATE TABLE</code> does not specify <code>SHARDS</code>.</td>
+<td>Number of shards a new table is split into when <code>CREATE TABLE</code> does not specify one. More shards = more parallelism but more metadata and fan-out.</td>
 </tr>
 <tr>
 <td><code>neorunbase.default.replication.factor</code></td>
 <td><code>2</code></td>
-<td>Default replication factor for shards.</td>
+<td>Physical copies kept of each shard. <code>2</code> = one primary plus one replica; the cluster needs at least this many data nodes to place a shard.</td>
 </tr>
 </tbody>
 </table>
@@ -1937,12 +1992,12 @@
 <tr>
 <td><code>neorunbase.admin.user</code></td>
 <td><code>admin</code></td>
-<td>Initial admin user for PG wire protocol and Admin UI.</td>
+<td>Bootstrap superuser, seeded on first start. Used for PG-wire auth and the admin HTTP UI login.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.password</code></td>
 <td><code>admin</code></td>
-<td>Initial admin password. <strong>Change on first login.</strong></td>
+<td>Bootstrap superuser password. <strong>Change before any non-local deployment</strong> — it grants full cluster control.</td>
 </tr>
 </tbody>
 </table>
@@ -1959,22 +2014,22 @@
 <tr>
 <td><code>neorunbase.log.mode</code></td>
 <td><code>ASYNC_FILE</code></td>
-<td><code>ASYNC_FILE</code> (rolling files), <code>RING_BUFFER</code> (in-memory ring buffer for container environments), or <code>NOP</code> (console only).</td>
+<td><code>ASYNC_FILE</code> (async append to rolling files under <code>log.path</code>; recommended for production), <code>RING_BUFFER</code> (in-memory ring buffer only, surfaced in the admin UI; suits ephemeral containers), or <code>NOP</code> (console only).</td>
 </tr>
 <tr>
 <td><code>neorunbase.log.path</code></td>
 <td><code>${neorunbase.base.data.dir}/logs</code></td>
-<td>Base directory for log files.</td>
+<td>Directory where rolling log files are written when <code>log.mode=ASYNC_FILE</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.log.level</code></td>
 <td><code>INFO</code></td>
-<td>Log level for NeorunBase application loggers.</td>
+<td>Root log level for NeorunBase loggers. <code>TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.log.ring.buffer.capacity</code></td>
 <td><code>1000</code></td>
-<td>Number of log lines retained in the in-memory ring buffer (when <code>RING_BUFFER</code> is selected).</td>
+<td>Number of most-recent log lines retained in the in-memory ring buffer (used by <code>RING_BUFFER</code> and the admin UI log tail).</td>
 </tr>
 </tbody>
 </table>
@@ -1991,32 +2046,32 @@
 <tr>
 <td><code>neorunbase.kms.enabled</code></td>
 <td><code>true</code></td>
-<td>Master toggle for the built-in KMS. When enabled the internal protocol is encrypted.</td>
+<td>Master switch for the built-in KMS, the root of trust for all envelope encryption. Disabling it turns off all encryption features.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kms.rocksdb.path</code></td>
 <td><code>${neorunbase.base.data.dir}/kms</code></td>
-<td>Local KMS key persistence directory.</td>
+<td>RocksDB store persisting the KMS key hierarchy (wrapped DEKs) on the leader coordinator. Must be durable and backed up.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kms.master.key.env</code></td>
 <td><code>NEORUNBASE_MASTER_KEY</code></td>
-<td>Name of the env var holding the master key passphrase.</td>
+<td>Name of the OS environment variable from which the master-key passphrase is read at startup. The same secret must be present on every node.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kms.pbkdf2.iterations</code></td>
 <td><code>200000</code></td>
-<td>PBKDF2 iterations for master-key derivation.</td>
+<td>PBKDF2 iteration count for deriving the master key from the passphrase. Must stay consistent so the same passphrase derives the same key.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kms.encrypt.internal.protocol</code></td>
 <td><code>true</code></td>
-<td>Encrypt internal protocol messages between Coordinator and Data Nodes.</td>
+<td>Encrypt the coordinator-to-data-node internal NIO payloads with a KMS key. Only effective when <code>kms.enabled=true</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kms.internal.protocol.key.id</code></td>
 <td><code>internal-protocol</code></td>
-<td>Key ID used for internal protocol encryption.</td>
+<td>Logical KMS key id used to encrypt internal-protocol messages.</td>
 </tr>
 </tbody>
 </table>
@@ -2033,42 +2088,42 @@
 <tr>
 <td><code>neorunbase.admin.http.port</code></td>
 <td><code>8080</code></td>
-<td>HTTP port for the Admin UI and REST API.</td>
+<td>TCP port for the admin HTTP server (management REST API + static admin UI). Non-leaders proxy leader-only calls to the leader over this port.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.ui.static.path</code></td>
 <td><code>./admin-ui</code></td>
-<td>Path to the React Admin UI build.</td>
+<td>Filesystem path to the built React admin-ui assets served as static files.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.worker.threads</code></td>
 <td><code>256</code></td>
-<td>Worker threads for admin HTTP request handling.</td>
+<td>Thread pool executing admin HTTP requests. Code default is <code>4</code> if unset.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.jwt.expiry.ms</code></td>
 <td><code>86400000</code></td>
-<td>JWT token expiry (24 hours). JWT signing uses SHA-256 of the master key.</td>
+<td>Lifetime of an issued admin UI JWT (24h). Tokens are signed with SHA-256 of the master key, so rotating it invalidates outstanding tokens.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.http.max.content.length</code></td>
 <td><code>10485760</code></td>
-<td>Maximum HTTP request body size (10 MB).</td>
+<td>Maximum accepted admin HTTP request body size (10 MiB).</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.shutdown.timeout.seconds</code></td>
 <td><code>5</code></td>
-<td>Admin HTTP server shutdown grace period.</td>
+<td>Grace period the admin HTTP server waits for in-flight requests on shutdown before forcing termination.</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.http.proxy.connect.timeout.ms</code></td>
 <td><code>5000</code></td>
-<td>Connect timeout for coordinator-to-coordinator HTTP proxy calls.</td>
+<td>Connect timeout for HTTP proxy calls between admin servers (e.g. leader-only endpoints forwarded from non-leaders).</td>
 </tr>
 <tr>
 <td><code>neorunbase.admin.http.proxy.read.timeout.ms</code></td>
 <td><code>30000</code></td>
-<td>Read timeout for the same proxy calls. Increase for large log-tail responses.</td>
+<td>Read timeout for the same proxy calls. Increase for large log-tail responses or slow links.</td>
 </tr>
 </tbody>
 </table>
@@ -2085,42 +2140,42 @@
 <tr>
 <td><code>neorunbase.metrics.collector.interval.ms</code></td>
 <td><code>15000</code></td>
-<td>Interval between metric collection rounds across cluster nodes.</td>
+<td>Period between metrics-collection sweeps. The leader polls every node this often.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.collector.initial.delay.ms</code></td>
 <td><code>10000</code></td>
-<td>Initial delay before metrics collection starts.</td>
+<td>Delay after startup before the first metrics sweep, giving nodes time to register.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.retention.days</code></td>
 <td><code>7</code></td>
-<td>Number of days to retain historical metrics.</td>
+<td>Days of historical metric samples to keep before the retention-cleanup task deletes them.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.rocksdb.path</code></td>
 <td><code>${neorunbase.base.data.dir}/metrics</code></td>
-<td>Metrics time-series storage directory.</td>
+<td>RocksDB store holding the metrics time series.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.collector.connect.timeout.ms</code></td>
 <td><code>3000</code></td>
-<td>HTTP connect timeout for metric scraping.</td>
+<td>TCP connect timeout when the collector opens an HTTP connection to scrape a node.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.collector.read.timeout.ms</code></td>
 <td><code>5000</code></td>
-<td>HTTP read timeout for metric scraping.</td>
+<td>Read/response timeout for each metrics-scrape HTTP call.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.retention.cleanup.initial.delay.minutes</code></td>
 <td><code>60</code></td>
-<td>Initial delay before retention cleanup.</td>
+<td>Delay after startup before the first metrics-retention cleanup run.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metrics.retention.cleanup.interval.minutes</code></td>
 <td><code>360</code></td>
-<td>Retention cleanup interval.</td>
+<td>Period between metrics-retention cleanup runs (every 6h).</td>
 </tr>
 </tbody>
 </table>
@@ -2137,12 +2192,12 @@
 <tr>
 <td><code>neorunbase.metadata.rocksdb.path</code></td>
 <td><code>${neorunbase.base.data.dir}/metadata</code></td>
-<td>Encrypted metadata store on the leader Coordinator. Holds table schemas and shard maps.</td>
+<td>Leader coordinator's encrypted metadata store. Holds the authoritative catalog (schemas + shard placement). Must be durable.</td>
 </tr>
 <tr>
 <td><code>neorunbase.metadata.kms.key.id</code></td>
 <td><code>metadata-encryption</code></td>
-<td>KMS key ID for metadata at-rest encryption.</td>
+<td>Logical KMS key id used to envelope-encrypt the metadata store at rest.</td>
 </tr>
 </tbody>
 </table>
@@ -2159,16 +2214,16 @@
 <tr>
 <td><code>neorunbase.data.encryption.enabled</code></td>
 <td><code>true</code></td>
-<td>Enable at-rest encryption. Each shard uses a per-shard DEK wrapped via the KMS.</td>
+<td>Encrypt RocksDB shard data at rest. Each shard gets its own DEK wrapped by the KMS key below. Requires <code>kms.enabled=true</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.data.encryption.kms.key.id</code></td>
 <td><code>data-encryption</code></td>
-<td>KMS key ID used to wrap per-shard DEKs.</td>
+<td>Logical KMS key id that wraps the per-shard DEKs for data-at-rest encryption.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="internal-protocol-tuning">Internal Protocol Tuning</h2>
+<h2 id="protocol-compression">Protocol Compression</h2>
 <table>
 <thead>
 <tr>
@@ -2181,52 +2236,21 @@
 <tr>
 <td><code>neorunbase.protocol.compression.enabled</code></td>
 <td><code>true</code></td>
-<td>Snappy compression for internal protocol messages.</td>
+<td>Snappy-compress internal-protocol payloads before sending over the NIO wire. Usually a win for large scatter/result payloads.</td>
 </tr>
 <tr>
 <td><code>neorunbase.protocol.compression.min.bytes</code></td>
 <td><code>256</code></td>
-<td>Minimum payload size to trigger compression.</td>
-</tr>
-<tr>
-<td><code>neorunbase.nio.read.buffer.size</code></td>
-<td><code>65536</code></td>
-<td>NIO read buffer size for internal protocol connections.</td>
-</tr>
-<tr>
-<td><code>neorunbase.nio.selector.timeout.ms</code></td>
-<td><code>1000</code></td>
-<td>NIO selector poll timeout.</td>
-</tr>
-<tr>
-<td><code>neorunbase.internal.rpc.timeout.ms</code></td>
-<td><code>5000</code></td>
-<td>Internal RPC request timeout.</td>
-</tr>
-<tr>
-<td><code>neorunbase.datanode.discovery.poll.interval.ms</code></td>
-<td><code>2000</code></td>
-<td>Coordinator startup poll interval for Data Node discovery.</td>
-</tr>
-<tr>
-<td><code>neorunbase.datanode.discovery.max.retries</code></td>
-<td><code>30</code></td>
-<td>Maximum Data Node discovery retries during startup.</td>
-</tr>
-<tr>
-<td><code>neorunbase.leader.init.poll.interval.ms</code></td>
-<td><code>1000</code></td>
-<td>Non-leader Coordinator initialization poll interval.</td>
-</tr>
-<tr>
-<td><code>neorunbase.leader.init.max.retries</code></td>
-<td><code>15</code></td>
-<td>Non-leader initialization max retries.</td>
+<td>Payloads smaller than this are sent uncompressed even when compression is enabled. Only applies when compression is enabled.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="iceberg-catalog-integration">Iceberg Catalog Integration</h2>
 <p>NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
+<div class="admonition note">
+<p class="admonition-title">Catalog backend support</p>
+<p><code>neorunbase.iceberg.catalog.type</code> accepts only <strong><code>none</code></strong> (disabled) or <strong><code>polaris</code></strong>. The generic <code>neorunbase.iceberg.catalog.rest.*</code> security/OAuth keys below are <strong>legacy and ignored</strong> under the polaris path; the admin UI hides them. Polaris runtime config is normally set from the admin UI (persisted in the metadata store), not from this file. Other Iceberg-REST flavors are intentionally not supported.</p>
+</div>
 <table>
 <thead>
 <tr>
@@ -2239,102 +2263,107 @@
 <tr>
 <td><code>neorunbase.iceberg.catalog.type</code></td>
 <td><code>none</code></td>
-<td><code>none</code> (disabled) or <code>polaris</code>.</td>
+<td>Catalog backend selector. <code>none</code> disables all Iceberg integration; <code>polaris</code> enables the Apache Polaris REST-catalog bootstrap.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.uri</code></td>
-<td></td>
-<td>Polaris REST endpoint, e.g. <code>http://shannon-polaris:8181/api/catalog</code>.</td>
+<td><code>neorunbase.iceberg.catalog.rest.uri</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> Generic REST catalog base URI.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.oauth.token.endpoint</code></td>
-<td></td>
-<td>Polaris OAuth2 token endpoint, e.g. <code>http://shannon-polaris:8181/api/catalog/v1/oauth/tokens</code>.</td>
+<td><code>neorunbase.iceberg.catalog.rest.security</code></td>
+<td><code>NONE</code></td>
+<td><em>(legacy, ignored under polaris)</em> REST catalog auth mode: <code>NONE</code> or <code>OAUTH2</code>.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.catalog.name</code></td>
-<td></td>
-<td>Polaris catalog name (used as Iceberg <code>prefix</code> and <code>?warehouse=</code> parameter).</td>
+<td><code>neorunbase.iceberg.catalog.rest.token-endpoint</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> OAuth2 token endpoint for client-credentials flow.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.client.id</code></td>
-<td></td>
-<td>OAuth2 client_credentials principal id.</td>
+<td><code>neorunbase.iceberg.catalog.rest.client-id</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> OAuth2 client id.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.client.secret</code></td>
-<td></td>
-<td>OAuth2 client_credentials secret.</td>
+<td><code>neorunbase.iceberg.catalog.rest.client-secret</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> OAuth2 client secret.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.realm</code></td>
-<td><code>POLARIS</code></td>
-<td>Sent as the <code>Polaris-Realm</code> request header.</td>
+<td><code>neorunbase.iceberg.catalog.rest.token</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> Static bearer token alternative to OAuth2.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.polaris.scope</code></td>
-<td><code>PRINCIPAL_ROLE:ALL</code></td>
-<td>OAuth2 scope on token requests.</td>
+<td><code>neorunbase.iceberg.catalog.rest.extra.properties</code></td>
+<td>(empty)</td>
+<td><em>(legacy, ignored under polaris)</em> Free-form extra REST-catalog properties (comma-separated <code>key=val</code>).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.rest.warehouse</code></td>
+<td><code>s3://warehouse</code></td>
+<td>Iceberg warehouse identifier. For a Polaris catalog this is the catalog name (e.g. <code>quickstart_catalog</code>); for an S3-path warehouse it is an <code>s3://</code> URI.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.endpoint</code></td>
 <td><code>http://localhost:9000</code></td>
-<td>S3 endpoint for Iceberg storage.</td>
+<td>S3 (or S3-compatible) endpoint used by Iceberg FileIO for Parquet/manifests.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.access.key</code></td>
 <td><code>admin</code></td>
-<td>S3 access key.</td>
+<td>S3 access key id for Iceberg object storage (credential).</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.secret.key</code></td>
 <td><code>admin123</code></td>
-<td>S3 secret key.</td>
+<td>S3 secret access key for Iceberg object storage (credential).</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.region</code></td>
 <td><code>us-east-1</code></td>
-<td>S3 region.</td>
+<td>AWS region string sent with S3 requests. Any value the gateway accepts works for S3-compatible stores.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.path.style.access</code></td>
 <td><code>true</code></td>
-<td>Path-style access (required for MinIO and similar).</td>
+<td>Use path-style S3 addressing. Required for MinIO/ShannonStore and most S3-compatible gateways.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.sse.type</code></td>
 <td><code>none</code></td>
-<td><code>none</code>, <code>s3</code> (SSE-S3), or <code>kms</code> (SSE-KMS) for Parquet objects written by the Iceberg sink.</td>
+<td>Server-side encryption for Parquet files written by the Iceberg sink: <code>none</code>, <code>s3</code> (SSE-S3, AES-256), or <code>kms</code> (SSE-KMS).</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.s3.sse.key</code></td>
-<td></td>
+<td>(empty)</td>
 <td>KMS key id/ARN when <code>sse.type=kms</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.interval.ms</code></td>
 <td><code>60000</code></td>
-<td>Background sync interval. <code>0</code> disables.</td>
+<td>Period between CDC-sync passes that push changed rows into Iceberg tables. <code>0</code> disables the periodic loop (manual sync still works).</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.thread.pool.size</code></td>
 <td><code>4</code></td>
-<td>Thread pool size for parallel table syncs.</td>
+<td>Threads used to sync multiple tables in parallel during one sync pass.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.auto.start</code></td>
 <td><code>false</code></td>
-<td>Auto-start sync job on server startup.</td>
+<td>Whether the periodic CDC-sync loop starts automatically at boot. When <code>false</code>, sync must be started explicitly (e.g. from the admin UI).</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.table.filters</code></td>
-<td></td>
-<td>Comma-separated table filters (<code>*</code> wildcard supported). Empty = all dirty tables.</td>
+<td>(empty)</td>
+<td>Comma-separated table filters (<code>*</code> wildcard supported). Empty = sync all dirty tables.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.changelog.batch.size</code></td>
 <td><code>500</code></td>
-<td>Batch size for changelog reads during incremental sync.</td>
+<td>Batch size for reading changed PKs from the changelog during incremental sync.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.sync.task.timeout.ms</code></td>
@@ -2346,10 +2375,34 @@
 <td><code>lakebase</code></td>
 <td>Default Iceberg namespace, auto-created on catalog init.</td>
 </tr>
+<tr>
+<td><code>neorunbase.iceberg.parquet.compression.codec</code></td>
+<td><code>snappy</code></td>
+<td>Parquet codec used by NeorunBase's own Iceberg writers (data + delete files): <code>snappy</code>, <code>gzip</code>, <code>zstd</code>, <code>lz4</code>, <code>none</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.cdc.partition.unit</code></td>
+<td><code>days</code></td>
+<td>Hidden-partition transform on the synthetic <code>_neorun_synced_at</code> column for CDC-synced tables: <code>hours</code>, <code>days</code>, or <code>months</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.parquet.read.prefetch.threshold.bytes</code></td>
+<td><code>67108864</code></td>
+<td>Iceberg-data Parquet read pre-fetch threshold (64 MiB). Files at or below this size are pulled in a single GET to avoid per-chunk seeks.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.load.batch.size</code></td>
+<td><code>1000</code></td>
+<td>Bulk-load batch size used when caching an external Iceberg table into LakeBase. Larger batches amortize per-INSERT overhead at the cost of memory.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="s3-backup">S3 Backup</h2>
-<p>Scheduled cluster backup to S3-compatible storage. See <a href="../../features/backup-restore/">Backup &amp; Restore</a> for the full feature description. Most operators configure these from the admin UI rather than from properties; the persisted values are stored encrypted in the metadata store.</p>
+<p>Scheduled cluster backup to S3-compatible storage. See <a href="../../features/backup-restore/">Backup &amp; Restore</a> for the full feature description.</p>
+<div class="admonition note">
+<p class="admonition-title">Runtime values live in the admin UI</p>
+<p>Most operators set the runtime backup values (enabled, endpoint, bucket, keys, retention) from the admin UI; those are persisted (encrypted) in the metadata store and override anything in this file. The properties below only control the <em>internals</em> of the backup loop.</p>
+</div>
 <table>
 <thead>
 <tr>
@@ -2360,54 +2413,19 @@
 </thead>
 <tbody>
 <tr>
-<td><code>neorunbase.backup.s3.enabled</code></td>
-<td><code>false</code></td>
-<td>Master switch for scheduled backups.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.endpoint</code></td>
-<td></td>
-<td>S3 endpoint URL.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.region</code></td>
-<td><code>us-east-1</code></td>
-<td>S3 region.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.bucket</code></td>
-<td></td>
-<td>Destination bucket.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.prefix</code></td>
-<td><code>neorunbase-backup</code></td>
-<td>Object key prefix under the bucket.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.access.key</code></td>
-<td></td>
-<td>Static access key.</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.secret.key</code></td>
-<td></td>
-<td>Static secret key (encrypted at rest).</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.s3.path.style.access</code></td>
-<td><code>true</code></td>
-<td>Path-style addressing (required for ShannonStore / MinIO).</td>
-</tr>
-<tr>
-<td><code>neorunbase.backup.interval.minutes</code></td>
+<td><code>neorunbase.backup.tick.interval.seconds</code></td>
 <td><code>60</code></td>
-<td>Scheduled backup interval.</td>
+<td>How often the backup ticker wakes up to evaluate interval, leadership, and enabled state.</td>
 </tr>
 <tr>
-<td><code>neorunbase.backup.retention.days</code></td>
-<td><code>30</code></td>
-<td>History retention window for the visible backup list.</td>
+<td><code>neorunbase.backup.history.cap</code></td>
+<td><code>200</code></td>
+<td>Cap on the in-memory recent-history list returned by the admin UI. The S3-side history index is independent and trimmed only by retention days.</td>
+</tr>
+<tr>
+<td><code>neorunbase.backup.rpc.timeout.ms</code></td>
+<td><code>1800000</code></td>
+<td>Per-node fan-out timeout for <code>BACKUP_RUN_REQ</code> / <code>BACKUP_RESTORE_REQ</code> (30 min).</td>
 </tr>
 </tbody>
 </table>
@@ -2425,16 +2443,21 @@
 <tr>
 <td><code>neorunbase.kafka.consumer.enabled</code></td>
 <td><code>false</code></td>
-<td>Master toggle for Kafka consumer integration.</td>
+<td>Master switch for the built-in Kafka ingestion consumers.</td>
 </tr>
 <tr>
 <td><code>neorunbase.kafka.consumer.groups</code></td>
-<td></td>
-<td>Comma-separated list of consumer group names.</td>
+<td>(empty)</td>
+<td>Comma-separated list of consumer-group names to start. Each expands to a per-group block (below). Empty = no consumers even if enabled.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kafka.consumer.leader.rpc.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>RPC timeout for the data-node consumer when it forwards a batch INSERT/DDL to the leader coordinator. Sits above the default selector latency budget because one batch can scatter to many shards.</td>
 </tr>
 </tbody>
 </table>
-<p>For each group <code>&lt;name&gt;</code> listed in <code>neorunbase.kafka.consumer.groups</code>, configure a per-group block:</p>
+<p>For each group <code>&lt;name&gt;</code> listed in <code>neorunbase.kafka.consumer.groups</code>, configure a per-group block. The defaults shown are what the loader falls back to if a key is omitted:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.brokers</span><span class="o">=</span><span class="s">localhost:9092</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.topics</span><span class="o">=</span><span class="s">topic1,topic2</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.group-id</span><span class="o">=</span><span class="s">neorunbase-&lt;name&gt;</span>
@@ -2448,6 +2471,77 @@
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.extra.properties</span><span class="o">=</span><span class="s">max.poll.records=500</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="na">neorunbase.kafka.consumer.group.&lt;name&gt;.max-consumers</span><span class="o">=</span><span class="s">3</span>
 </code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Per-group key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.brokers</code></td>
+<td><code>localhost:9092</code></td>
+<td>Kafka bootstrap servers.</td>
+</tr>
+<tr>
+<td><code>.topics</code></td>
+<td>(empty)</td>
+<td>Comma-separated topics to consume.</td>
+</tr>
+<tr>
+<td><code>.group-id</code></td>
+<td><code>neorunbase-&lt;name&gt;</code></td>
+<td>Kafka consumer <code>group.id</code>.</td>
+</tr>
+<tr>
+<td><code>.target-table</code></td>
+<td>(empty)</td>
+<td>NeorunBase table to ingest into.</td>
+</tr>
+<tr>
+<td><code>.id-columns</code></td>
+<td>(empty)</td>
+<td>Primary-key / upsert columns.</td>
+</tr>
+<tr>
+<td><code>.num-shards</code></td>
+<td><code>2</code></td>
+<td>Shards if the target table is auto-created.</td>
+</tr>
+<tr>
+<td><code>.format</code></td>
+<td><code>json</code></td>
+<td>Record format.</td>
+</tr>
+<tr>
+<td><code>.batch-size</code></td>
+<td><code>100</code></td>
+<td>Records buffered per INSERT batch.</td>
+</tr>
+<tr>
+<td><code>.poll-timeout-ms</code></td>
+<td><code>1000</code></td>
+<td><code>KafkaConsumer.poll</code> timeout.</td>
+</tr>
+<tr>
+<td><code>.auto-offset-reset</code></td>
+<td><code>latest</code></td>
+<td><code>earliest</code> or <code>latest</code>.</td>
+</tr>
+<tr>
+<td><code>.extra.properties</code></td>
+<td>(empty)</td>
+<td>Raw <code>KafkaConsumer</code> props as <code>k=v,k=v</code>.</td>
+</tr>
+<tr>
+<td><code>.max-consumers</code></td>
+<td><code>3</code></td>
+<td>Max parallel consumer threads.</td>
+</tr>
+</tbody>
+</table>
 <p>The leader Coordinator distributes consumer groups round-robin across the Data Nodes; each Data Node hosts the consumer worker for the groups assigned to it.</p>
 <h2 id="iam-identity-access-management">IAM (Identity &amp; Access Management)</h2>
 <table>
@@ -2462,12 +2556,12 @@
 <tr>
 <td><code>neorunbase.iam.rocksdb.path</code></td>
 <td><code>${neorunbase.base.data.dir}/iam</code></td>
-<td>RocksDB path for IAM data persistence.</td>
+<td>RocksDB store for IAM state (users, roles, grants, policies, STS temp credentials). Owned by the leader, replicated to peers. Must be durable.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iam.sts.cleanup.interval.hours</code></td>
 <td><code>1</code></td>
-<td>Sweep interval for expired STS temporary credentials.</td>
+<td>How often to sweep expired STS temporary credentials from the AuthManager keystore.</td>
 </tr>
 </tbody>
 </table>
@@ -2484,27 +2578,27 @@
 <tr>
 <td><code>neorunbase.wal.encryption.enabled</code></td>
 <td><code>true</code></td>
-<td>Enable WAL envelope encryption.</td>
+<td>Envelope-encrypt WAL segments (per-segment DEK wrapped by the KMS key below). Requires <code>kms.enabled=true</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.wal.encryption.kms.key.id</code></td>
 <td><code>wal-encryption</code></td>
-<td>KMS key ID for WAL segment DEKs.</td>
+<td>Logical KMS key id that wraps the per-segment WAL DEKs.</td>
 </tr>
 <tr>
 <td><code>neorunbase.wal.directory</code></td>
 <td><code>${neorunbase.base.data.dir}/wal</code></td>
-<td>Base WAL directory. Per-shard subdirectories are created automatically.</td>
+<td>Base WAL directory; per-shard subdirectories are created automatically. Must be durable.</td>
 </tr>
 <tr>
 <td><code>neorunbase.wal.segment.size</code></td>
 <td><code>67108864</code></td>
-<td>WAL segment rotation threshold (64 MB).</td>
+<td>Maximum size a WAL segment grows to before rotation (64 MiB).</td>
 </tr>
 <tr>
 <td><code>neorunbase.wal.sync.interval.ms</code></td>
 <td><code>1000</code></td>
-<td>WAL fsync interval.</td>
+<td>How often buffered WAL writes are fsync'd to disk. Smaller = stronger durability, more IO.</td>
 </tr>
 </tbody>
 </table>
@@ -2521,17 +2615,17 @@
 <tr>
 <td><code>neorunbase.storage.row.data.mode</code></td>
 <td><code>heap</code></td>
-<td><code>heap</code> (default — append-only encrypted heap segments + 16-byte RocksDB pointer per row) or <code>rocksdb</code> (legacy escape hatch; values stored inside RocksDB). Indexes, changelog, and system column families always remain in RocksDB.</td>
+<td><code>heap</code> (default — values appended to <code>{shardDir}/heap/seg-*.nrheap</code>, RocksDB holds only a 16-byte pointer per row) or <code>rocksdb</code> (legacy rollback escape hatch; values live inside RocksDB). Indexes, changelog, and system column families always stay in RocksDB.</td>
 </tr>
 <tr>
 <td><code>neorunbase.heap.segment.size</code></td>
 <td><code>67108864</code></td>
-<td>Heap segment rotation threshold (64 MB).</td>
+<td>Maximum size a heap row-data segment grows to before rotation (64 MiB). Only relevant when <code>storage.row.data.mode=heap</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.heap.encryption.kms.key.id</code></td>
 <td><code>heap-encryption</code></td>
-<td>KMS key ID for heap segment DEKs.</td>
+<td>Logical KMS key id that wraps the per-segment DEKs for heap row-data files.</td>
 </tr>
 </tbody>
 </table>
@@ -2553,12 +2647,86 @@
 <tr>
 <td><code>neorunbase.scrubber.interval.minutes</code></td>
 <td><code>360</code></td>
-<td>Minutes between scrub passes (6 hours).</td>
+<td>Minutes between automatic scrub passes (6h).</td>
 </tr>
 <tr>
 <td><code>neorunbase.scrubber.throttle.bytes.per.sec</code></td>
 <td><code>52428800</code></td>
-<td>Maximum disk throughput the scrubber consumes (50 MB/s).</td>
+<td>Maximum disk throughput the scrubber may consume (50 MB/s). The scan paces itself to stay under this rate.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="internal-protocol-tuning">Internal Protocol Tuning</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.nio.read.buffer.size</code></td>
+<td><code>65536</code></td>
+<td>Per-connection read buffer allocated by the internal NIO servers (64 KiB). Larger buffers reduce read syscalls at the cost of memory per channel.</td>
+</tr>
+<tr>
+<td><code>neorunbase.nio.selector.timeout.ms</code></td>
+<td><code>1000</code></td>
+<td><code>Selector.select()</code> poll timeout in the internal NIO event loops. Lower = snappier wakeups, slightly more CPU spin.</td>
+</tr>
+<tr>
+<td><code>neorunbase.internal.rpc.timeout.ms</code></td>
+<td><code>120000</code></td>
+<td>Internal RPC request timeout (2 min). Iceberg scan / DDL-forwarding paths floor this at <code>300000</code> (5 min) regardless of this value.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.discovery.poll.interval.ms</code></td>
+<td><code>2000</code></td>
+<td>During coordinator startup, how often to re-poll ZooKeeper for registered data nodes while waiting for at least one.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.discovery.max.retries</code></td>
+<td><code>30</code></td>
+<td>Maximum data-node discovery poll attempts at startup before proceeding without them. Total wait ≈ retries × poll interval.</td>
+</tr>
+<tr>
+<td><code>neorunbase.leader.init.poll.interval.ms</code></td>
+<td><code>1000</code></td>
+<td>On a non-leader coordinator, how often to poll for the leader to finish initialization before completing its own startup.</td>
+</tr>
+<tr>
+<td><code>neorunbase.leader.init.max.retries</code></td>
+<td><code>15</code></td>
+<td>Maximum non-leader initialization poll attempts before giving up the wait for the leader.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-node-periodic-tasks">Data Node Periodic Tasks</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.datanode.disk.info.refresh.interval.seconds</code></td>
+<td><code>60</code></td>
+<td>How often the data node refreshes its disk capacity/availability info in ZooKeeper so coordinators see current free-space numbers.</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.temp.table.cleanup.interval.seconds</code></td>
+<td><code>60</code></td>
+<td>How often the data node sweeps for expired temporary tables (intermediate query results).</td>
+</tr>
+<tr>
+<td><code>neorunbase.datanode.temp.table.ttl.ms</code></td>
+<td><code>600000</code></td>
+<td>Time-to-live for temporary tables before they are eligible for cleanup (10 min).</td>
 </tr>
 </tbody>
 </table>
@@ -2575,26 +2743,26 @@
 <tr>
 <td><code>neorunbase.pgwire.read.buffer.initial.bytes</code></td>
 <td><code>8192</code></td>
-<td>Initial per-connection read buffer size. Grown on demand up to the cap below.</td>
+<td>Initial per-connection read buffer, grown on demand up to the cap below.</td>
 </tr>
 <tr>
 <td><code>neorunbase.pgwire.read.buffer.max.bytes</code></td>
 <td><code>67108864</code></td>
-<td>Absolute upper bound on a single inbound pg-wire message (64 MiB). Larger frames receive ErrorResponse and connection close.</td>
+<td>Absolute upper bound on a single inbound pg-wire message (64 MiB). A client advertising a larger frame receives ErrorResponse + connection close.</td>
 </tr>
 <tr>
 <td><code>neorunbase.pgwire.worker.pool.size</code></td>
 <td><code>0</code></td>
-<td>pg-wire worker pool size. <code>0</code> = auto: <code>max(2, 2 × CPU cores)</code>.</td>
+<td>pg-wire worker pool that executes queries off the selector. <code>0</code> = auto: <code>max(2, 2 × CPU cores)</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.pgwire.worker.shutdown.timeout.seconds</code></td>
 <td><code>5</code></td>
-<td>Worker pool drain grace period at shutdown.</td>
+<td>Grace period for the worker pool to drain on shutdown before forced termination.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="vector-ann-index-maintenance">Vector ANN Index Maintenance</h2>
+<h2 id="vector-ann-fts-index-maintenance">Vector ANN &amp; FTS Index Maintenance</h2>
 <table>
 <thead>
 <tr>
@@ -2607,7 +2775,27 @@
 <tr>
 <td><code>neorunbase.ann.flush.interval.seconds</code></td>
 <td><code>30</code></td>
-<td>Background flush interval for dirty in-memory ANN indexes to encrypted sidecar files. <code>0</code> disables periodic flush — sidecars are only written on shard close. Lower values bound the data-loss window on ungraceful shutdown; higher values amortize the full-graph re-serialize cost.</td>
+<td>Interval between background flushes of dirty in-memory ANN indexes to their encrypted sidecar files. <code>0</code> disables periodic flush (sidecars written only on shard close).</td>
+</tr>
+<tr>
+<td><code>neorunbase.fts.flush.interval.seconds</code></td>
+<td><code>30</code></td>
+<td>Same flush trade-off for the BM25 inverted-index sidecars. <code>0</code> disables periodic flush (written only on shard close + backup pre-flush hook).</td>
+</tr>
+<tr>
+<td><code>neorunbase.fts.storage.default</code></td>
+<td><code>encrypted_disk</code></td>
+<td>FTS storage backend for new <code>CREATE INDEX … USING fts</code>: <code>encrypted_disk</code> (KMS-enveloped Lucene segments on disk, PB-class scale) or <code>memory</code> (entire index in heap, flushed to one encrypted byte[] sidecar; bounded by RAM).</td>
+</tr>
+<tr>
+<td><code>neorunbase.fts.plaintext.cache.bytes</code></td>
+<td><code>268435456</code></td>
+<td>Per-FTS-index plaintext (decrypted segment) LRU cache cap when <code>storage=encrypted_disk</code> (256 MiB). Cold segments are re-decrypted on demand.</td>
+</tr>
+<tr>
+<td><code>neorunbase.fts.chunk.size.bytes</code></td>
+<td><code>1048576</code></td>
+<td>AES-GCM chunk size inside each encrypted FTS segment file (1 MiB). Larger chunks reduce GCM tag overhead but increase the per-decrypt memory window.</td>
 </tr>
 </tbody>
 </table>
@@ -2624,12 +2812,12 @@
 <tr>
 <td><code>neorunbase.graph.default.max.results</code></td>
 <td><code>1000</code></td>
-<td>Default cap on the visited set when <code>GRAPH_NEIGHBORS</code> / <code>POST /admin/graph/neighbors</code> omit <code>max_results</code>. Bounds Coordinator memory on hub-node queries; per-call values always win.</td>
+<td>Default cap on the visited set when <code>GRAPH_NEIGHBORS</code> / <code>POST /admin/graph/neighbors</code> omit <code>max_results</code>. Per-call values always win.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="csr-adjacency-graph-acceleration">CSR Adjacency (Graph Acceleration)</h2>
-<p>CSR (Compressed Sparse Row) materialises a per-shard adjacency-list view of selected edge tables so that BFS expansion becomes a sequential neighbor-block read instead of a B-tree IN-list lookup. Edge rows remain primary; CSR is a derived view rebuilt by background compaction (write-back / LSM style). Disabled by default — turn on per table once the edge schema (<code>src_id BIGINT</code>, <code>dst_id BIGINT</code>, <code>rel_type TEXT</code>) is in place. See <a href="../../features/graph/">Graph Traversal &amp; Analytics</a> for the full surface.</p>
+<p>CSR (Compressed Sparse Row) materializes a per-shard adjacency-list view of selected edge tables so that BFS expansion becomes a sequential neighbor-block read instead of a B-tree IN-list lookup. Edge rows remain primary; CSR is a derived view rebuilt by background compaction (write-back / LSM style). Disabled by default — turn on per table once the edge schema (<code>src_id BIGINT</code>, <code>dst_id BIGINT</code>, <code>rel_type TEXT</code>) is in place. See <a href="../../features/graph/">Graph Traversal &amp; Analytics</a> for the full surface.</p>
 <table>
 <thead>
 <tr>
@@ -2647,12 +2835,12 @@
 <tr>
 <td><code>neorunbase.csr.enabled.tables</code></td>
 <td>(empty)</td>
-<td>Comma-separated list of qualified edge tables to materialise (e.g. <code>public.relations,public.eligibility</code>).</td>
+<td>Comma-separated list of qualified edge tables to materialize (e.g. <code>public.relations,public.edges</code>).</td>
 </tr>
 <tr>
 <td><code>neorunbase.csr.compaction.interval.seconds</code></td>
 <td><code>3600</code></td>
-<td>Per-shard background interval at which the CSR compactor scans for new edge rows and rebuilds the affected adjacency blocks.</td>
+<td>Per-shard background interval at which the CSR compactor scans for new edge rows and rebuilds affected adjacency blocks.</td>
 </tr>
 <tr>
 <td><code>neorunbase.csr.max.delta.rows.before.compaction</code></td>
@@ -2662,12 +2850,56 @@
 <tr>
 <td><code>neorunbase.csr.segment.size</code></td>
 <td><code>67108864</code></td>
-<td>CSR segment file rollover (64 MiB). Mirrors <code>neorunbase.heap.segment.size</code> for the heap layer.</td>
+<td>CSR segment file rollover (64 MiB). Mirrors <code>neorunbase.heap.segment.size</code>.</td>
 </tr>
 <tr>
 <td><code>neorunbase.csr.neighbor.timeout.ms</code></td>
 <td><code>30000</code></td>
-<td>Per-node RPC timeout for one BFS-hop neighbor expansion through CSR. The hop fans out to every Data Node holding part of the frontier; this is the wall-clock budget per node.</td>
+<td>Per-node RPC timeout for one BFS-hop neighbor expansion through CSR.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="distributed-search-scatter-fts-vector-hybrid">Distributed Search Scatter (FTS / Vector / Hybrid)</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.search.scatter.stage.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>Per-stage RPC timeout for FTS, Vector ANN, and Hybrid scatter calls. One query fans out to every owning data node in parallel; this is the wall-clock budget per node. The Hybrid path shares this value with its inner FTS + Vector executors.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="distributed-pagerank-bsp-pregel-lite">Distributed PageRank (BSP / Pregel-lite)</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.pagerank.distributed.stage.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>Per-superstep RPC timeout for <code>PAGERANK_LOCAL_STEP_REQ</code>. Caps how long any one node can take to return its sparse contribution map. Tighten on small graphs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.pagerank.distributed.delta.broadcast.ratio</code></td>
+<td><code>0.001</code></td>
+<td>Delta-broadcast threshold ratio. After the first superstep the coordinator only re-sends rank entries that moved by more than <code>max(convergenceThreshold × ratio, floor)</code>. Smaller = more entries re-sent; larger = wire savings at the cost of staleness.</td>
+</tr>
+<tr>
+<td><code>neorunbase.pagerank.distributed.delta.broadcast.floor</code></td>
+<td><code>1e-12</code></td>
+<td>Absolute floor on the delta-broadcast threshold. Guards against a very small <code>convergenceThreshold</code> collapsing the derived threshold to ~zero.</td>
 </tr>
 </tbody>
 </table>
@@ -2684,12 +2916,57 @@
 <tr>
 <td><code>neorunbase.coordinator.sync.max.retries</code></td>
 <td><code>3</code></td>
-<td>Maximum retries when the leader broadcasts metadata or IAM snapshots to peer Coordinators over the internal protocol.</td>
+<td>Maximum retries when the leader broadcasts metadata or IAM snapshots to peer coordinators over the internal protocol.</td>
 </tr>
 <tr>
 <td><code>neorunbase.coordinator.sync.retry.delay.ms</code></td>
 <td><code>1000</code></td>
-<td>Sleep between sync retry attempts.</td>
+<td>Sleep between sync retry attempts. With <code>max.retries</code> this caps total time spent retrying a single peer per round.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cluster-bootstrap-fetch">Cluster Bootstrap Fetch</h2>
+<p>On every startup, non-leader coordinators and data nodes pull authoritative KMS / metadata / IAM snapshots from the leader and overwrite their local RocksDB before signaling ready in ZooKeeper. If retries are exhausted the process exits with code 1 so the supervisor restarts it — it never serves stale state.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.cluster.bootstrap.fetch.max.retries</code></td>
+<td><code>30</code></td>
+<td>Maximum bootstrap-fetch attempts before the process exits with code 1.</td>
+</tr>
+<tr>
+<td><code>neorunbase.cluster.bootstrap.fetch.retry.delay.ms</code></td>
+<td><code>1000</code></td>
+<td>Sleep between bootstrap-fetch retry attempts.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sticky-leader-election">Sticky Leader Election</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.cluster.election.sticky.enabled</code></td>
+<td><code>true</code></td>
+<td>When enabled, the previously-elected leader's node-id is persisted to ZK; non-incumbent nodes defer joining the election queue so the incumbent reclaims leadership on restart without a leadership toggle. Disabling falls back to first-lock-wins.</td>
+</tr>
+<tr>
+<td><code>neorunbase.cluster.election.deference.window.ms</code></td>
+<td><code>3000</code></td>
+<td>How long non-incumbent nodes wait before entering the leader-selector queue at startup. Should be ≥ typical peer startup time. Increase for slow-booting nodes.</td>
 </tr>
 </tbody>
 </table>
@@ -2706,17 +2983,27 @@
 <tr>
 <td><code>neorunbase.query.ann.rebuild.timeout.ms</code></td>
 <td><code>300000</code></td>
-<td>RPC timeout for <code>ANN_REBUILD_REQ</code> (5 minutes). Vector index rebuilds can take minutes on large shards.</td>
+<td>RPC timeout for <code>ANN_REBUILD_REQ</code> when <code>REBUILD INDEX</code> is issued (5 min). Full vector index rebuilds can take minutes on large shards.</td>
 </tr>
 <tr>
 <td><code>neorunbase.query.table.sync.poll.interval.ms</code></td>
 <td><code>100</code></td>
-<td>Non-leader Coordinator wait poll for newly-created tables to propagate from the leader.</td>
+<td>Poll interval used by <code>waitForTableSync</code> on non-leader coordinators when a freshly-created table needs to propagate from the leader's catalog.</td>
+</tr>
+<tr>
+<td><code>neorunbase.query.scatter.future.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>Fallback per-shard scatter-future timeout used by inline scatter paths (full-table fetch, replica fan-out) that don't thread through <code>internal.rpc.timeout.ms</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.query.merge.prepare.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>Distributed merge PREPARE per-shard timeout (1 min). PREPARE writes pending tombstones + staged rows to the shard WAL, which may need to flush significant state.</td>
 </tr>
 <tr>
 <td><code>neorunbase.reshard.shard.operation.timeout.ms</code></td>
 <td><code>120000</code></td>
-<td>Internal protocol RPC timeout for shard copy / replicate during resharding.</td>
+<td>Internal protocol RPC timeout for shard copy and shard replicate during resharding.</td>
 </tr>
 <tr>
 <td><code>neorunbase.reshard.ddl.operation.timeout.ms</code></td>
@@ -2738,27 +3025,27 @@
 <tr>
 <td><code>neorunbase.disk.repair.enabled</code></td>
 <td><code>false</code></td>
-<td>Enable automatic disk repair.</td>
+<td>Enable the automatic disk-repair service. When enabled it detects failed/full data dirs and re-replicates affected shards onto healthy disks/nodes.</td>
 </tr>
 <tr>
 <td><code>neorunbase.disk.repair.interval.seconds</code></td>
 <td><code>300</code></td>
-<td>Repair cycle interval.</td>
+<td>Period between disk-repair scan cycles (5 min).</td>
 </tr>
 <tr>
 <td><code>neorunbase.disk.repair.grace.period.seconds</code></td>
 <td><code>600</code></td>
-<td>Grace period before a disk is confirmed dead.</td>
+<td>How long a disk must remain unhealthy before it is confirmed dead and its shards are repaired elsewhere (10 min). Avoids reacting to transient blips.</td>
 </tr>
 <tr>
 <td><code>neorunbase.disk.repair.max.concurrent</code></td>
 <td><code>4</code></td>
-<td>Maximum concurrent shard repairs.</td>
+<td>Maximum number of shard repairs running at once. Caps the IO/network impact of recovery.</td>
 </tr>
 <tr>
 <td><code>neorunbase.disk.repair.min.available.bytes</code></td>
 <td><code>104857600</code></td>
-<td>Minimum free bytes for a disk to be considered healthy (100 MB).</td>
+<td>Minimum free space for a disk to count as healthy (100 MiB); below this it is excluded from new shard placement.</td>
 </tr>
 </tbody>
 </table>
