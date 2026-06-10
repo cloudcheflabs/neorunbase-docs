@@ -998,6 +998,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#format-version-2-and-3-deletion-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format version 2 and 3 (deletion vectors)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1588,8 +1599,11 @@
 <p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
 <ul>
 <li>WHERE-clause and column-projection pushdown to data nodes</li>
-<li>Both <strong>equality deletes</strong> and <strong>position deletes</strong> are applied at read time, so external tools writing into the same table stay compatible</li>
+<li><strong>Equality deletes</strong>, <strong>position deletes</strong>, and Iceberg <strong>format-version 3 deletion vectors</strong> are all applied at read time, so external tools writing into the same table stay compatible</li>
 </ul>
+<h3 id="format-version-2-and-3-deletion-vectors">Format version 2 and 3 (deletion vectors)</h3>
+<p>NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes <strong>equality deletes</strong>, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use <strong>deletion vectors</strong> — a roaring bitmap of deleted row positions stored in a <a href="https://iceberg.apache.org/puffin-spec/">Puffin</a> <code>deletion-vector-v1</code> blob instead of position-delete files — and NeorunBase reads and applies these transparently.</p>
+<p>New tables created by NeorunBase are v2 by default; opt into v3 with <code>-Dneorunbase.iceberg.format.version=3</code> (or <code>NEORUNBASE_ICEBERG_FORMAT_VERSION=3</code>).</p>
 <h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
 <p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
 <p>Multi-format read applies everywhere an external Iceberg table is read:</p>
