@@ -49,7 +49,13 @@ Adding a column to a NeorunBase table (`ALTER TABLE … ADD COLUMN …`) is prop
 `SELECT * FROM iceberg.<namespace>.<table>` is a federated read against the Iceberg catalog. Queries support:
 
 - WHERE-clause and column-projection pushdown to data nodes
-- Both **equality deletes** and **position deletes** are applied at read time, so external tools writing into the same table stay compatible
+- **Equality deletes**, **position deletes**, and Iceberg **format-version 3 deletion vectors** are all applied at read time, so external tools writing into the same table stay compatible
+
+### Format version 2 and 3 (deletion vectors)
+
+NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes **equality deletes**, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use **deletion vectors** — a roaring bitmap of deleted row positions stored in a [Puffin](https://iceberg.apache.org/puffin-spec/) `deletion-vector-v1` blob instead of position-delete files — and NeorunBase reads and applies these transparently.
+
+New tables created by NeorunBase are v2 by default; opt into v3 with `-Dneorunbase.iceberg.format.version=3` (or `NEORUNBASE_ICEBERG_FORMAT_VERSION=3`).
 
 ### Multi-Format Data Files (Parquet, ORC, Avro)
 
