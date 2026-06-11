@@ -59,6 +59,7 @@ nav:
       - "IAM Policy Reference": features/iam-policy.md
       - "Admin Password Recovery": features/admin-password-recovery.md
       - "Admin UI": features/admin-ui.md
+      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
   - "Configuration":
       - "Configuration Reference": configuration/configuration.md
   - "Operations":
