@@ -1,0 +1,2281 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/site-replication/">
+      
+      
+        <link rel="prev" href="../replication-ha/">
+      
+      
+        <link rel="next" href="../topology-aware-placement/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Site Replication (DR) - NeorunBase</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#site-replication-dr" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+      
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NeorunBase
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Site Replication (DR)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../installation/installation/" class="md-tabs__link">
+          
+  
+  
+  Installation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../postgresql-compatibility/" class="md-tabs__link">
+          
+  
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../configuration/configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../operations/operations/" class="md-tabs__link">
+          
+  
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+      
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
+
+    </a>
+    NeorunBase
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NeorunBase Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Installation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download & Install
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/nginx-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NGINX Reverse Proxy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postgresql-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL Compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributed-sharding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Sharding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../replication-ha/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication & High Availability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Site Replication (DR)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Site Replication (DR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wire-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-protocol-layer-skips-encryption-for-this-opcode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the protocol layer skips encryption for this opcode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identity-neorunbasesiteid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity: neorunbase.site.id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-rest-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin REST surface
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Admin REST surface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-adminapisite-replicationconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /admin/api/site-replication/config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-adminapisite-replicationconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /admin/api/site-replication/config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-adminapisite-replicationstatus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /admin/api/site-replication/status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-adminapisite-replicationtest-enqueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /admin/api/site-replication/test-enqueue
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operator workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bringing-up-a-new-standby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bringing up a new standby
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-lag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring lag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#promoting-a-standby-to-primary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Promoting a standby to primary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-100-ships" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What 1.0.0 ships
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#totalsent-never-advances-after-enqueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        totalSent never advances after enqueue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#totalfailed-is-non-zero-but-totalsent-keeps-moving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        totalFailed is non-zero but totalSent keeps moving
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#receiver-logs-tag-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Receiver logs Tag mismatch!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#receiver-logs-decode-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Receiver logs decode failed: ...
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-aware-placement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology-Aware Shard Placement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reactive-shard-repair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reactive Shard Repair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../per-table-stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Per-Table Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encryption at Rest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pg-wire-tls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pg-wire TLS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../catalogs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backup-restore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup & Restore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kafka-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../full-text-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full-Text Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hybrid-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Graph Traversal & Analytics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geospatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geospatial Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity and Access Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iam-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IAM Policy Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../admin-password-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Password Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../admin-ui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="site-replication-dr">Site Replication (DR)</h1>
+<p>NeorunBase 1.0.0 introduces <strong>cross-site (disaster-recovery) replication</strong>: a leader-coordinator on the <strong>primary</strong> site streams its WAL to one or more <strong>standby</strong> sites in near-real time, so a failover site can keep serving reads (and, after promotion, writes) when the primary site is lost.</p>
+<p>Site replication is distinct from <a href="../replication-ha/">intra-cluster replication</a>. Intra-cluster replication keeps multiple copies of each shard inside the <strong>same</strong> cluster, behind the same coordinators, sharing the same KMS. Site replication crosses cluster boundaries — every standby site has its own ZooKeeper ensemble, its own coordinator quorum, its own data nodes, and its own KMS.</p>
+<p>The 1.0.0 release ships the wire path, the leader-only streamer, and the admin surface. It does <strong>not</strong> ship the WAL-tail tap on the production DML commit path — that lands in 1.1.0. v1 is the foundation: it is fully observable, exercised end-to-end in CI, and ready for operators to wire into bespoke flows via the test-enqueue hook.</p>
+<h2 id="the-model">The model</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+----------------------- primary site (role=primary) ---------+
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|                                                             |
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|   client → coord (leader) ──► WalManager.write(rec)         |
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|                                       │                     |
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|                                       ▼                     |
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|                          SiteReplicationService.enqueue()   |
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|                                       │                     |
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>|                          per-peer outbox (in-memory)        |
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>|                                       │                     |
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>|                          site-replication-streamer-&lt;peer&gt;   |
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>|                                       │                     |
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>+---------------------------------------┼---------------------+
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                                        │  REPLICATE_WAL_BATCH_REQ
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                                        ▼  (TCP, opcode 300)
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>+--------------------- standby site (role=standby) -----------+
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>|                                                             |
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|        data-node (port 7100)                                |
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>|        DataNodeRequestHandler.handleReplicateWalBatch       |
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>|                ├─ skip if originSiteId == localSiteId       |
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>|                ├─ INSERT/UPDATE → shard.put                 |
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>|                ├─ DELETE        → shard.delete              |
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>|                └─ PREPARE/COMMIT/ROLLBACK → seq ack only    |
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>|                                                             |
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>+-------------------------------------------------------------+
+</code></pre></div>
+<p>The streamer is <strong>leader-only</strong> — only the elected leader coordinator runs the per-peer threads. Followers carry the same code but their <code>leaderSupplier</code> returns <code>false</code>, so the <code>streamLoop</code> sleeps in a tight idle. Leader handover is sticky-aware: the new leader picks up streaming from its own in-memory queue (which is empty on a cold leader); records that were buffered on the <em>old</em> leader but not yet shipped are <em>lost on cold restart</em>. v1 accepts this trade-off — the recovery flow on the standby is "restore from the latest standby-side backup, then resume streaming", which closes any gap the in-memory queue could have introduced.</p>
+<h2 id="wire-format">Wire format</h2>
+<p>Each batch is a single <code>REPLICATE_WAL_BATCH_REQ</code> (opcode <code>300</code>). The response is <code>REPLICATE_WAL_BATCH_RES</code> (opcode <code>301</code>).</p>
+<p>The codec lives in <code>com.cloudcheflabs.neorunbase.common.replication.SiteReplicationCodec</code>. The body layout is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[ siteIdLen : int ]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>[ siteId    : utf-8 ]      ← header: where this batch came FROM
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[ fromSeq   : long ]
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>[ recordCount : int ]
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>[ recordLen : int ]
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>[ record    : bytes ]      ← WalRecord wire format, repeated × recordCount
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>...
+</code></pre></div>
+<p>The receiver decodes the header, stamps every decoded <code>WalRecord</code> with <code>originSiteId = batch.originSiteId</code>, then applies them in order. The <code>originSiteId</code> is a <strong>transient</strong> field on <code>WalRecord</code> — it is <strong>not</strong> persisted into the local WAL's binary format, only carried in memory. This guarantees that:</p>
+<ul>
+<li>A record received from site B and applied locally never re-enters site B's outbox (loop prevention at the enqueue side).</li>
+<li>A standby promoted to primary later does not "leak" the upstream <code>originSiteId</code> into its own WAL bytes — its own newly-issued records get a fresh <code>originSiteId = localSiteId</code>.</li>
+</ul>
+<p>The response body is a JSON object:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;appliedCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;lastAppliedSeq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1042</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;skippedCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;failedCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;originSiteId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site-a&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>appliedCount</code> is the number of records the receiver mutated state for. <code>skippedCount</code> is the loop-guard count — records dropped because <code>originSiteId == localSiteId</code>. <code>lastAppliedSeq</code> is the highest sequence among applied records, which the streamer surfaces via <code>/admin/api/site-replication/status</code>.</p>
+<h2 id="why-the-protocol-layer-skips-encryption-for-this-opcode">Why the protocol layer skips encryption for this opcode</h2>
+<p>NeorunBase's internal protocol normally encrypts every payload with the cluster's <code>internal-protocol</code> KMS key. But site replication crosses <strong>distinct</strong> KMS instances — site A's <code>internal-protocol</code> key is unknown to site B. If the receiver tried to decrypt the payload with its own key, it would fail with <code>Tag mismatch!</code>.</p>
+<p><code>InternalMessage.encode()</code> therefore skips KMS encryption for <code>REPLICATE_WAL_BATCH_REQ</code> / <code>REPLICATE_WAL_BATCH_RES</code>. v1 ships these two opcodes as <strong>plaintext at the protocol layer</strong>.</p>
+<p>This is acceptable for v1 because:</p>
+<ol>
+<li>The wire still carries an <code>originSiteId</code> header that lets receivers reject foreign or self-loop batches.</li>
+<li>The receiver requires the caller to present a configured peer's <code>accessKey</code> / <code>secretKey</code> (in v1 these are configured at both ends but not yet enforced over the wire; <strong>v1.1</strong> will add HMAC challenge-response over the same opcode).</li>
+<li>Production deployments are expected to terminate cross-site replication links over <strong>TLS</strong> (stunnel, mTLS at the kernel, or a service mesh). The protocol layer's own encryption is intra-cluster's defence in depth, not the only defence.</li>
+</ol>
+<p>If you operate without TLS between sites, treat v1 site replication as untrusted-transport — verify it stays inside a private network you control.</p>
+<h2 id="configuration">Configuration</h2>
+<p>Site replication is configured on the <strong>primary</strong> with a JSON document that lists peers. The configuration is persisted in <code>RocksDbMetadataStore</code> (key <code>replication.site.config</code>) and survives coordinator restart.</p>
+<h3 id="identity-neorunbasesiteid">Identity: <code>neorunbase.site.id</code></h3>
+<p>Every node in a cluster reports the same <code>neorunbase.site.id</code>. It is a free-form string — recommended values are short (<code>site-a</code>, <code>seoul</code>, <code>dc1</code>) because it is sent on every batch header.</p>
+<p>If unset, it defaults to <code>neorunbase.cluster.id</code> so existing clusters carry on with no change in behaviour (they look like single-site primaries that have no peers configured, which is the v1 default).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>-Dneorunbase.site.id=site-a
+</code></pre></div>
+<p>Set this <strong>identically</strong> on every coordinator and data node in a cluster — heterogeneous site IDs inside one cluster will confuse the loop guard.</p>
+<h3 id="admin-rest-surface">Admin REST surface</h3>
+<p>All endpoints are under <code>/admin/api/site-replication/</code>, require <code>Authorization: Bearer &lt;admin-token&gt;</code>, and reject the password-change bootstrap token (the receiver is intentionally locked behind the same password-rotation gate as the rest of the admin surface).</p>
+<h4 id="get-adminapisite-replicationconfig"><code>GET /admin/api/site-replication/config</code></h4>
+<p>Returns the current configuration. <code>secretKey</code> is <strong>always masked</strong> — the response substitutes the boolean field <code>secretKeySet</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;batchMaxRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;batchMaxBytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1048576</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;tickMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="nt">&quot;peers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="nt">&quot;siteId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site-b&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nt">&quot;internalEndpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site-b-data:7100&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="nt">&quot;accessKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="nt">&quot;secretKeySet&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="post-adminapisite-replicationconfig"><code>POST /admin/api/site-replication/config</code></h4>
+<p>Apply a new config. The streamer is stopped, the in-memory outboxes are rebuilt for the new peer set, and the streamer is restarted. Idempotent.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>bool</td>
+<td>yes</td>
+<td>Master switch. When <code>false</code>, <code>enqueue()</code> is a no-op and the streamer threads idle.</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td>enum</td>
+<td>yes</td>
+<td><code>primary</code> or <code>standby</code>. Cosmetic in v1 (the streamer runs unconditionally on the leader regardless of role); v1.1 will use it to gate the WAL-tail tap on primary-only.</td>
+</tr>
+<tr>
+<td><code>batchMaxRecords</code></td>
+<td>int</td>
+<td>no, default 100</td>
+<td>Max records the streamer drains per tick before shipping.</td>
+</tr>
+<tr>
+<td><code>batchMaxBytes</code></td>
+<td>int</td>
+<td>no, default 1 MiB</td>
+<td>Soft cap on serialized batch size. v1 uses it as a guideline, not a hard split.</td>
+</tr>
+<tr>
+<td><code>tickMs</code></td>
+<td>int</td>
+<td>no, default 200</td>
+<td>Streamer idle interval when the outbox is empty. Lower = lower replication lag, higher = lower CPU when idle.</td>
+</tr>
+<tr>
+<td><code>peers[].siteId</code></td>
+<td>string</td>
+<td>yes</td>
+<td>Peer's <code>neorunbase.site.id</code>. Used as a key for per-peer status.</td>
+</tr>
+<tr>
+<td><code>peers[].internalEndpoint</code></td>
+<td>string</td>
+<td>yes</td>
+<td><code>host:port</code> of one of the peer's data nodes. Any data node works — the receiver runs on every data node.</td>
+</tr>
+<tr>
+<td><code>peers[].accessKey</code> / <code>secretKey</code></td>
+<td>string</td>
+<td>yes</td>
+<td>v1: stored, not yet enforced over the wire. v1.1: HMAC challenge-response.</td>
+</tr>
+</tbody>
+</table>
+<p>Returns <code>{"status":"ok"}</code>.</p>
+<h4 id="get-adminapisite-replicationstatus"><code>GET /admin/api/site-replication/status</code></h4>
+<p>Live status snapshot:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;leader&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">&quot;totalEnqueued&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1042</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">&quot;totalSent&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1042</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">&quot;totalFailed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">&quot;peers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">&quot;site-b&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nt">&quot;queueDepth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nt">&quot;lastAppliedSeq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1042</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>leader</code> — <code>true</code> only on the elected leader coordinator. Standby coordinators report <code>false</code> and <code>totalEnqueued</code>/<code>totalSent</code> of <code>0</code>.</li>
+<li><code>totalEnqueued</code> — records the local <code>enqueue()</code> accepted. Counted <strong>once per call</strong> regardless of fan-out across peers.</li>
+<li><code>totalSent</code> — sum over all peers of records the receiver acknowledged via <code>appliedCount</code>. Includes records the receiver dropped via the loop guard.</li>
+<li><code>totalFailed</code> — records the streamer retried because the receiver returned an error or the RPC failed. The records are pushed back at the <strong>tail</strong> of the in-memory queue, not the head, so a long-running outage can re-order a tail by up to <code>tickMs × queueDepth</code>.</li>
+<li><code>peers.&lt;siteId&gt;.queueDepth</code> — how many records are currently pending shipment.</li>
+<li><code>peers.&lt;siteId&gt;.lastAppliedSeq</code> — the highest sequence the peer has acknowledged. Track this with your monitoring system to alarm on replication lag.</li>
+</ul>
+<h4 id="post-adminapisite-replicationtest-enqueue"><code>POST /admin/api/site-replication/test-enqueue</code></h4>
+<p>Test hook (intended for operators verifying connectivity, not for production traffic). Accepts a JSON body that mirrors <code>WalRecord</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;txId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tx-smoke-1&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;sequence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1001</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INSERT&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">&quot;shardId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;public.sr_smoke&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cGsx&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cm93MQ==&quot;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>key</code> / <code>data</code> are base64 — the receiver treats them as opaque bytes. <code>type</code> is one of <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> / <code>PREPARE</code> / <code>COMMIT</code> / <code>ROLLBACK</code>.</p>
+<p>Returns <code>{"status":"enqueued"}</code>. Watch <code>totalSent</code> and <code>peers.&lt;siteId&gt;.lastAppliedSeq</code> move on the next status poll.</p>
+<h2 id="operator-workflow">Operator workflow</h2>
+<h3 id="bringing-up-a-new-standby">Bringing up a new standby</h3>
+<ol>
+<li>Cold-restore the standby site from the primary's most recent backup. NeorunBase ships <a href="../backup-restore/">Backup &amp; Restore</a> — use <code>/admin/api/backup/restore</code> on the standby with the primary's archive. This brings the standby's RocksDB shards, IAM, and metadata to a consistent point-in-time snapshot.</li>
+<li>Bring the standby up with its own distinct <code>neorunbase.site.id</code> (e.g. <code>site-b</code>).</li>
+<li>On the <strong>primary</strong>, POST the standby's data-node endpoint to <code>/admin/api/site-replication/config</code>:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://primary-coord/admin/api/site-replication/config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$ADMIN_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">     </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="s1">       &quot;enabled&quot;: true,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="s1">       &quot;role&quot;: &quot;primary&quot;,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="s1">       &quot;peers&quot;: [{</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="s1">         &quot;siteId&quot;: &quot;site-b&quot;,</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s1">         &quot;internalEndpoint&quot;: &quot;site-b-data-1.dr.example.com:7100&quot;,</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s1">         &quot;accessKey&quot;: &quot;admin&quot;,</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="s1">         &quot;secretKey&quot;: &quot;&lt;peer-secret&gt;&quot;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="s1">       }]</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s1">     }&#39;</span>
+</code></pre></div>
+<ol>
+<li>Verify with <code>GET /admin/api/site-replication/status</code> — <code>enabled:true</code>, <code>leader:true</code>, and <code>peers.site-b.queueDepth</code> initially <code>0</code> (no traffic since v1's WAL-tail tap is not yet wired into the DML commit hook — see "What v1 ships vs. v1.1").</li>
+<li>Use the test-enqueue endpoint to confirm the wire path works end-to-end. The standby's data-node log should show one <code>REPLICATE_WAL_BATCH</code> apply entry per shipped batch.</li>
+</ol>
+<h3 id="monitoring-lag">Monitoring lag</h3>
+<p>Poll <code>/admin/api/site-replication/status</code> from your monitoring system (Prometheus exporter, observability pipeline, etc.):</p>
+<ul>
+<li><strong>Replication lag alarm</strong> — alarm when <code>peers.&lt;siteId&gt;.queueDepth &gt; N</code> for more than M minutes, or when <code>peers.&lt;siteId&gt;.lastAppliedSeq</code> stops advancing while <code>totalEnqueued</code> advances.</li>
+<li><strong>Failure alarm</strong> — alarm when <code>totalFailed</code> derivative exceeds a threshold (e.g. ≥10 failures per minute sustained).</li>
+<li><strong>Leader flip</strong> — <code>leader:true</code> on the wrong coordinator suggests a leader-election storm. Cross-reference with the <a href="../../operations/operations/">Cluster Operations</a> leader-election runbook.</li>
+</ul>
+<h3 id="promoting-a-standby-to-primary">Promoting a standby to primary</h3>
+<p>v1 promotion is <strong>manual</strong>:</p>
+<ol>
+<li>Stop the (failed) primary if it is reachable, or fence it at the network layer.</li>
+<li>On the chosen standby: change its config role to <code>primary</code> (it is cosmetic in v1 but reserves the field for v1.1's hot-path gate). Add the <em>former</em> primary as a peer if and when it returns, so the standby can stream back to it.</li>
+<li>Re-point your application traffic to the standby's pg-wire/Arrow Flight endpoints. NeorunBase does not own DNS — that is your orchestration layer's job.</li>
+<li>Audit any in-flight transactions on the primary that did not reach the standby (compare the standby's last applied sequence to the primary's last issued sequence, if the primary is recoverable). v1 cannot guarantee zero-loss promotion on a sudden primary failure — it is an <strong>asynchronous</strong> replication design.</li>
+</ol>
+<h3 id="network-requirements">Network requirements</h3>
+<p>The streamer dials peers on their <strong>data-node internal port</strong> (default <code>7100</code>). Open this port between sites:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>primary-coords/* → standby-datanodes/* on 7100/tcp
+</code></pre></div>
+<p>If you also want the standby to stream back to the primary (active-active is not supported in v1 — there is no conflict-resolution layer — but operators sometimes pre-open the reverse direction so promotion is a config-only operation), open the symmetric path too.</p>
+<p>Latency: the streamer's <code>tickMs</code> (default 200 ms) is the <strong>idle</strong> wake interval, not the per-RPC latency. A batch leaves immediately as records enqueue. End-to-end replication lag is dominated by the network RTT between sites + the receiver's RocksDB write latency. The wire ships records as a single batch, so a coast-to-coast RTT of ~70ms produces ~70ms lag for the first record and amortises down for the rest of a batch.</p>
+<h2 id="what-100-ships">What 1.0.0 ships</h2>
+<p>The 1.0.0 release is now <strong>end-to-end DML+DDL replication</strong>, not just the wire path:</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wire path (opcode 300/301, codec)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Leader-only streamer threads</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Per-peer in-memory outbox</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Loop prevention via <code>originSiteId</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Admin REST (config, status, test-enqueue)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Admin UI page (<code>/site-replication</code>)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Plaintext at protocol layer; terminate over TLS in production</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Production WAL-tail tap</strong> — every successful <code>RocksDBShard.put</code> ships to peer</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>DDL replication</strong> — CREATE TABLE / DROP TABLE flows over the same pipeline</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Receiver-side index reconcile</strong> — after apply, ANN (HNSW) + FTS (Lucene) caches on the standby are invalidated so the next query rebuilds incrementally from the freshly replicated rows</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>Out of scope for 1.0.0 and tracked as follow-ups:
+- Persistent outbox (resume after coordinator restart without losing in-flight records).
+- HMAC challenge-response over the wire (currently relies on TLS at the transport layer).
+- Reverse direction (peer → primary) for active-active (requires conflict resolution — research phase).
+- Per-peer outbox size cap with backpressure (today: bounded queue with drop-oldest on overload).
+- Catch-up from a checkpoint after long outage (today: rebuild standby via <a href="../backup-restore/">backup-restore</a>, then resume).</p>
+<h2 id="configuration-reference">Configuration reference</h2>
+<table>
+<thead>
+<tr>
+<th>JVM property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.site.id</code></td>
+<td>value of <code>neorunbase.cluster.id</code></td>
+<td>This cluster's site identity. Stamped onto every outbound batch.</td>
+</tr>
+</tbody>
+</table>
+<p>There are no other system properties for site replication — all knobs are in the JSON config persisted via <code>/admin/api/site-replication/config</code>.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="totalsent-never-advances-after-enqueue"><code>totalSent</code> never advances after <code>enqueue</code></h3>
+<p>Likely causes:</p>
+<ul>
+<li><code>enabled:false</code> in the persisted config. Re-POST with <code>enabled:true</code>.</li>
+<li>The receiver returns <code>peer rejected batch: ...</code> — check the standby's coordinator/data-node logs. Common cause: <code>localSiteId not configured on this data node</code> (the standby was started without <code>-Dneorunbase.site.id=...</code> and falls back to a UUID-based clusterId — the loop guard then treats every record as foreign-origin and applies them, but if the standby's data node lacks the WAL apply column families it falls back further).</li>
+<li>DNS / firewall — confirm the streamer's connect log line: <code>Connected to data node at &lt;peer-endpoint&gt;</code>. Absence of that line means the connect attempt itself fails. Check the <strong>primary's coordinator log</strong> for <code>Connect to ... timed out after 10s</code> from <code>SiteReplicationService</code>.</li>
+</ul>
+<h3 id="totalfailed-is-non-zero-but-totalsent-keeps-moving"><code>totalFailed</code> is non-zero but <code>totalSent</code> keeps moving</h3>
+<p>Transient network blips. The streamer re-queues the failed batch at the tail and continues. Investigate only if <code>totalFailed</code> derivative is sustained.</p>
+<h3 id="receiver-logs-tag-mismatch">Receiver logs <code>Tag mismatch!</code></h3>
+<p>This should not happen as of 1.0.0 — the encryption-skip for opcodes 300/301 is the fix. If you see it, you are running a mixed version (one site upgraded, the other not) — both sites must run ≥ 1.0.0 for the encryption-skip to apply on both encode and decode.</p>
+<h3 id="receiver-logs-decode-failed">Receiver logs <code>decode failed: ...</code></h3>
+<p>Codec version mismatch — both sites must be on the same protocol version. The codec layout is stable at 1.0.0; downgrade or upgrade in lockstep across sites.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../replication-ha/">Replication &amp; High Availability</a> — intra-cluster shard replication, the other layer of fault tolerance.</li>
+<li><a href="../backup-restore/">Backup &amp; Restore</a> — the bootstrap mechanism for a new standby and the cold-restore path during promotion.</li>
+<li><a href="../nic-fail-safety/">NIC Silent-Fail Safety</a> — the underlying transport hardening that keeps the streamer from wedging on a half-open peer.</li>
+<li><a href="../../operations/operations/">Cluster Operations</a> — leader-election runbook + general operational guidance.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>

@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/topology-aware-placement/">
       
       
-        <link rel="prev" href="../catalogs/">
+        <link rel="prev" href="../site-replication/">
       
       
-        <link rel="next" href="../backup-restore/">
+        <link rel="next" href="../reactive-shard-repair/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Iceberg Integration - NeorunBase</title>
+        <title>Topology-Aware Shard Placement - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#iceberg-integration" class="md-skip">
+        <a href="#topology-aware-shard-placement" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Iceberg Integration
+              Topology-Aware Shard Placement
             
           </span>
         </div>
@@ -795,10 +795,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../topology-aware-placement/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology-Aware Shard Placement
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -814,6 +841,170 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-6-pass-cascade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The 6-pass cascade
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-observe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What you observe
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What you observe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-node-startup-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data-node startup log
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-rest-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin REST surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operator workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#onboarding-a-new-rack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Onboarding a new rack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#heterogeneous-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heterogeneous capacity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -991,37 +1182,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Iceberg Integration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
         
   
   
@@ -1037,131 +1201,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-apache-polaris" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog — Apache Polaris
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-sync-cdc" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Sync (CDC)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#built-in-time-column-partitioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in Time Column + Partitioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schema-evolution-add-column" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Evolution — ADD COLUMN
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reading-iceberg-tables-icebergnstable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#format-version-2-and-3-deletion-vectors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Format version 2 and 3 (deletion vectors)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-Format Data Files (Parquet, ORC, Avro)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#open-lakehouse-analytics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open Lakehouse Analytics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-not-yet-supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Is Not (Yet) Supported
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1701,69 +1740,137 @@
 
 
 
-<h1 id="iceberg-integration">Iceberg Integration</h1>
-<p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
-<div class="admonition note">
-<p class="admonition-title">Iceberg catalogs are first-class</p>
-<p>An Iceberg connection is registered as a named <a href="../catalogs/">catalog</a>. You can register more than one (e.g. <code>iceberg-east</code>, <code>iceberg-west</code>); tables in each are addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>. This page uses <code>iceberg</code> as the example catalog name.</p>
-</div>
-<h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
-<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via <code>CREATE CATALOG</code> SQL, or seeded at startup from <code>neorunbase.iceberg.*</code>. Each catalog supplies:</p>
+<h1 id="topology-aware-shard-placement">Topology-Aware Shard Placement</h1>
+<p>NeorunBase 1.0.0 places shard replicas across data nodes with awareness of the <strong>fault domains</strong> the data nodes live in — zone, rack, host — and the <strong>capacity</strong> each data node reports. A shard's RF replicas land on as-distinct-as-possible domains, so a rack power loss or a host hardware failure removes at most one copy of any shard.</p>
+<p>For unlabeled clusters (the default) the algorithm degenerates to capacity-weighted round-robin, which is backwards-compatible with the legacy <code>(shard + replicaIndex) mod nodeCount</code> placement.</p>
+<h2 id="labels">Labels</h2>
+<p>Each data node reports three optional labels at registration time:</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>JVM property</th>
+<th>Environment variable</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hostId</code></td>
+<td><code>-Dneorunbase.host.id</code></td>
+<td><code>NEORUNBASE_HOST_ID</code></td>
+<td>Physical server identity. Distinct on dual-socket nodes; identical across processes sharing the same chassis.</td>
+</tr>
+<tr>
+<td><code>rackId</code></td>
+<td><code>-Dneorunbase.rack.id</code></td>
+<td><code>NEORUNBASE_RACK_ID</code></td>
+<td>The rack the host sits in. Usually one PDU + one ToR switch.</td>
+</tr>
+<tr>
+<td><code>zoneId</code></td>
+<td><code>-Dneorunbase.zone.id</code></td>
+<td><code>NEORUNBASE_ZONE_ID</code></td>
+<td>Datacenter availability zone — for AWS, an AZ; for self-hosted, a power-domain.</td>
+</tr>
+</tbody>
+</table>
+<p>System property takes precedence over the environment variable. Setting only <code>hostId</code> is valid — the strategy falls back: missing <code>zoneId</code> falls through to <code>rackId</code>, missing <code>rackId</code> falls through to <code>hostId</code>, missing <code>hostId</code> falls through to <code>nodeId</code>. This lets you populate labels gradually as your topology becomes legible.</p>
+<p>The labels are persisted in ZooKeeper as part of the data node's ephemeral registration and survive heartbeats (the disk-info refresh path preserves them). They are surfaced on:</p>
 <ul>
-<li>Polaris URI and OAuth token endpoint</li>
-<li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
-<li>OAuth2 client ID / client secret, realm, scope</li>
-<li>S3 endpoint, access key, secret key, region</li>
+<li><code>GET /admin/nodes/datanodes</code> — fields <code>hostId</code>, <code>rackId</code>, <code>zoneId</code>.</li>
+<li>The admin UI Topology page — printed under each data node's host:port.</li>
 </ul>
-<p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
-<p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
-<h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
-<p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
+<h2 id="the-6-pass-cascade">The 6-pass cascade</h2>
+<p><code>com.cloudcheflabs.neorunbase.cluster.ShardPlacementStrategy</code> runs once per shard and assigns <code>RF</code> replicas:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>fault-domain hierarchy (strongest distinctness first):
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  zone  →  rack  →  host  →  node  →  desperation (cycle reuse)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Pass 1 — zone-distinct:  rank candidate nodes, accept any whose zone hasn&#39;t been picked.
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Pass 2 — rack-distinct:  among remaining nodes, accept any whose rack hasn&#39;t been picked.
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Pass 3 — host-distinct:  among remaining nodes, accept any whose host hasn&#39;t been picked.
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Pass 4 — node-distinct:  accept any remaining node (this is the legacy floor).
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Pass 5 — cycle reuse:    only if RF &gt; distinct-node count, log a warning + repeat from pass 1.
+</code></pre></div>
+<p>Within each pass, candidates are scored by capacity — sum of <code>availableBytes</code> across the data node's disks. Nodes that haven't reported disk info get the median weight so they aren't starved during bootstrap. The chosen RF set is then sorted by descending capacity so the largest-capacity replica is designated <strong>primary</strong> — this is weighted-HRW-lite, evaluated at assignment time instead of per-request.</p>
+<p>A label being null in one node doesn't break the cascade — that node's "zone" effectively equals its rack/host/nodeId via the fallback. Heterogeneously-labeled clusters (partial topology rollout) get the <em>best available</em> distinctness without explicit handling.</p>
+<h2 id="what-you-observe">What you observe</h2>
+<h3 id="data-node-startup-log">Data-node startup log</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Registered data node: dn-7100 at dn-host:7100 with 4 disks ready=false
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    topology=(host=host-a1 rack=rack-1 zone=zone-east)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Data node dn-7100 registered with topology labels: host=host-a1 rack=rack-1 zone=zone-east
+</code></pre></div>
+<h3 id="admin-rest-surface">Admin REST surface</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>http://coord:8080/admin/nodes/datanodes
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">[</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="o">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="s2">&quot;nodeId&quot;</span>:<span class="w"> </span><span class="s2">&quot;dn-7100&quot;</span>,
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="s2">&quot;host&quot;</span>:<span class="w"> </span><span class="s2">&quot;dn-host&quot;</span>,
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="s2">&quot;internalPort&quot;</span>:<span class="w"> </span><span class="m">7100</span>,
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="s2">&quot;hostId&quot;</span>:<span class="w"> </span><span class="s2">&quot;host-a1&quot;</span>,
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="s2">&quot;rackId&quot;</span>:<span class="w"> </span><span class="s2">&quot;rack-1&quot;</span>,
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="s2">&quot;zoneId&quot;</span>:<span class="w"> </span><span class="s2">&quot;zone-east&quot;</span>,
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="s2">&quot;disks&quot;</span>:<span class="w"> </span><span class="o">[</span>...<span class="o">]</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="o">}</span>,
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span>...
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="o">]</span>
+</code></pre></div>
+<h3 id="admin-ui">Admin UI</h3>
+<p>The Topology page (<code>/nodes</code>) prints <code>zone=… rack=… host=…</code> under each data node's host:port line.</p>
+<h2 id="operator-workflow">Operator workflow</h2>
+<h3 id="initial-setup">Initial setup</h3>
+<p>Put the labels in your systemd EnvironmentFile / Kubernetes pod env / docker compose env at every data-node host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">NEORUNBASE_HOST_ID</span><span class="o">=</span>node-prod-a-1
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">NEORUNBASE_RACK_ID</span><span class="o">=</span>rack-a-3
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nv">NEORUNBASE_ZONE_ID</span><span class="o">=</span>ap-northeast-2a
+</code></pre></div>
+<p>The labels are read once at data-node startup, so changing them later requires a data-node restart. The labels are not part of the shard catalog — they only affect <em>future</em> placement decisions. Restarting after a label change doesn't move existing shards.</p>
+<h3 id="onboarding-a-new-rack">Onboarding a new rack</h3>
+<ol>
+<li>Bring the new data nodes up with their new <code>rackId</code> / <code>zoneId</code>.</li>
+<li>Confirm <code>GET /admin/nodes/datanodes</code> lists them with labels.</li>
+<li><strong>New tables</strong> automatically use the topology-aware placement. <strong>Existing tables</strong> are unaffected until you trigger a per-table reshard via <code>POST /admin/tables/{name}/reshard</code>, which re-runs the strategy with the current data-node set.</li>
+</ol>
+<h3 id="heterogeneous-capacity">Heterogeneous capacity</h3>
+<p>If your cluster has a mix of small and large data nodes, the strategy already accounts for it via the capacity-weighted primary selection. You don't need to do anything — larger nodes will own a proportionally larger share of primaries. The replication factor remains symmetric (each replica is a copy), but read traffic spreads weighted-HRW-style toward the larger nodes.</p>
+<h2 id="configuration-reference">Configuration reference</h2>
+<table>
+<thead>
+<tr>
+<th>JVM property</th>
+<th>Environment variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.host.id</code></td>
+<td><code>NEORUNBASE_HOST_ID</code></td>
+<td>unset</td>
+<td>Distinct hostname for host-distinct placement.</td>
+</tr>
+<tr>
+<td><code>neorunbase.rack.id</code></td>
+<td><code>NEORUNBASE_RACK_ID</code></td>
+<td>unset</td>
+<td>Rack identity for rack-distinct placement.</td>
+</tr>
+<tr>
+<td><code>neorunbase.zone.id</code></td>
+<td><code>NEORUNBASE_ZONE_ID</code></td>
+<td>unset</td>
+<td>Availability zone for zone-distinct placement.</td>
+</tr>
+</tbody>
+</table>
+<p>There are no other knobs — the algorithm and pass priority are deliberately fixed so behaviour is predictable.</p>
+<h2 id="see-also">See also</h2>
 <ul>
-<li><strong>First sync</strong> writes the full table as a single Iceberg snapshot.</li>
-<li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
-</ul>
-<p>A high-water mark is recorded inside the Iceberg table, so coordinator restarts resume sync exactly where it left off.</p>
-<h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
-<p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
-<p>Tables are also automatically:</p>
-<ul>
-<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
-<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
-</ul>
-<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
-<h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
-<p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
-<p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
-<h2 id="reading-iceberg-tables-icebergnstable">Reading Iceberg Tables (<code>iceberg.&lt;ns&gt;.&lt;table&gt;</code>)</h2>
-<p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
-<ul>
-<li>WHERE-clause and column-projection pushdown to data nodes</li>
-<li><strong>Equality deletes</strong>, <strong>position deletes</strong>, and Iceberg <strong>format-version 3 deletion vectors</strong> are all applied at read time, so external tools writing into the same table stay compatible</li>
-</ul>
-<h3 id="format-version-2-and-3-deletion-vectors">Format version 2 and 3 (deletion vectors)</h3>
-<p>NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes <strong>equality deletes</strong>, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use <strong>deletion vectors</strong> — a roaring bitmap of deleted row positions stored in a <a href="https://iceberg.apache.org/puffin-spec/">Puffin</a> <code>deletion-vector-v1</code> blob instead of position-delete files — and NeorunBase reads and applies these transparently.</p>
-<p>New tables created by NeorunBase are v2 by default; opt into v3 with <code>-Dneorunbase.iceberg.format.version=3</code> (or <code>NEORUNBASE_ICEBERG_FORMAT_VERSION=3</code>).</p>
-<h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
-<p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
-<p>Multi-format read applies everywhere an external Iceberg table is read:</p>
-<ul>
-<li>The distributed data-node scan</li>
-<li>The coordinator-local scan</li>
-<li>Loading an external Iceberg table into LakeBase</li>
-</ul>
-<p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
-<p><code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; …</code> is supported as a copy-on-write merge. Direct <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or <code>MERGE INTO</code>.</p>
-<h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
-<p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
-<h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
-<ul>
-<li>Direct <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> on Iceberg tables (use <code>MERGE INTO</code> or the native table)</li>
-<li><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, type promotion in schema evolution</li>
-<li>Snapshot expiration and small-file / manifest compaction</li>
-<li>Time travel (<code>AS OF SNAPSHOT</code> / <code>AS OF TIMESTAMP</code>)</li>
-<li>Branching and tagging</li>
-<li>Iceberg REST catalogs other than Polaris</li>
+<li><a href="../replication-ha/">Replication &amp; High Availability</a> — intra-cluster shard replication.</li>
+<li><a href="../site-replication/">Site Replication (DR)</a> — cross-site disaster recovery streaming.</li>
+<li><a href="../../operations/operations/">Cluster Operations</a> — bootstrap order and operator runbook.</li>
 </ul>
 
 

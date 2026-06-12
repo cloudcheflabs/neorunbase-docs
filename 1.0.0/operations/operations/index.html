@@ -763,6 +763,118 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/site-replication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Site Replication (DR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/topology-aware-placement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology-Aware Shard Placement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/reactive-shard-repair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reactive Shard Repair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/per-table-stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Per-Table Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/transactions/" class="md-nav__link">
         
   
@@ -1796,6 +1908,7 @@
 <li><strong>Bootstrap order.</strong> Start ZooKeeper first, then Data Nodes, then Coordinators. The example launcher follows this sequence with brief sleeps; in production, leave Data Nodes time to register in ZooKeeper before bringing up Coordinators so the leader's startup discovery loop completes promptly.</li>
 <li><strong>Coordinator HA.</strong> When more than one Coordinator is running, ZooKeeper elects a leader for metadata and KMS ownership. Non-leader Coordinators forward write-side admin operations to the leader and serve PG wire traffic locally.</li>
 <li><strong>Shard repair &amp; rebalancing.</strong> When a Data Node leaves the cluster, the leader Coordinator detects the absence via ZooKeeper ephemeral nodes and replicates affected shards onto healthy Data Nodes (provided <code>neorunbase.disk.repair.enabled=true</code> for the disk-level case). When new Data Nodes join, the cluster rebalances shards toward them. See <a href="../../features/replication-ha/">Replication &amp; High Availability</a>.</li>
+<li><strong>Disaster recovery (cross-site).</strong> A separate, <strong>leader-only</strong> streamer ships WAL records to one or more standby clusters via <code>REPLICATE_WAL_BATCH</code> over the internal protocol. Configure peers under <code>/admin/api/site-replication/config</code> and monitor <code>lastAppliedSeq</code> and per-peer queue depth under <code>/admin/api/site-replication/status</code>. See <a href="../../features/site-replication/">Site Replication (DR)</a>.</li>
 <li><strong>Iceberg sync.</strong> Set <code>neorunbase.iceberg.catalog.type=rest</code> and <code>neorunbase.iceberg.sync.auto.start=true</code> to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see <a href="../../configuration/configuration/#iceberg-catalog-integration">Configuration</a>.</li>
 <li><strong>Kafka ingestion.</strong> Set <code>neorunbase.kafka.consumer.enabled=true</code> and define one or more consumer groups. The leader Coordinator distributes the configured groups round-robin across Data Nodes; each worker forwards parsed inserts back to the leader Coordinator over the internal protocol so the standard shard routing path applies. See <a href="../../features/kafka-integration/">Kafka Integration</a>.</li>
 <li><strong>CSR adjacency for graph workloads.</strong> Set <code>neorunbase.csr.enabled=true</code> and list edge tables in <code>neorunbase.csr.enabled.tables</code> to opt into the CSR fast path. The leader Coordinator schedules background compactions every <code>neorunbase.csr.compaction.interval.seconds</code>; force a rebuild after bulk inserts via <code>POST /admin/graph/csr/compact</code>, and inspect per-shard segment counts / <code>src_id</code> totals via <code>GET /admin/graph/csr/status</code>. See <a href="../../features/graph/#csr-adjacency-phase-1-acceleration-layer">Graph Traversal &amp; Analytics</a>.</li>

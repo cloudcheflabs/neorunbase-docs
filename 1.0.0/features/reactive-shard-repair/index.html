@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/reactive-shard-repair/">
       
       
-        <link rel="prev" href="../catalogs/">
+        <link rel="prev" href="../topology-aware-placement/">
       
       
-        <link rel="next" href="../backup-restore/">
+        <link rel="next" href="../per-table-stats/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Iceberg Integration - NeorunBase</title>
+        <title>Reactive Shard Repair - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#iceberg-integration" class="md-skip">
+        <a href="#reactive-shard-repair" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Iceberg Integration
+              Reactive Shard Repair
             
           </span>
         </div>
@@ -823,10 +823,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../reactive-shard-repair/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reactive Shard Repair
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -842,6 +869,170 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-detection-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The detection algorithm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-observe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What you observe
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What you observe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#status-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-does-the-reactive-worker-fire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When does the reactive worker fire?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operator workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operator workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuning-for-noisy-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning for noisy networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disabling-the-worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disabling the worker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-the-per-task-log-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the per-task log line
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -991,37 +1182,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Iceberg Integration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
         
   
   
@@ -1037,131 +1201,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-apache-polaris" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog — Apache Polaris
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-sync-cdc" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Sync (CDC)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#built-in-time-column-partitioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in Time Column + Partitioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schema-evolution-add-column" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Evolution — ADD COLUMN
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reading-iceberg-tables-icebergnstable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#format-version-2-and-3-deletion-vectors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Format version 2 and 3 (deletion vectors)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-Format Data Files (Parquet, ORC, Avro)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#open-lakehouse-analytics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open Lakehouse Analytics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-not-yet-supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Is Not (Yet) Supported
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1701,69 +1740,139 @@
 
 
 
-<h1 id="iceberg-integration">Iceberg Integration</h1>
-<p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
-<div class="admonition note">
-<p class="admonition-title">Iceberg catalogs are first-class</p>
-<p>An Iceberg connection is registered as a named <a href="../catalogs/">catalog</a>. You can register more than one (e.g. <code>iceberg-east</code>, <code>iceberg-west</code>); tables in each are addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>. This page uses <code>iceberg</code> as the example catalog name.</p>
-</div>
-<h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
-<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via <code>CREATE CATALOG</code> SQL, or seeded at startup from <code>neorunbase.iceberg.*</code>. Each catalog supplies:</p>
+<h1 id="reactive-shard-repair">Reactive Shard Repair</h1>
+<p>NeorunBase 1.0.0 adds a <strong>continuous, divergence-driven</strong> repair worker that detects when a shard's replicas have drifted apart — without waiting for a full data node to drop from ZooKeeper.</p>
+<p>This sits alongside the existing repair paths and fills a gap they don't cover:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Triggered by</th>
+<th>What it catches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Disk Repair</strong> (<code>DiskRepairService</code>)</td>
+<td>A disk on a known data node fails (<code>getAvailableBytes() == 0</code> after grace period)</td>
+<td>Per-disk loss, single-disk-failure scenarios.</td>
+</tr>
+<tr>
+<td><strong>Shard Repair</strong> (<code>ShardRepairService</code> — manual trigger)</td>
+<td>An operator clicks Trigger Repair or <code>POST /admin/maintenance/repair/trigger</code></td>
+<td>Full data-node loss after grace period. Operator-driven.</td>
+</tr>
+<tr>
+<td><strong>Reactive Shard Repair</strong> ← new in 1.0.0</td>
+<td>A scan finds a replica whose row count diverges from the high-water-mark replica beyond the configured threshold</td>
+<td>Partial write failure, replica that silently fell behind, split-brain recovery without waiting for full node loss.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-detection-algorithm">The detection algorithm</h2>
+<p>The worker runs on the elected <strong>leader coordinator</strong>. Followers carry the same code but their <code>leaderSupplier</code> returns <code>false</code>, so the scan loop and the drain loop both idle.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>every scan.interval.seconds (default 60s):
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  for each table:
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    for each shard:
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>      if shard has only 1 replica, skip (nothing to compare against)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>      reference_count := max(probe(replica.SHARD_INFO_REQ).cfRowCounts[table]
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                             for replica in shard.replicas)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>      reference_node  := the replica that holds reference_count
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>      for each replica != reference_node:
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        if probe.cfRowCount &lt; reference_count * (1 - divergence.fraction):
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>          enqueue (table, shardId, src=reference_node, dst=this replica)
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>drain loop:
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>  pull tasks off the queue;
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>  invoke ShardRepairService.copyShardToReplica(task)
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>  on success → totalRepaired++
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>  on failure → re-queue at the tail after backoff → totalFailed++
+</code></pre></div>
+<p>The probe re-uses the existing <code>SHARD_INFO_REQ</code> opcode — no new wire format. The receiver already returns per-CF row counts (<code>shards.&lt;shardId&gt;.cfRowCounts.&lt;table&gt;</code>), so the divergence check is one number subtraction per replica per scan.</p>
+<p>The drain re-uses <code>ShardRepairService.copyShardToReplica</code>, which is the same primitive the manual trigger uses. So a reactively-detected divergence is repaired the same way an operator-triggered repair would be — by copying the SST + WAL state via <code>SHARD_COPY_REQ</code> / <code>SHARD_REPLICATE_REQ</code>.</p>
+<h2 id="what-you-observe">What you observe</h2>
+<h3 id="status-endpoint">Status endpoint</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>http://coord:8080/admin/maintenance/reactive-repair/status
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="s2">&quot;enabled&quot;</span>:<span class="w"> </span>true,
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="s2">&quot;running&quot;</span>:<span class="w"> </span>true,
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="s2">&quot;leader&quot;</span>:<span class="w"> </span>true,
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="s2">&quot;lastScanTimestamp&quot;</span>:<span class="w"> </span><span class="m">1781272157653</span>,
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="s2">&quot;queueDepth&quot;</span>:<span class="w"> </span><span class="m">0</span>,
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="s2">&quot;totalDetected&quot;</span>:<span class="w"> </span><span class="m">0</span>,
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="s2">&quot;totalRepaired&quot;</span>:<span class="w"> </span><span class="m">0</span>,
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="s2">&quot;totalFailed&quot;</span>:<span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="o">}</span>
+</code></pre></div>
 <ul>
-<li>Polaris URI and OAuth token endpoint</li>
-<li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
-<li>OAuth2 client ID / client secret, realm, scope</li>
-<li>S3 endpoint, access key, secret key, region</li>
+<li><code>lastScanTimestamp</code> advances every scan interval.</li>
+<li><code>queueDepth</code> is positive when there are tasks pending repair.</li>
+<li><code>totalDetected</code> / <code>totalRepaired</code> / <code>totalFailed</code> are cumulative counters since coordinator startup.</li>
 </ul>
-<p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
-<p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
-<h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
-<p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
+<h3 id="admin-ui">Admin UI</h3>
+<p>The Shard Repair page (<code>/repair</code>) prints a "Reactive Shard Repair (continuous)" panel above the manual repair UI with the same counters in tiles.</p>
+<h3 id="logs">Logs</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>INFO  c.c.n.c.r.ReactiveShardRepairService - Reactive shard repair started (scan every 60s, divergence threshold 5%)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>INFO  c.c.n.c.r.ReactiveShardRepairService - Reactive repair: public.t shard 3 replica dn-7102 diverged (47/53), enqueuing repair from dn-7100
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>INFO  c.c.n.c.r.ReactiveShardRepairService - Reactive repair: public.t shard 3 dn-7102 ← dn-7100 OK
+</code></pre></div>
+<h2 id="configuration">Configuration</h2>
+<table>
+<thead>
+<tr>
+<th>JVM property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.enabled</code></td>
+<td><code>true</code></td>
+<td>Master switch. When <code>false</code>, neither the scan nor drain thread runs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.scan.interval.seconds</code></td>
+<td><code>60</code></td>
+<td>How often the scan walks every (table, shard, replica) tuple. Lower = faster reaction, higher network probe cost. Minimum 5 seconds.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.divergence.fraction</code></td>
+<td><code>0.05</code></td>
+<td>A replica is enqueued for repair when its row count is below <code>referenceCount × (1 − divergence.fraction)</code>. The default 5% absorbs normal replication lag without false positives; lower it to 0.01 if your workload's lag is very tight.</td>
+</tr>
+</tbody>
+</table>
+<p>These are loaded by <code>ConfigLoader</code> at coordinator startup. Change in <code>conf/neorunbase.properties</code> and restart the coordinator.</p>
+<h2 id="when-does-the-reactive-worker-fire">When does the reactive worker fire?</h2>
+<p>In a healthy cluster running normal writes, all replicas should stay within a few records of each other — well inside the 5% default tolerance. The worker fires when something goes wrong <strong>without</strong> the cluster also detecting the broken replica via ZK:</p>
 <ul>
-<li><strong>First sync</strong> writes the full table as a single Iceberg snapshot.</li>
-<li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
+<li>A replica's data node hung mid-write (TCP stack still alive, application thread stuck).</li>
+<li>A replica's data node restarted and silently missed WAL apply for some batches.</li>
+<li>A network partition let writes succeed on majority replicas while one replica was unreachable; the partition has since healed but the replica is now stale.</li>
+<li>A bug introduced a silent write skip on one replica (this is what the algorithm protects against — a class of errors you'd otherwise only catch via <code>SELECT count(*)</code> discrepancies across replicas).</li>
 </ul>
-<p>A high-water mark is recorded inside the Iceberg table, so coordinator restarts resume sync exactly where it left off.</p>
-<h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
-<p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
-<p>Tables are also automatically:</p>
+<p>When the worker fires, the metric to alarm on is <strong><code>totalFailed</code> rate</strong> — sustained failures usually mean the source replica is unreachable, the target's disk is full, or the SHARD_REPLICATE_REQ landed mid-IO. Investigate the most recent log lines around the failed task.</p>
+<h2 id="operator-workflow">Operator workflow</h2>
+<h3 id="tuning-for-noisy-networks">Tuning for noisy networks</h3>
+<p>If your cluster runs across a noisy WAN where momentary lag triggers false positives, raise <code>divergence.fraction</code> (e.g. to 0.10 for 10%) or raise the scan interval (e.g. to 300s for 5 min). The worker is designed to be <em>eventually correct</em>, not immediately reactive — a 5-minute reaction time is still cheap operator vigilance compared to manual repair triggers.</p>
+<h3 id="disabling-the-worker">Disabling the worker</h3>
+<p>Set <code>neorunbase.reactive.shard.repair.enabled=false</code> in <code>conf/neorunbase.properties</code> and restart the coordinator. The status endpoint will then return <code>enabled:false, running:false</code>. The manual repair endpoints continue to work.</p>
+<h3 id="reading-the-per-task-log-line">Reading the per-task log line</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Reactive repair: public.t shard 3 replica dn-7102 diverged (47/53), enqueuing repair from dn-7100
+</code></pre></div>
 <ul>
-<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
-<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
+<li><code>public.t</code> — the table whose replica diverged.</li>
+<li><code>shard 3</code> — the shard ID.</li>
+<li><code>dn-7102</code> — the replica that fell behind.</li>
+<li><code>47/53</code> — <code>dn-7102</code> reports 47 rows in this shard for this table; the high-water-mark replica reports 53.</li>
+<li><code>dn-7100</code> — the high-water-mark replica that will be used as the copy source.</li>
 </ul>
-<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
-<h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
-<p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
-<p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
-<h2 id="reading-iceberg-tables-icebergnstable">Reading Iceberg Tables (<code>iceberg.&lt;ns&gt;.&lt;table&gt;</code>)</h2>
-<p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
+<h2 id="see-also">See also</h2>
 <ul>
-<li>WHERE-clause and column-projection pushdown to data nodes</li>
-<li><strong>Equality deletes</strong>, <strong>position deletes</strong>, and Iceberg <strong>format-version 3 deletion vectors</strong> are all applied at read time, so external tools writing into the same table stay compatible</li>
-</ul>
-<h3 id="format-version-2-and-3-deletion-vectors">Format version 2 and 3 (deletion vectors)</h3>
-<p>NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes <strong>equality deletes</strong>, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use <strong>deletion vectors</strong> — a roaring bitmap of deleted row positions stored in a <a href="https://iceberg.apache.org/puffin-spec/">Puffin</a> <code>deletion-vector-v1</code> blob instead of position-delete files — and NeorunBase reads and applies these transparently.</p>
-<p>New tables created by NeorunBase are v2 by default; opt into v3 with <code>-Dneorunbase.iceberg.format.version=3</code> (or <code>NEORUNBASE_ICEBERG_FORMAT_VERSION=3</code>).</p>
-<h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
-<p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
-<p>Multi-format read applies everywhere an external Iceberg table is read:</p>
-<ul>
-<li>The distributed data-node scan</li>
-<li>The coordinator-local scan</li>
-<li>Loading an external Iceberg table into LakeBase</li>
-</ul>
-<p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
-<p><code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; …</code> is supported as a copy-on-write merge. Direct <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or <code>MERGE INTO</code>.</p>
-<h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
-<p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
-<h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
-<ul>
-<li>Direct <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> on Iceberg tables (use <code>MERGE INTO</code> or the native table)</li>
-<li><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, type promotion in schema evolution</li>
-<li>Snapshot expiration and small-file / manifest compaction</li>
-<li>Time travel (<code>AS OF SNAPSHOT</code> / <code>AS OF TIMESTAMP</code>)</li>
-<li>Branching and tagging</li>
-<li>Iceberg REST catalogs other than Polaris</li>
+<li><a href="../replication-ha/">Replication &amp; High Availability</a> — intra-cluster shard replication and shard repair fundamentals.</li>
+<li><a href="../topology-aware-placement/">Topology-Aware Shard Placement</a> — where the divergent replica was placed in the first place.</li>
+<li><a href="../../operations/operations/">Cluster Operations</a> — disk repair, manual shard repair, and the broader maintenance runbook.</li>
 </ul>
 
 
