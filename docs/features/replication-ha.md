@@ -2,6 +2,8 @@
 
 NeorunBase provides fault tolerance and high availability through shard replication and automatic failure recovery.
 
+This page covers **intra-cluster** replication — copies of each shard inside a single cluster, sharing coordinators, KMS, and ZooKeeper. For cross-cluster, cross-site, disaster-recovery streaming, see [Site Replication (DR)](site-replication.md).
+
 ## Shard Replication
 
 Each shard can be configured with a replication factor. NeorunBase maintains multiple copies of each shard across different Data Nodes. This ensures that data remains available even if one or more Data Nodes go down.
