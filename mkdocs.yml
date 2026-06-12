@@ -43,6 +43,10 @@ nav:
       - "PostgreSQL Compatibility": features/postgresql-compatibility.md
       - "Distributed Sharding": features/distributed-sharding.md
       - "Replication & High Availability": features/replication-ha.md
+      - "Site Replication (DR)": features/site-replication.md
+      - "Topology-Aware Shard Placement": features/topology-aware-placement.md
+      - "Reactive Shard Repair": features/reactive-shard-repair.md
+      - "Per-Table Statistics": features/per-table-stats.md
       - "Distributed Transactions": features/transactions.md
       - "Encryption at Rest": features/encryption.md
       - "pg-wire TLS": features/pg-wire-tls.md
