@@ -1210,13 +1210,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#examples-and-end-to-end-test" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Examples and end-to-end test
+        Examples
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#java-jdbc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Java (JDBC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-psycopg2-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python (psycopg2 + requests)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1903,37 +1931,89 @@ branch), use <code>POST /admin/api/iceberg/wap/cherrypick</code>:</p>
 <p>Both endpoints require the <code>Authorization: Bearer &lt;token&gt;</code> header. They are handled
 on the cluster leader; requests to a follower coordinator are forwarded automatically.</p>
 </div>
-<h2 id="examples-and-end-to-end-test">Examples and end-to-end test</h2>
-<p>A complete, runnable demonstration ships in the NeorunBase repo:</p>
-<ul>
-<li>
-<p><strong>Java (JDBC)</strong> — <code>neorunbase-server/src/test/java/com/cloudcheflabs/neorunbase/server/IcebergWapExample.java</code>.
-  Connects via JDBC, creates the catalog with <code>'wap.branch'='audit'</code>, CTAS into the
-  Iceberg table, shows <code>main</code> is empty while the <code>audit</code> branch holds the rows, calls the
-  publish endpoint with <code>java.net.http.HttpClient</code>, then re-reads <code>main</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">CP</span><span class="o">=</span><span class="k">$(</span>./gradlew<span class="w"> </span>-q<span class="w"> </span>:neorunbase-server:printTestClasspath<span class="k">)</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">CP</span><span class="o">=</span><span class="s2">&quot;neorunbase-server/build/classes/java/test:</span><span class="nv">$CP</span><span class="s2">&quot;</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CP</span><span class="s2">&quot;</span><span class="w"> </span>com.cloudcheflabs.neorunbase.server.IcebergWapExample<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span>localhost<span class="w"> </span><span class="m">5434</span><span class="w"> </span>localhost<span class="w"> </span><span class="m">8084</span><span class="w"> </span>admin<span class="w"> </span>admin
+<h2 id="examples">Examples</h2>
+<p>Everything is programmable — NeorunBase speaks the PostgreSQL wire protocol, so writes and the
+audit run over plain JDBC/<code>psycopg2</code>, and publish is a REST call. With the catalog created
+<code>WITH ('wap.branch'='audit')</code>, the <code>CREATE TABLE ... AS SELECT</code> lands on the <code>audit</code> branch and
+<code>main</code> stays empty until you publish.</p>
+<h3 id="java-jdbc">Java (JDBC)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.URI</span><span class="p">;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.http.*</span><span class="p">;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.sql.*</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1">// JDBC to the coordinator; admin REST token obtained from POST /admin/auth/login.</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">        </span><span class="s">&quot;jdbc:postgresql://localhost:5434/neorunbase?preferQueryMode=simple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">     </span><span class="n">Statement</span><span class="w"> </span><span class="n">stmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="c1">// 1. Catalog with WAP active — every Iceberg write goes to the &#39;audit&#39; branch.</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;CREATE CATALOG iceberg WITH (&quot;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;type=&#39;rest&#39;, uri=&#39;http://localhost:8181/api/catalog&#39;, warehouse=&#39;quickstart_catalog&#39;, &quot;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;security=&#39;OAUTH2&#39;, &#39;client-id&#39;=&#39;root&#39;, &#39;client-secret&#39;=&#39;s3cr3t&#39;, &quot;</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&#39;s3.endpoint&#39;=&#39;http://localhost:9000&#39;, &#39;s3.access-key&#39;=&#39;minioadmin&#39;, &quot;</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&#39;s3.secret-key&#39;=&#39;minioadmin&#39;, &#39;s3.path-style-access&#39;=&#39;true&#39;, &quot;</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&#39;wap.branch&#39;=&#39;audit&#39;)&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="c1">// 2. WRITE — CTAS into the Iceberg table; rows land on &#39;audit&#39;, main stays empty.</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="n">stmt</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;CREATE TABLE iceberg.public.wap_demo AS SELECT * FROM wap_src&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">    </span><span class="c1">// 3. AUDIT — SELECT over main returns 0 (frozen) until publish.</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT COUNT(*) FROM iceberg.public.wap_demo&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">        </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;main rows before publish = &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span><span class="w">   </span><span class="c1">// 0</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="c1">// 4. PUBLISH — fast-forward main to the audit branch via the admin REST API.</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="w">    </span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="w">            </span><span class="p">.</span><span class="na">uri</span><span class="p">(</span><span class="n">URI</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;http://localhost:8084/admin/api/iceberg/wap/publish&quot;</span><span class="p">))</span>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="w">            </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Authorization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Bearer &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">token</span><span class="p">)</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">            </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="w">            </span><span class="p">.</span><span class="na">POST</span><span class="p">(</span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">BodyPublishers</span><span class="p">.</span><span class="na">ofString</span><span class="p">(</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="w">                </span><span class="s">&quot;{\&quot;namespace\&quot;:\&quot;public\&quot;,\&quot;table\&quot;:\&quot;wap_demo\&quot;,\&quot;branch\&quot;:\&quot;audit\&quot;,\&quot;to\&quot;:\&quot;main\&quot;}&quot;</span><span class="p">))</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="w">    </span><span class="n">HttpClient</span><span class="p">.</span><span class="na">newHttpClient</span><span class="p">().</span><span class="na">send</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">HttpResponse</span><span class="p">.</span><span class="na">BodyHandlers</span><span class="p">.</span><span class="na">ofString</span><span class="p">());</span>
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="w">    </span><span class="c1">// 5. VERIFY — main now reflects the published rows.</span>
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stmt</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT COUNT(*) FROM iceberg.public.wap_demo&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="w">        </span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;main rows after publish = &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span><span class="w">    </span><span class="c1">// 3</span>
+<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a><span class="p">}</span>
 </code></pre></div>
-</li>
-<li>
-<p><strong>Python</strong> — <code>examples/python/iceberg_wap_example.py</code>. Runs CTAS via psycopg2 (or the
-  <code>psql</code> CLI), audits the <code>audit</code> branch through the Polaris REST catalog
-  (<code>.metadata.refs</code>), posts to the publish endpoint, then re-verifies <code>main</code>. Connection
-  details come from environment variables.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>psycopg2-binary<span class="w"> </span>requests
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>python3<span class="w"> </span>examples/python/iceberg_wap_example.py
+<h3 id="python-psycopg2-requests">Python (<code>psycopg2</code> + <code>requests</code>)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span><span class="o">,</span><span class="w"> </span><span class="nn">requests</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5434</span><span class="p">,</span> <span class="n">dbname</span><span class="o">=</span><span class="s2">&quot;neorunbase&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>                        <span class="n">user</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">PASSWORD</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># 1. Catalog with WAP active.</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE CATALOG iceberg WITH (&quot;</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>            <span class="s2">&quot;type=&#39;rest&#39;, uri=&#39;http://localhost:8181/api/catalog&#39;, warehouse=&#39;quickstart_catalog&#39;, &quot;</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>            <span class="s2">&quot;security=&#39;OAUTH2&#39;, &#39;client-id&#39;=&#39;root&#39;, &#39;client-secret&#39;=&#39;s3cr3t&#39;, &quot;</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            <span class="s2">&quot;&#39;s3.endpoint&#39;=&#39;http://localhost:9000&#39;, &#39;s3.access-key&#39;=&#39;minioadmin&#39;, &quot;</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>            <span class="s2">&quot;&#39;s3.secret-key&#39;=&#39;minioadmin&#39;, &#39;s3.path-style-access&#39;=&#39;true&#39;, &quot;</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>            <span class="s2">&quot;&#39;wap.branch&#39;=&#39;audit&#39;)&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># 2. WRITE — CTAS; rows land on the &#39;audit&#39; branch.</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE iceberg.public.wap_demo AS SELECT * FROM wap_src&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="c1"># 3. AUDIT — main is empty (frozen) before publish.</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) FROM iceberg.public.wap_demo&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;main before publish =&quot;</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>     <span class="c1"># 0</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="c1"># 4. PUBLISH — fast-forward main to audit.</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;http://localhost:8084/admin/api/iceberg/wap/publish&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>              <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>              <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;public&quot;</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;wap_demo&quot;</span><span class="p">,</span> <span class="s2">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;audit&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">:</span> <span class="s2">&quot;main&quot;</span><span class="p">})</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="c1"># 5. VERIFY — main now has the rows.</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) FROM iceberg.public.wap_demo&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;main after publish =&quot;</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>      <span class="c1"># 3</span>
 </code></pre></div>
-</li>
-<li>
-<p><strong>End-to-end script</strong> — <code>tests/test-iceberg-wap-e2e.sh</code> brings up Polaris + MinIO + a
-  two-coordinator NeorunBase cluster (Docker), runs the full write → audit → publish flow,
-  and asserts that <code>main</code> is empty before publish and has the rows after.</p>
-</li>
-</ul>
-<p>All three use the same names: catalog <code>iceberg</code>, namespace <code>public</code>, table <code>wap_demo</code>,
-WAP branch <code>audit</code>.</p>
+<p>The same <code>audit</code> branch can also be selected without <code>CREATE CATALOG WITH</code> by launching the
+coordinator with <code>-Dneorunbase.iceberg.wap.branch=audit</code> (see <a href="#selecting-the-wap-branch">Selecting the WAP branch</a>).</p>
 
 
 
