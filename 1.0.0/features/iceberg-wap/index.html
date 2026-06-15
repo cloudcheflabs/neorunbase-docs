@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/per-table-stats/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-wap/">
       
       
-        <link rel="prev" href="../reactive-shard-repair/">
+        <link rel="prev" href="../iceberg-integration/">
       
       
-        <link rel="next" href="../transactions/">
+        <link rel="next" href="../backup-restore/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Per-Table Statistics - NeorunBase</title>
+        <title>Iceberg Write-Audit-Publish (WAP) - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#per-table-statistics" class="md-skip">
+        <a href="#iceberg-write-audit-publish-wap" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Per-Table Statistics
+              Iceberg Write-Audit-Publish (WAP)
             
           </span>
         </div>
@@ -851,37 +851,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Per-Table Statistics
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../per-table-stats/" class="md-nav__link">
         
   
   
@@ -897,120 +870,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#where-the-numbers-come-from" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where the numbers come from
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-two-endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why two endpoints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#caveats-and-accuracy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Caveats and accuracy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integration-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration patterns
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Integration patterns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#prometheus" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prometheus
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#self-service-is-my-table-the-biggest" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Self-service "is my table the biggest?"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#billing-chargeback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Billing / chargeback
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1160,10 +1019,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../iceberg-wap/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Write-Audit-Publish (WAP)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1179,6 +1065,165 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#selecting-the-wap-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selecting the WAP branch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Selecting the WAP branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-per-catalog-create-catalog-with-wapbranch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Per-catalog — CREATE CATALOG ... WITH ('wap.branch'=...)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-coordinator-system-property-dneorunbaseicebergwapbranch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Coordinator system property — -Dneorunbase.iceberg.wap.branch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Coordinator system property — -Dneorunbase.iceberg.wap.branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#table-scoped-overrides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table-scoped overrides
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-for-ctas-merge-into-cdc-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behavior for CTAS / MERGE INTO / CDC sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auditing-the-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auditing the branch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#publishing-rest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing (REST)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Publishing (REST)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fast-forward-publish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fast-forward publish
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cherry-pick-publish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cherry-pick publish
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples-and-end-to-end-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples and end-to-end test
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1718,89 +1763,177 @@
 
 
 
-<h1 id="per-table-statistics">Per-Table Statistics</h1>
-<p>NeorunBase 1.0.0 exposes per-table row counts and approximate storage size via the admin REST API, suitable for fast polling from observability pipelines (Prometheus exporters, Grafana, custom dashboards).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>GET<span class="w"> </span>/admin/tables/<span class="o">{</span>tableName<span class="o">}</span>/stats
+<h1 id="iceberg-write-audit-publish-wap">Iceberg Write-Audit-Publish (WAP)</h1>
+<p>Write-Audit-Publish (WAP) lets you stage Iceberg writes on a <strong>branch</strong>, <strong>audit</strong> the
+staged data in isolation, and only then <strong>publish</strong> it to <code>main</code> — the version every
+reader sees. Until you publish, <code>SELECT</code> over SQL keeps reading <code>main</code> as if nothing
+changed, so bad or partial data never reaches consumers.</p>
+<p>This builds on the <a href="../iceberg-integration/">Iceberg Integration</a> catalog and CDC sync.</p>
+<h2 id="the-flow">The flow</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>        write                 audit                    publish
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ┌──────────────┐     ┌──────────────────┐     ┌───────────────────┐
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │ CTAS /       │     │ readers still see │     │ fast-forward main │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  │ MERGE INTO / │ ──▶ │ main (frozen);    │ ──▶ │ to the audit head │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  │ CDC sync     │     │ rows staged on    │     │ → rows go live    │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  │ → audit      │     │ the audit branch  │     │                   │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  └──────────────┘     └──────────────────┘     └───────────────────┘
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;tableName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;public.counter_test&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;fullName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;public.counter_test&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;numShards&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;replicationFactor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;totalRowCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&quot;approximateSizeBytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1043174</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+<ol>
+<li><strong>Write</strong> — every Iceberg write lands on the WAP branch (e.g. <code>audit</code>) instead of
+   <code>main</code>.</li>
+<li><strong>Audit</strong> — <code>main</code> is frozen; <code>SELECT ... FROM &lt;catalog&gt;.&lt;ns&gt;.&lt;table&gt;</code> over psql/JDBC
+   still reads <code>main</code> and returns the <em>previous</em> contents. The staged rows live only on
+   the branch, where you inspect them via the Iceberg/Polaris REST catalog.</li>
+<li><strong>Publish</strong> — a single REST call fast-forwards <code>main</code> to the branch head, atomically
+   making the staged data visible to all readers.</li>
+</ol>
+<h2 id="selecting-the-wap-branch">Selecting the WAP branch</h2>
+<p>There is <strong>no SQL <code>SET</code></strong> for the WAP branch. Pick one of two ways:</p>
+<h3 id="1-per-catalog-create-catalog-with-wapbranch">1. Per-catalog — <code>CREATE CATALOG ... WITH ('wap.branch'=...)</code></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">CATALOG</span><span class="w"> </span><span class="n">iceberg</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="k">type</span><span class="o">=</span><span class="s1">&#39;rest&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">uri</span><span class="o">=</span><span class="s1">&#39;http://polaris:8181/api/catalog&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">warehouse</span><span class="o">=</span><span class="s1">&#39;quickstart_catalog&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="k">security</span><span class="o">=</span><span class="s1">&#39;OAUTH2&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="s1">&#39;client-id&#39;</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="s1">&#39;client-secret&#39;</span><span class="o">=</span><span class="s1">&#39;s3cr3t&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="s1">&#39;extra-properties&#39;</span><span class="o">=</span><span class="s1">&#39;prefix=quickstart_catalog,header.Polaris-Realm=POLARIS,scope=PRINCIPAL_ROLE:ALL&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="s1">&#39;s3.endpoint&#39;</span><span class="o">=</span><span class="s1">&#39;http://minio:9000&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="s1">&#39;s3.access-key&#39;</span><span class="o">=</span><span class="s1">&#39;minioadmin&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="s1">&#39;s3.secret-key&#39;</span><span class="o">=</span><span class="s1">&#39;minioadmin&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="s1">&#39;s3.region&#39;</span><span class="o">=</span><span class="s1">&#39;us-east-1&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="s1">&#39;s3.path-style-access&#39;</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="s1">&#39;wap.branch&#39;</span><span class="o">=</span><span class="s1">&#39;audit&#39;</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">);</span>
 </code></pre></div>
-<h2 id="where-the-numbers-come-from">Where the numbers come from</h2>
-<p>The handler scatters one <code>SHARD_INFO_REQ</code> per data node that hosts any replica of the table, aggregates the response from the <strong>primary</strong> replica of each shard (so each row is counted once, not once per replica), and sums:</p>
-<ul>
-<li><code>totalRowCount</code> — sum of <code>shards.&lt;shardId&gt;.cfRowCounts.&lt;fullTableName&gt;</code> across all shards. Each value is RocksDB's <code>rocksdb.estimate-num-keys</code> for the column family, which is exact for fresh tables and within a few percent for tables with significant compaction history.</li>
-<li><code>approximateSizeBytes</code> — sum of <code>shards.&lt;shardId&gt;.sizeBytes</code> across all shards. This is the on-disk size of the RocksDB column families that back the shard's data, including any sidecar segments for vector / FTS / CSR indexes that live in the same shard directory. It is an upper bound on the <em>encrypted</em> on-disk footprint, not the logical row size.</li>
-</ul>
-<h2 id="why-two-endpoints">Why two endpoints</h2>
-<p>There are two related endpoints:</p>
+<p>Every Iceberg write through this catalog is routed to the <code>audit</code> branch.</p>
+<h3 id="2-coordinator-system-property-dneorunbaseicebergwapbranch">2. Coordinator system property — <code>-Dneorunbase.iceberg.wap.branch</code></h3>
+<p>Launch the coordinator with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-Dneorunbase.iceberg.wap.branch<span class="o">=</span>audit
+</code></pre></div>
+<p>(equivalently <code>NEORUNBASE_ICEBERG_WAP_BRANCH=audit</code>). This is what the end-to-end test
+<a href="#references"><code>tests/test-iceberg-wap-e2e.sh</code></a> injects into coordinator-1.</p>
+<h4 id="table-scoped-overrides">Table-scoped overrides</h4>
+<p>The system property can be narrowed to specific tables. Most specific wins:</p>
 <table>
 <thead>
 <tr>
-<th>Endpoint</th>
-<th>Returns</th>
-<th>When to use</th>
+<th>Property</th>
+<th>Scope</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>GET /admin/tables/{name}/stats</code></td>
-<td>Compact totals only</td>
-<td>Fast polling, monitoring exporter. One JSON object per poll regardless of shard count.</td>
+<td><code>-Dneorunbase.iceberg.wap.branch.&lt;namespace&gt;.&lt;table&gt;</code></td>
+<td>one table in one namespace</td>
 </tr>
 <tr>
-<td><code>GET /admin/tables/{name}/shards</code></td>
-<td>Per-shard breakdown including replica node IDs and per-shard rowCount</td>
-<td>Operator forensics — "which shard is bigger than expected?", "which data nodes does this table live on?", "is my reshard complete?"</td>
+<td><code>-Dneorunbase.iceberg.wap.branch.&lt;table&gt;</code></td>
+<td>a table by name (any namespace)</td>
+</tr>
+<tr>
+<td><code>-Dneorunbase.iceberg.wap.branch</code></td>
+<td>default for all Iceberg writes</td>
 </tr>
 </tbody>
 </table>
-<p>The per-shard endpoint always existed; the totals-only <code>/stats</code> is the new 1.0.0 surface and is a thin wrapper that avoids returning a list of N×RF entries when all you wanted was a single number to graph.</p>
-<h2 id="caveats-and-accuracy">Caveats and accuracy</h2>
+<p>A catalog's <code>'wap.branch'</code> option, when present, takes precedence over the system
+property for that catalog. Leave all of these unset and writes go straight to <code>main</code>
+(WAP disabled).</p>
+<h2 id="behavior-for-ctas-merge-into-cdc-sync">Behavior for CTAS / MERGE INTO / CDC sync</h2>
+<p>When a WAP branch is active, the branch is created if missing (branched off the current
+<code>main</code>) and <strong>all</strong> of these write to it, never to <code>main</code>:</p>
 <ul>
-<li><strong>The primary replica is authoritative for the row count.</strong> Replicas can lag the primary by replication latency. If a replica has diverged beyond the <a href="../reactive-shard-repair/">reactive-repair threshold</a>, the <code>/stats</code> endpoint still reports the primary's view (because that's the authoritative one) — the divergent replica is what gets repaired in the background.</li>
-<li><strong>Tombstones aren't subtracted.</strong> RocksDB's <code>rocksdb.estimate-num-keys</code> counts entries including tombstones until compaction reclaims them. For DELETE-heavy workloads, the reported count can briefly overshoot the user-visible row count by a few percent until the next major compaction.</li>
-<li><strong>The size is approximate.</strong> It's the sum of <code>RocksDBShard.getApproximateSize()</code>, which itself comes from RocksDB's level-0/level-N file size summaries. Useful for trending, not for billing.</li>
-<li><strong>Empty / freshly-created tables.</strong> A CREATE TABLE that hasn't received any DML returns <code>totalRowCount=0, approximateSizeBytes&gt;0</code> — the non-zero size is the column family metadata overhead, ~50 KiB per shard.</li>
+<li><strong>CTAS</strong> — <code>CREATE TABLE iceberg.&lt;ns&gt;.&lt;t&gt; AS SELECT ...</code> stages the new snapshot on the
+  branch.</li>
+<li><strong><code>MERGE INTO</code></strong> — <code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; ...</code> (copy-on-write)
+  commits its add-data + delete files to the branch.</li>
+<li><strong>CDC sync</strong> — the automatic table mirror (full first sync and incremental
+  add-data + equality-delete commits) targets the branch. The sync high-water mark is
+  still tracked, so restarts resume correctly.</li>
 </ul>
-<h2 id="integration-patterns">Integration patterns</h2>
-<h3 id="prometheus">Prometheus</h3>
-<p>A simple exporter pattern, run on the coordinator host:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="ch">#!/usr/bin/env bash</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Run every 30 seconds; output Prometheus exposition format.</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span>/etc/neorunbase/admin-token<span class="k">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">for</span><span class="w"> </span>table<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>curl<span class="w"> </span>-sS<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="s2">&quot;http://localhost:8080/admin/tables&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.[]&#39;</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nv">stats</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-sS<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="s2">&quot;http://localhost:8080/admin/tables/</span><span class="si">${</span><span class="nv">table</span><span class="si">}</span><span class="s2">/stats&quot;</span><span class="k">)</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="nv">rows</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$stats</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.totalRowCount&#39;</span><span class="k">)</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nv">bytes</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$stats</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.approximateSizeBytes&#39;</span><span class="k">)</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;neorunbase_table_rows{table=\&quot;</span><span class="si">${</span><span class="nv">table</span><span class="si">}</span><span class="s2">\&quot;} </span><span class="si">${</span><span class="nv">rows</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;neorunbase_table_bytes{table=\&quot;</span><span class="si">${</span><span class="nv">table</span><span class="si">}</span><span class="s2">\&quot;} </span><span class="si">${</span><span class="nv">bytes</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">done</span>
+<p><code>main</code> stays exactly as it was until you publish, so concurrent readers are unaffected.</p>
+<h2 id="auditing-the-branch">Auditing the branch</h2>
+<p>Because <code>main</code> is frozen, <code>SELECT</code> over SQL will <strong>not</strong> show the staged rows — that is the
+point. To audit the staged data, read the table's metadata refs from the Iceberg/Polaris
+REST catalog: the branch appears under <code>.metadata.refs[&lt;branch&gt;]</code> with its head
+<code>snapshot-id</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Polaris OAuth token</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">POLARIS_TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8181/api/catalog/v1/oauth/tokens<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Polaris-Realm: POLARIS&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="nv">grant_type</span><span class="o">=</span>client_credentials<span class="w"> </span>-d<span class="w"> </span><span class="nv">client_id</span><span class="o">=</span>root<span class="w"> </span>-d<span class="w"> </span><span class="nv">client_secret</span><span class="o">=</span>s3cr3t<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="nv">scope</span><span class="o">=</span>PRINCIPAL_ROLE:ALL<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import sys,json;print(json.load(sys.stdin)[&#39;access_token&#39;])&quot;</span><span class="k">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Table metadata — look at .metadata.refs.audit.snapshot-id</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;http://localhost:8181/api/catalog/v1/quickstart_catalog/namespaces/public/tables/wap_demo&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$POLARIS_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Polaris-Realm: POLARIS&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import sys,json; print(json.load(sys.stdin)[&#39;metadata&#39;][&#39;refs&#39;])&quot;</span>
 </code></pre></div>
-<p>Drop the output behind nginx and point Prometheus at it. The endpoint scales linearly with <code>(numShards × replicationFactor)</code> because it has to probe every data node holding a replica — for a 16-shard table at RF=2 on a 6-node cluster, that's at most 6 probes (cached per-node within one handler call), each &lt;5ms. A polling cadence of 15–30 seconds is realistic.</p>
-<h3 id="self-service-is-my-table-the-biggest">Self-service "is my table the biggest?"</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">TOKEN</span><span class="o">=</span>...
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">for</span><span class="w"> </span>t<span class="w"> </span><span class="k">in</span><span class="w"> </span>tableA<span class="w"> </span>tableB<span class="w"> </span>tableC<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nv">bytes</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-sS<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="s2">&quot;http://coord:8080/admin/tables/</span><span class="si">${</span><span class="nv">t</span><span class="si">}</span><span class="s2">/stats&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.approximateSizeBytes&#39;</span><span class="k">)</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;%-20s %s\n&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$t</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bytes</span><span class="s2">&quot;</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">done</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-k2<span class="w"> </span>-n<span class="w"> </span>-r
+<p>From that snapshot you can read the staged parquet files directly (see the Python
+example and <code>tests/query_iceberg.py</code>), run row counts, checksums, or any data-quality
+check before publishing.</p>
+<h2 id="publishing-rest">Publishing (REST)</h2>
+<p>Publish is an authenticated admin REST call. First obtain a JWT:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8084/admin/auth/login<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;admin&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import sys,json; print(json.load(sys.stdin)[&#39;token&#39;])&quot;</span><span class="k">)</span>
 </code></pre></div>
-<h3 id="billing-chargeback">Billing / chargeback</h3>
-<p>Treat <code>approximateSizeBytes</code> as a leading indicator with a ~10% safety margin. For actual billing-grade numbers, snapshot the underlying RocksDB SST files and use the storage-encrypted size directly.</p>
-<h2 id="see-also">See also</h2>
+<h3 id="fast-forward-publish">Fast-forward publish</h3>
+<p><code>POST /admin/api/iceberg/wap/publish</code> advances <code>to</code> (default <code>main</code>) to the head of
+<code>branch</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8084/admin/api/iceberg/wap/publish<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;namespace&quot;:&quot;public&quot;,&quot;table&quot;:&quot;wap_demo&quot;,&quot;branch&quot;:&quot;audit&quot;,&quot;to&quot;:&quot;main&quot;}&#39;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># -&gt; {&quot;success&quot;:true,&quot;publishedSnapshotId&quot;:...,&quot;from&quot;:&quot;audit&quot;,&quot;to&quot;:&quot;main&quot;}</span>
+</code></pre></div>
+<p>After this, <code>SELECT ... FROM iceberg.public.wap_demo</code> returns the published rows.</p>
+<h3 id="cherry-pick-publish">Cherry-pick publish</h3>
+<p>When you want to publish a single specific snapshot (rather than fast-forward the whole
+branch), use <code>POST /admin/api/iceberg/wap/cherrypick</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8084/admin/api/iceberg/wap/cherrypick<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;namespace&quot;:&quot;public&quot;,&quot;table&quot;:&quot;wap_demo&quot;,&quot;snapshotId&quot;:1234567890123456789}&#39;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># -&gt; {&quot;success&quot;:true,&quot;publishedSnapshotId&quot;:...,&quot;cherrypickedSnapshotId&quot;:1234567890123456789}</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Auth and leader</p>
+<p>Both endpoints require the <code>Authorization: Bearer &lt;token&gt;</code> header. They are handled
+on the cluster leader; requests to a follower coordinator are forwarded automatically.</p>
+</div>
+<h2 id="examples-and-end-to-end-test">Examples and end-to-end test</h2>
+<p>A complete, runnable demonstration ships in the NeorunBase repo:</p>
 <ul>
-<li><a href="../topology-aware-placement/">Topology-Aware Shard Placement</a> — where these shards live in the first place.</li>
-<li><a href="../../operations/operations/">Cluster Operations</a> — disk repair and the broader observability surface.</li>
-<li><a href="../admin-ui/">Admin UI</a> — the visual representation of the same numbers.</li>
+<li>
+<p><strong>Java (JDBC)</strong> — <code>neorunbase-server/src/test/java/com/cloudcheflabs/neorunbase/server/IcebergWapExample.java</code>.
+  Connects via JDBC, creates the catalog with <code>'wap.branch'='audit'</code>, CTAS into the
+  Iceberg table, shows <code>main</code> is empty while the <code>audit</code> branch holds the rows, calls the
+  publish endpoint with <code>java.net.http.HttpClient</code>, then re-reads <code>main</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">CP</span><span class="o">=</span><span class="k">$(</span>./gradlew<span class="w"> </span>-q<span class="w"> </span>:neorunbase-server:printTestClasspath<span class="k">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">CP</span><span class="o">=</span><span class="s2">&quot;neorunbase-server/build/classes/java/test:</span><span class="nv">$CP</span><span class="s2">&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CP</span><span class="s2">&quot;</span><span class="w"> </span>com.cloudcheflabs.neorunbase.server.IcebergWapExample<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span>localhost<span class="w"> </span><span class="m">5434</span><span class="w"> </span>localhost<span class="w"> </span><span class="m">8084</span><span class="w"> </span>admin<span class="w"> </span>admin
+</code></pre></div>
+</li>
+<li>
+<p><strong>Python</strong> — <code>examples/python/iceberg_wap_example.py</code>. Runs CTAS via psycopg2 (or the
+  <code>psql</code> CLI), audits the <code>audit</code> branch through the Polaris REST catalog
+  (<code>.metadata.refs</code>), posts to the publish endpoint, then re-verifies <code>main</code>. Connection
+  details come from environment variables.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>psycopg2-binary<span class="w"> </span>requests
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>python3<span class="w"> </span>examples/python/iceberg_wap_example.py
+</code></pre></div>
+</li>
+<li>
+<p><strong>End-to-end script</strong> — <code>tests/test-iceberg-wap-e2e.sh</code> brings up Polaris + MinIO + a
+  two-coordinator NeorunBase cluster (Docker), runs the full write → audit → publish flow,
+  and asserts that <code>main</code> is empty before publish and has the rows after.</p>
+</li>
 </ul>
+<p>All three use the same names: catalog <code>iceberg</code>, namespace <code>public</code>, table <code>wap_demo</code>,
+WAP branch <code>audit</code>.</p>
 
 
 
