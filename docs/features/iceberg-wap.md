@@ -160,35 +160,94 @@ curl -s -X POST http://localhost:8084/admin/api/iceberg/wap/cherrypick \
     Both endpoints require the `Authorization: Bearer <token>` header. They are handled
     on the cluster leader; requests to a follower coordinator are forwarded automatically.
 
-## Examples and end-to-end test
+## Examples
 
-A complete, runnable demonstration ships in the NeorunBase repo:
+Everything is programmable — NeorunBase speaks the PostgreSQL wire protocol, so writes and the
+audit run over plain JDBC/`psycopg2`, and publish is a REST call. With the catalog created
+`WITH ('wap.branch'='audit')`, the `CREATE TABLE ... AS SELECT` lands on the `audit` branch and
+`main` stays empty until you publish.
 
-- **Java (JDBC)** — `neorunbase-server/src/test/java/com/cloudcheflabs/neorunbase/server/IcebergWapExample.java`.
-  Connects via JDBC, creates the catalog with `'wap.branch'='audit'`, CTAS into the
-  Iceberg table, shows `main` is empty while the `audit` branch holds the rows, calls the
-  publish endpoint with `java.net.http.HttpClient`, then re-reads `main`.
+### Java (JDBC)
 
-    ```bash
-    CP=$(./gradlew -q :neorunbase-server:printTestClasspath)
-    CP="neorunbase-server/build/classes/java/test:$CP"
-    java -cp "$CP" com.cloudcheflabs.neorunbase.server.IcebergWapExample \
-        localhost 5434 localhost 8084 admin admin
-    ```
+```java
+import java.net.URI;
+import java.net.http.*;
+import java.sql.*;
 
-- **Python** — `examples/python/iceberg_wap_example.py`. Runs CTAS via psycopg2 (or the
-  `psql` CLI), audits the `audit` branch through the Polaris REST catalog
-  (`.metadata.refs`), posts to the publish endpoint, then re-verifies `main`. Connection
-  details come from environment variables.
+// JDBC to the coordinator; admin REST token obtained from POST /admin/auth/login.
+try (Connection conn = DriverManager.getConnection(
+        "jdbc:postgresql://localhost:5434/neorunbase?preferQueryMode=simple", "admin", password);
+     Statement stmt = conn.createStatement()) {
 
-    ```bash
-    pip install psycopg2-binary requests
-    python3 examples/python/iceberg_wap_example.py
-    ```
+    // 1. Catalog with WAP active — every Iceberg write goes to the 'audit' branch.
+    stmt.execute("CREATE CATALOG iceberg WITH ("
+            + "type='rest', uri='http://localhost:8181/api/catalog', warehouse='quickstart_catalog', "
+            + "security='OAUTH2', 'client-id'='root', 'client-secret'='s3cr3t', "
+            + "'s3.endpoint'='http://localhost:9000', 's3.access-key'='minioadmin', "
+            + "'s3.secret-key'='minioadmin', 's3.path-style-access'='true', "
+            + "'wap.branch'='audit')");
 
-- **End-to-end script** — `tests/test-iceberg-wap-e2e.sh` brings up Polaris + MinIO + a
-  two-coordinator NeorunBase cluster (Docker), runs the full write → audit → publish flow,
-  and asserts that `main` is empty before publish and has the rows after.
+    // 2. WRITE — CTAS into the Iceberg table; rows land on 'audit', main stays empty.
+    stmt.execute("CREATE TABLE iceberg.public.wap_demo AS SELECT * FROM wap_src");
 
-All three use the same names: catalog `iceberg`, namespace `public`, table `wap_demo`,
-WAP branch `audit`.
+    // 3. AUDIT — SELECT over main returns 0 (frozen) until publish.
+    try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM iceberg.public.wap_demo")) {
+        rs.next();
+        System.out.println("main rows before publish = " + rs.getLong(1));   // 0
+    }
+
+    // 4. PUBLISH — fast-forward main to the audit branch via the admin REST API.
+    HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8084/admin/api/iceberg/wap/publish"))
+            .header("Authorization", "Bearer " + token)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(
+                "{\"namespace\":\"public\",\"table\":\"wap_demo\",\"branch\":\"audit\",\"to\":\"main\"}"))
+            .build();
+    HttpClient.newHttpClient().send(req, HttpResponse.BodyHandlers.ofString());
+
+    // 5. VERIFY — main now reflects the published rows.
+    try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM iceberg.public.wap_demo")) {
+        rs.next();
+        System.out.println("main rows after publish = " + rs.getLong(1));    // 3
+    }
+}
+```
+
+### Python (`psycopg2` + `requests`)
+
+```python
+import psycopg2, requests
+
+conn = psycopg2.connect(host="localhost", port=5434, dbname="neorunbase",
+                        user="admin", password=PASSWORD)
+conn.autocommit = True
+cur = conn.cursor()
+
+# 1. Catalog with WAP active.
+cur.execute("CREATE CATALOG iceberg WITH ("
+            "type='rest', uri='http://localhost:8181/api/catalog', warehouse='quickstart_catalog', "
+            "security='OAUTH2', 'client-id'='root', 'client-secret'='s3cr3t', "
+            "'s3.endpoint'='http://localhost:9000', 's3.access-key'='minioadmin', "
+            "'s3.secret-key'='minioadmin', 's3.path-style-access'='true', "
+            "'wap.branch'='audit')")
+
+# 2. WRITE — CTAS; rows land on the 'audit' branch.
+cur.execute("CREATE TABLE iceberg.public.wap_demo AS SELECT * FROM wap_src")
+
+# 3. AUDIT — main is empty (frozen) before publish.
+cur.execute("SELECT COUNT(*) FROM iceberg.public.wap_demo")
+print("main before publish =", cur.fetchone()[0])     # 0
+
+# 4. PUBLISH — fast-forward main to audit.
+requests.post("http://localhost:8084/admin/api/iceberg/wap/publish",
+              headers={"Authorization": f"Bearer {token}"},
+              json={"namespace": "public", "table": "wap_demo", "branch": "audit", "to": "main"})
+
+# 5. VERIFY — main now has the rows.
+cur.execute("SELECT COUNT(*) FROM iceberg.public.wap_demo")
+print("main after publish =", cur.fetchone()[0])      # 3
+```
+
+The same `audit` branch can also be selected without `CREATE CATALOG WITH` by launching the
+coordinator with `-Dneorunbase.iceberg.wap.branch=audit` (see [Selecting the WAP branch](#selecting-the-wap-branch)).
