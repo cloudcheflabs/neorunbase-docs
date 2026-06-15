@@ -52,6 +52,7 @@ nav:
       - "pg-wire TLS": features/pg-wire-tls.md
       - "Catalogs": features/catalogs.md
       - "Iceberg Integration": features/iceberg-integration.md
+      - "Iceberg Write-Audit-Publish (WAP)": features/iceberg-wap.md
       - "Backup & Restore": features/backup-restore.md
       - "Kafka Integration": features/kafka-integration.md
       - "Vector Database": features/vector-database.md
