@@ -25,7 +25,9 @@ After Iceberg is enabled, NeorunBase automatically keeps every selected table mi
 - **First sync** writes the full table as a single Iceberg snapshot.
 - **Subsequent syncs** are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.
 
-A high-water mark is recorded inside the Iceberg table, so coordinator restarts resume sync exactly where it left off.
+Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.
+
+A per-shard **high-water mark** (the source changelog position) is stamped into the incremental commit's **snapshot summary**, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.
 
 ## Built-in Time Column + Partitioning
 
