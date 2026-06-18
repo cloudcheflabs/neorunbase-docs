@@ -63,6 +63,8 @@ Option keys may be **bare or quoted** (Trino-style), and values may use single o
 | `s3.region` | S3 region string. |
 | `s3.path-style-access` | `true` for MinIO/ShannonStore and most S3-compatible gateways. |
 | `default-namespace` | Namespace used when one is not given. |
+| `index.patterns` | Comma-separated `namespace.tableGlob` patterns (`*`/`?` wildcards) selecting which tables get an automatic primary-key serving index. **Blank = opt-in OFF** (nothing auto-indexed) — safe for catalogs with thousands of tables. See [Iceberg Serving](iceberg-serving.md). |
+| `wap.branch` | Default Write-Audit-Publish branch for this catalog's Iceberg writes. See [Iceberg WAP](iceberg-wap.md). |
 
 ### `ALTER CATALOG`
 

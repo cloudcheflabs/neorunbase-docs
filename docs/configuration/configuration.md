@@ -150,6 +150,11 @@ Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unr
 
 NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See [Iceberg Integration](../features/iceberg-integration.md) for the full feature description.
 
+For the low-latency **serving** path — the automatic primary-key point/range index, its
+persistence, the `neorunbase.iceberg.index.patterns` auto-index scope, and the
+`neorunbase.iceberg.pk.index.*` / `read.cache.*` / `data.cache.*` / `plan.cache.*` tuning
+knobs — see [Iceberg Serving (LakeBase)](../features/iceberg-serving.md).
+
 !!! note "Catalog backend support"
     `neorunbase.iceberg.catalog.type` accepts only **`none`** (disabled) or **`polaris`**. The `neorunbase.iceberg.polaris.*` fields below configure the startup **default catalog**; additional catalogs are created with `CREATE CATALOG` / the admin UI **Catalogs** page (persisted in the metadata store and snapshot-replicated). See [Catalogs](../features/catalogs.md). The generic `neorunbase.iceberg.catalog.rest.*` security/OAuth keys are **legacy and ignored** under the polaris path; the admin UI hides them. Other Iceberg-REST flavors are intentionally not supported.
 
