@@ -53,6 +53,13 @@ Adding a column to a NeorunBase table (`ALTER TABLE … ADD COLUMN …`) is prop
 - WHERE-clause and column-projection pushdown to data nodes
 - **Equality deletes**, **position deletes**, and Iceberg **format-version 3 deletion vectors** are all applied at read time, so external tools writing into the same table stay compatible
 
+!!! tip "Low-latency serving (LakeBase)"
+    A `WHERE` on the table's primary key (`= / IN / BETWEEN / <,<=,>,>=`) is answered by an
+    automatic per-snapshot **point/range index** in single-digit milliseconds at thousands of
+    QPS, instead of a multi-file scan — turning NeorunBase into a serving layer over the open
+    lakehouse without copying data. See **[Iceberg Serving (LakeBase)](iceberg-serving.md)**
+    for the index, persistence, maintenance, manual `CREATE INDEX`, and governance patterns.
+
 ### Format version 2 and 3 (deletion vectors)
 
 NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes **equality deletes**, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use **deletion vectors** — a roaring bitmap of deleted row positions stored in a [Puffin](https://iceberg.apache.org/puffin-spec/) `deletion-vector-v1` blob instead of position-delete files — and NeorunBase reads and applies these transparently.
