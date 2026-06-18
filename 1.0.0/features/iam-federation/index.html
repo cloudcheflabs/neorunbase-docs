@@ -8,25 +8,31 @@
       
       
       
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iam-federation/">
       
+      
+        <link rel="prev" href="../iam-policy/">
+      
+      
+        <link rel="next" href="../admin-password-recovery/">
       
       
         
       
       
-      <link rel="icon" href="/neorunbase-docs/1.0.0/images/logo/neorunbase-without-name.png">
+      <link rel="icon" href="../../images/logo/neorunbase-without-name.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>NeorunBase</title>
+        <title>IAM Federation (ontul) - NeorunBase</title>
       
     
     
-      <link rel="stylesheet" href="/neorunbase-docs/1.0.0/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/neorunbase-docs/1.0.0/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -45,9 +51,9 @@
       
     
     
-      <link rel="stylesheet" href="/neorunbase-docs/1.0.0/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("/neorunbase-docs/1.0.0",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -71,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#iam-federation-with-ontul" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -85,9 +96,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/neorunbase-docs/1.0.0/." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-header__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="/neorunbase-docs/1.0.0/images/logo/neorunbase-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              IAM Federation (ontul)
             
           </span>
         </div>
@@ -205,7 +216,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/neorunbase-docs/1.0.0/." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -226,7 +237,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/neorunbase-docs/1.0.0/architecture/architecture/" class="md-tabs__link">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
           
   
   
@@ -246,7 +257,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/neorunbase-docs/1.0.0/installation/installation/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
@@ -262,11 +273,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/neorunbase-docs/1.0.0/features/postgresql-compatibility/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../postgresql-compatibility/" class="md-tabs__link">
           
   
   
@@ -286,7 +299,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/neorunbase-docs/1.0.0/configuration/configuration/" class="md-tabs__link">
+        <a href="../../configuration/configuration/" class="md-tabs__link">
           
   
   
@@ -306,7 +319,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/neorunbase-docs/1.0.0/operations/operations/" class="md-tabs__link">
+        <a href="../../operations/operations/" class="md-tabs__link">
           
   
   
@@ -342,9 +355,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/neorunbase-docs/1.0.0/." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
+    <a href="../.." title="NeorunBase" class="md-nav__button md-logo" aria-label="NeorunBase" data-md-component="logo">
       
-  <img src="/neorunbase-docs/1.0.0/images/logo/neorunbase-without-name.png" alt="logo">
+  <img src="../../images/logo/neorunbase-without-name.png" alt="logo">
 
     </a>
     NeorunBase
@@ -359,7 +372,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -438,7 +451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/architecture/architecture/" class="md-nav__link">
+      <a href="../../architecture/architecture/" class="md-nav__link">
         
   
   
@@ -525,7 +538,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/installation/installation/" class="md-nav__link">
+      <a href="../../installation/installation/" class="md-nav__link">
         
   
   
@@ -553,7 +566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/installation/getting-started/" class="md-nav__link">
+      <a href="../../installation/getting-started/" class="md-nav__link">
         
   
   
@@ -581,7 +594,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/installation/nginx-proxy/" class="md-nav__link">
+      <a href="../../installation/nginx-proxy/" class="md-nav__link">
         
   
   
@@ -613,26 +626,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -650,7 +668,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -668,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/postgresql-compatibility/" class="md-nav__link">
+      <a href="../postgresql-compatibility/" class="md-nav__link">
         
   
   
@@ -696,7 +714,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/distributed-sharding/" class="md-nav__link">
+      <a href="../distributed-sharding/" class="md-nav__link">
         
   
   
@@ -724,7 +742,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/replication-ha/" class="md-nav__link">
+      <a href="../replication-ha/" class="md-nav__link">
         
   
   
@@ -752,7 +770,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/site-replication/" class="md-nav__link">
+      <a href="../site-replication/" class="md-nav__link">
         
   
   
@@ -780,7 +798,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/topology-aware-placement/" class="md-nav__link">
+      <a href="../topology-aware-placement/" class="md-nav__link">
         
   
   
@@ -808,7 +826,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/reactive-shard-repair/" class="md-nav__link">
+      <a href="../reactive-shard-repair/" class="md-nav__link">
         
   
   
@@ -836,7 +854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/per-table-stats/" class="md-nav__link">
+      <a href="../per-table-stats/" class="md-nav__link">
         
   
   
@@ -864,7 +882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/transactions/" class="md-nav__link">
+      <a href="../transactions/" class="md-nav__link">
         
   
   
@@ -892,7 +910,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/encryption/" class="md-nav__link">
+      <a href="../encryption/" class="md-nav__link">
         
   
   
@@ -920,7 +938,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/pg-wire-tls/" class="md-nav__link">
+      <a href="../pg-wire-tls/" class="md-nav__link">
         
   
   
@@ -948,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/catalogs/" class="md-nav__link">
+      <a href="../catalogs/" class="md-nav__link">
         
   
   
@@ -976,7 +994,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iceberg-integration/" class="md-nav__link">
+      <a href="../iceberg-integration/" class="md-nav__link">
         
   
   
@@ -1004,7 +1022,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iceberg-serving/" class="md-nav__link">
+      <a href="../iceberg-serving/" class="md-nav__link">
         
   
   
@@ -1032,7 +1050,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iceberg-wap/" class="md-nav__link">
+      <a href="../iceberg-wap/" class="md-nav__link">
         
   
   
@@ -1060,7 +1078,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/backup-restore/" class="md-nav__link">
+      <a href="../backup-restore/" class="md-nav__link">
         
   
   
@@ -1088,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/kafka-integration/" class="md-nav__link">
+      <a href="../kafka-integration/" class="md-nav__link">
         
   
   
@@ -1116,7 +1134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/vector-database/" class="md-nav__link">
+      <a href="../vector-database/" class="md-nav__link">
         
   
   
@@ -1144,7 +1162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/full-text-search/" class="md-nav__link">
+      <a href="../full-text-search/" class="md-nav__link">
         
   
   
@@ -1172,7 +1190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/hybrid-search/" class="md-nav__link">
+      <a href="../hybrid-search/" class="md-nav__link">
         
   
   
@@ -1200,7 +1218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/graph/" class="md-nav__link">
+      <a href="../graph/" class="md-nav__link">
         
   
   
@@ -1228,7 +1246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/geospatial/" class="md-nav__link">
+      <a href="../geospatial/" class="md-nav__link">
         
   
   
@@ -1256,7 +1274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iam/" class="md-nav__link">
+      <a href="../iam/" class="md-nav__link">
         
   
   
@@ -1284,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iam-policy/" class="md-nav__link">
+      <a href="../iam-policy/" class="md-nav__link">
         
   
   
@@ -1309,10 +1327,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/iam-federation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IAM Federation (ontul)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1328,6 +1373,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-no-translation-is-needed-the-dbtable-prefix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why no translation is needed — the db:table: prefix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-sign-on-sso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single sign-on (SSO)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-only-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read-only guard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resilience" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resilience
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mode-switching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mode switching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1340,7 +1499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/admin-password-recovery/" class="md-nav__link">
+      <a href="../admin-password-recovery/" class="md-nav__link">
         
   
   
@@ -1368,7 +1527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/admin-ui/" class="md-nav__link">
+      <a href="../admin-ui/" class="md-nav__link">
         
   
   
@@ -1396,7 +1555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/features/nic-fail-safety/" class="md-nav__link">
+      <a href="../nic-fail-safety/" class="md-nav__link">
         
   
   
@@ -1483,7 +1642,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/configuration/configuration/" class="md-nav__link">
+      <a href="../../configuration/configuration/" class="md-nav__link">
         
   
   
@@ -1570,7 +1729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/neorunbase-docs/1.0.0/operations/operations/" class="md-nav__link">
+      <a href="../../operations/operations/" class="md-nav__link">
         
   
   
@@ -1611,8 +1770,157 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+
+<h1 id="iam-federation-with-ontul">IAM Federation with ontul</h1>
+<p>NeorunBase IAM runs in one of two <strong>authority modes</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Authority</th>
+<th>Local IAM</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>standalone</code></strong> (default)</td>
+<td>NeorunBase itself</td>
+<td>read-write — create/edit users, groups, policies here</td>
+<td>NeorunBase is deployed on its own</td>
+</tr>
+<tr>
+<td><strong><code>federated</code></strong></td>
+<td><strong>ontul</strong></td>
+<td><strong>read-only</strong> — synced from ontul; local writes are rejected</td>
+<td>NeorunBase is used alongside ontul, which governs access for all data sources</td>
+</tr>
+</tbody>
+</table>
+<p>In a federated deployment, <a href="https://www.cloudchef-labs.com">ontul</a> is the unified data engine and the single
+place where access policies are authored. But an external application or dashboard often connects <strong>directly to
+NeorunBase</strong> (over the PostgreSQL wire / JDBC) for low-latency <a href="../iceberg-serving/">serving</a> — bypassing ontul.
+Federation makes the policies authored in ontul apply to that direct path: NeorunBase <strong>pulls</strong> the IAM graph
+from ontul and enforces it locally.</p>
+<div class="admonition info">
+<p class="admonition-title">Pull, not push — ontul is unmodified</p>
+<p>NeorunBase <em>pulls</em> from ontul's existing admin REST API. ontul needs no plugin, no callback, and no
+awareness of NeorunBase. Enforcement happens locally in NeorunBase (no per-query round trip to ontul), so
+direct-serving stays fast.</p>
+</div>
+<h2 id="how-it-works">How it works</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>            author policy (db:table:…)              pull users+groups+policies
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   operator ───────────────────────────▶ ontul ◀───────────────────────────── NeorunBase
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                                  (every sync interval, leader)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                                         │ import (read-only)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   external app ──── pg-wire + ontul JWT ─────────────▶ NeorunBase ── enforce mask/deny/row-filter
+</code></pre></div>
+<ol>
+<li><strong>Author in ontul, in NeorunBase's resource format.</strong> The operator writes the policy in ontul using
+   NeorunBase's native resource syntax — <code>db:table:&lt;catalog&gt;.&lt;ns&gt;.&lt;table&gt;</code> for an Iceberg catalog table,
+   <code>db:table:&lt;schema&gt;.&lt;table&gt;</code> for a native table — and <code>pg:Select</code> / <code>SELECT</code> actions. The ontul Admin UI's
+   policy editor offers a <strong>"NeorunBase serving policy" template</strong> for exactly this.</li>
+<li><strong>NeorunBase pulls</strong> <code>GET /admin/iam/{users,groups,policies}</code> from ontul on each sync interval (leader only),
+   and imports them into its replicated IAM store <strong>verbatim</strong> — no translation. The local bootstrap admin is
+   preserved so the NeorunBase console keeps working.</li>
+<li><strong>Enforcement</strong> is identical to standalone mode: a query's user → effective policies → column masking, column
+   deny, and row-level filters are applied on the <a href="../iceberg-serving/">serving path</a>, including Iceberg catalog
+   tables.</li>
+</ol>
+<h3 id="why-no-translation-is-needed-the-dbtable-prefix">Why no translation is needed — the <code>db:table:</code> prefix</h3>
+<p>NeorunBase resources are prefixed <code>db:table:</code>; ontul's own resources are prefixed <code>data:table:</code>. The two
+prefixes are distinct, so a policy authored for NeorunBase (<code>db:table:…</code>) is unambiguously distinguishable from
+ontul's own policies (<code>data:table:…</code>). NeorunBase imports ontul's policies as-is; any <code>data:table:</code> policy that
+is pulled simply never matches a NeorunBase query resource (which is always <code>db:table:…</code>) and is inert. This is
+why federation requires <strong>no resource rewriting</strong> — you author NeorunBase policies in NeorunBase's format.</p>
+<h2 id="single-sign-on-sso">Single sign-on (SSO)</h2>
+<p>The external app authenticates to NeorunBase's pg-wire endpoint with an <strong>ontul-issued JWT</strong> placed in the
+password field. NeorunBase validates the token <strong>locally</strong> using a shared HMAC key (ontul's master key) — no
+call back to ontul — resolves the subject to the mirrored user, and applies that user's synced policies.</p>
+<p>Set the shared key with <code>neorunbase.iam.federation.ontul.jwt.key</code> (= ontul's <code>ONTUL_MASTER_KEY</code>). When blank,
+ontul-token SSO is disabled and mirrored users have no local credential.</p>
+<h2 id="read-only-guard">Read-only guard</h2>
+<p>In federated mode every mutating IAM/STS admin request (<code>POST</code>/<code>PUT</code>/<code>DELETE</code> under <code>/admin/iam</code> or
+<code>/admin/sts</code>) is rejected with <strong>HTTP 403 — "IAM is managed by ontul"</strong>. Reads are allowed, and the mode toggle
+(<code>/admin/iam/mode</code>) stays writable so you can switch back to standalone. The federation sync is the only writer.</p>
+<h2 id="resilience">Resilience</h2>
+<ul>
+<li><strong>Leader-only</strong> writer; followers receive the synced IAM via the normal replication path.</li>
+<li><strong>Fail-closed</strong>: if a pull fails (ontul unreachable, token expired) the last good snapshot is kept and
+  enforcement continues; new/changed policies simply aren't seen until the next successful pull.</li>
+<li><strong>Runtime toggle</strong>: switch <code>standalone ↔ federated</code> from the Admin UI (IAM page) without a restart.</li>
+</ul>
+<h2 id="configuration">Configuration</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iam.mode</code></td>
+<td><code>standalone</code></td>
+<td><code>standalone</code> or <code>federated</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.url</code></td>
+<td><em>(blank)</em></td>
+<td>ontul admin base URL, e.g. <code>http://ontul-master:8080</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.token</code></td>
+<td><em>(blank)</em></td>
+<td>ontul credential for the pull — a long-lived ontul token (OTOK, sent as <code>Token</code>) or a JWT (<code>Bearer</code>, auto-detected). A read-only "IAM reader" principal.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.jwt.key</code></td>
+<td><em>(blank)</em></td>
+<td>Shared HMAC key (= ontul's master key) to validate ontul JWTs locally for SSO.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.sync.interval.ms</code></td>
+<td><code>60000</code></td>
+<td>Pull interval.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.catalog.alias</code></td>
+<td><em>(blank)</em></td>
+<td><code>ontulCat=neorunbaseCat</code> CSV — only if the same physical catalog has different logical names in each system.</td>
+</tr>
+</tbody>
+</table>
+<p>All of these are also settable at runtime from the <strong>Admin UI → IAM</strong> page (the mode toggle, ontul URL, token,
+and sync interval), which persists them across the cluster.</p>
+<h2 id="mode-switching">Mode switching</h2>
+<ul>
+<li><strong>standalone → federated</strong>: the next pull replaces the policy graph with ontul's; the local admin is kept.</li>
+<li><strong>federated → standalone</strong>: the last-synced policies become the local, now-writable baseline.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../iam/">Identity and Access Management</a> — the IAM model (users, groups, policies).</li>
+<li><a href="../iam-policy/">IAM Policy Reference</a> — policy statement syntax (masking, row filters, column deny).</li>
+<li><a href="../iceberg-serving/">Iceberg Serving (LakeBase)</a> — the low-latency serving path RBAC is enforced on.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -1656,12 +1964,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/neorunbase-docs/1.0.0", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "/neorunbase-docs/1.0.0/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
     
     
-      <script src="/neorunbase-docs/1.0.0/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="/neorunbase-docs/1.0.0/javascripts/extra.js"></script>
+        <script src="../../javascripts/extra.js"></script>
       
     
   </body>
