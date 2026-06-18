@@ -1017,6 +1017,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/iceberg-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Serving (LakeBase)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/iceberg-wap/" class="md-nav__link">
         
   
@@ -2443,6 +2471,10 @@
 </table>
 <h2 id="iceberg-catalog-integration">Iceberg Catalog Integration</h2>
 <p>NeorunBase can synchronize tables to an Apache Polaris Iceberg REST catalog. See <a href="../../features/iceberg-integration/">Iceberg Integration</a> for the full feature description.</p>
+<p>For the low-latency <strong>serving</strong> path — the automatic primary-key point/range index, its
+persistence, the <code>neorunbase.iceberg.index.patterns</code> auto-index scope, and the
+<code>neorunbase.iceberg.pk.index.*</code> / <code>read.cache.*</code> / <code>data.cache.*</code> / <code>plan.cache.*</code> tuning
+knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBase)</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Catalog backend support</p>
 <p><code>neorunbase.iceberg.catalog.type</code> accepts only <strong><code>none</code></strong> (disabled) or <strong><code>polaris</code></strong>. The <code>neorunbase.iceberg.polaris.*</code> fields below configure the startup <strong>default catalog</strong>; additional catalogs are created with <code>CREATE CATALOG</code> / the admin UI <strong>Catalogs</strong> page (persisted in the metadata store and snapshot-replicated). See <a href="../../features/catalogs/">Catalogs</a>. The generic <code>neorunbase.iceberg.catalog.rest.*</code> security/OAuth keys are <strong>legacy and ignored</strong> under the polaris path; the admin UI hides them. Other Iceberg-REST flavors are intentionally not supported.</p>

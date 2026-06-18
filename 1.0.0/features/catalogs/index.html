@@ -1196,6 +1196,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../iceberg-serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Serving (LakeBase)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../iceberg-wap/" class="md-nav__link">
         
   
@@ -1838,6 +1866,14 @@
 <tr>
 <td><code>default-namespace</code></td>
 <td>Namespace used when one is not given.</td>
+</tr>
+<tr>
+<td><code>index.patterns</code></td>
+<td>Comma-separated <code>namespace.tableGlob</code> patterns (<code>*</code>/<code>?</code> wildcards) selecting which tables get an automatic primary-key serving index. <strong>Blank = opt-in OFF</strong> (nothing auto-indexed) — safe for catalogs with thousands of tables. See <a href="../iceberg-serving/">Iceberg Serving</a>.</td>
+</tr>
+<tr>
+<td><code>wap.branch</code></td>
+<td>Default Write-Audit-Publish branch for this catalog's Iceberg writes. See <a href="../iceberg-wap/">Iceberg WAP</a>.</td>
 </tr>
 </tbody>
 </table>

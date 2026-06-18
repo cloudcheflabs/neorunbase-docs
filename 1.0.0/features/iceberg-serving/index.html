@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-serving/">
       
       
-        <link rel="prev" href="../catalogs/">
+        <link rel="prev" href="../iceberg-integration/">
       
       
-        <link rel="next" href="../iceberg-serving/">
+        <link rel="next" href="../iceberg-wap/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Iceberg Integration - NeorunBase</title>
+        <title>Iceberg Serving (LakeBase) - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#iceberg-integration" class="md-skip">
+        <a href="#iceberg-serving-lakebase" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Iceberg Integration
+              Iceberg Serving (LakeBase)
             
           </span>
         </div>
@@ -991,6 +991,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1010,7 +1038,7 @@
   <span class="md-ellipsis">
     
   
-    Iceberg Integration
+    Iceberg Serving (LakeBase)
   
 
     
@@ -1028,7 +1056,7 @@
   <span class="md-ellipsis">
     
   
-    Iceberg Integration
+    Iceberg Serving (LakeBase)
   
 
     
@@ -1054,10 +1082,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#catalog-apache-polaris" class="md-nav__link">
+  <a href="#why-iceberg-alone-is-slow-to-serve" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Catalog — Apache Polaris
+        Why Iceberg alone is slow to serve
       
     </span>
   </a>
@@ -1065,55 +1093,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#automatic-sync-cdc" class="md-nav__link">
+  <a href="#the-primary-key-index" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Automatic Sync (CDC)
+        The primary-key index
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#built-in-time-column-partitioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in Time Column + Partitioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schema-evolution-add-column" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Evolution — ADD COLUMN
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reading-iceberg-tables-icebergnstable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)">
+    <nav class="md-nav" aria-label="The primary-key index">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#format-version-2-and-3-deletion-vectors" class="md-nav__link">
+  <a href="#supported-predicates" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Format version 2 and 3 (deletion vectors)
+        Supported predicates
       
     </span>
   </a>
@@ -1121,10 +1116,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
+  <a href="#fully-automatic" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Multi-Format Data Files (Parquet, ORC, Avro)
+        Fully automatic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#persistence-across-restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistence across restart
       
     </span>
   </a>
@@ -1137,10 +1143,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#open-lakehouse-analytics" class="md-nav__link">
+  <a href="#maintenance-eager-incremental" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open Lakehouse Analytics
+        Maintenance: eager + incremental
       
     </span>
   </a>
@@ -1148,10 +1154,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-is-not-yet-supported" class="md-nav__link">
+  <a href="#manual-secondary-indexes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Is Not (Yet) Supported
+        Manual secondary indexes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#governance-which-tables-get-indexed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance: which tables get indexed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-stays-in-iceberg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What stays in Iceberg
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -1162,34 +1212,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../iceberg-serving/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Iceberg Serving (LakeBase)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1757,78 +1779,249 @@
 
 
 
-<h1 id="iceberg-integration">Iceberg Integration</h1>
-<p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
+<h1 id="iceberg-serving-lakebase">Iceberg Serving (LakeBase)</h1>
+<p>NeorunBase serves Apache Iceberg tables as a <strong>LakeBase</strong>: a low-latency, high-QPS
+<em>serving</em> layer over the open lakehouse, <strong>without copying rows into NeorunBase's own
+storage</strong>. A <code>SELECT</code> with a primary-key predicate on an Iceberg table is answered in
+<strong>single-digit milliseconds at thousands of QPS</strong> — comparable to, and in the point-lookup
+case faster than, a native RocksDB read — while the data itself stays in Iceberg/S3 and
+remains readable by every other engine (Spark, Trino, Flink, …).</p>
+<p>Analytics (large scans, joins, aggregations) belong on an analytical engine; NeorunBase's
+job here is <strong>serving</strong>: fast point and range reads of governed Iceberg tables.</p>
+<div class="admonition info">
+<p class="admonition-title">How fast?</p>
+<p>On a 20,000-row table split across 8 data files, 16 concurrent clients over the
+PostgreSQL wire protocol: <strong>point lookup ≈ 9,000 TPS / ~1.8 ms</strong>, <strong>range scan
+(<code>BETWEEN</code>) ≈ 9,000 TPS / ~1.8 ms</strong>. Without the index the same workload is a
+multi-file S3 scan at tens of TPS and hundreds of milliseconds.</p>
+</div>
+<h2 id="why-iceberg-alone-is-slow-to-serve">Why Iceberg alone is slow to serve</h2>
+<p>Iceberg is an excellent <em>table format</em>, but it has <strong>no row-level index</strong>. Its only pruning
+inputs are:</p>
+<ul>
+<li><strong>partition values</strong>, and</li>
+<li><strong>per-file column min/max statistics</strong> (used to skip whole data files).</li>
+</ul>
+<p>For a serving workload these are often not enough:</p>
+<ul>
+<li>Primary keys are frequently <strong>hash-distributed across files</strong> (e.g. a NeorunBase native
+  table synced to Iceberg shards rows by primary key), so every file's <code>[min, max]</code> for the
+  key column overlaps and min/max pruning cannot isolate a single file.</li>
+<li>Even when pruning isolates one file, that file still has to be read from S3 and scanned
+  row by row to find the one matching row.</li>
+</ul>
+<p>NeorunBase closes this gap with a <strong>secondary index that stores locations only</strong> — never the
+row data. This is the LakeBase "pointer index": the keys and their <code>(file, row)</code> locations
+live in NeorunBase; the rows stay in Iceberg.</p>
+<h2 id="the-primary-key-index">The primary-key index</h2>
+<p>For an Iceberg table that declares a <strong>single identifier (primary-key) field</strong>, NeorunBase
+keeps a per-snapshot ordered map:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>primary key  -&gt;  (data file, row ordinal)
+</code></pre></div>
+<p>A serving query then resolves the matching key(s) and reads <strong>only the matching rows</strong> from
+the (cached) data files — no multi-file scan, no data-node round trip.</p>
+<h3 id="supported-predicates">Supported predicates</h3>
+<p>The index fast path activates when the <code>WHERE</code> clause filters the indexed column with any of:</p>
+<table>
+<thead>
+<tr>
+<th>Form</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Equality</td>
+<td><code>WHERE id = 42</code></td>
+</tr>
+<tr>
+<td><code>IN</code> list</td>
+<td><code>WHERE id IN (1, 2, 3)</code></td>
+</tr>
+<tr>
+<td><code>BETWEEN</code></td>
+<td><code>WHERE id BETWEEN 100 AND 199</code></td>
+</tr>
+<tr>
+<td>Range comparison</td>
+<td><code>WHERE id &gt;= 1000</code>, <code>WHERE id &lt; 50</code></td>
+</tr>
+<tr>
+<td><code>AND</code> of the above on the same column</td>
+<td><code>WHERE id &gt;= 100 AND id &lt;= 199</code></td>
+</tr>
+</tbody>
+</table>
+<p>The index is an <strong>ordered</strong> structure, so range predicates are served by an in-memory range
+scan over the keys. Constant-folded bounds (e.g. <code>id BETWEEN :lo AND :lo + 99</code>) are evaluated
+before lookup. Any other predicate shape (or a column without an index) falls back to the
+normal scan path, and the full <code>WHERE</code> is always re-applied to the returned rows so results
+are correct regardless of which path ran.</p>
+<p>Range lookups require an ordered key type (integer, bigint, or string/uuid). Other key types
+(decimal, float) support equality/<code>IN</code> only.</p>
+<h3 id="fully-automatic">Fully automatic</h3>
+<p>There is <strong>no <code>CREATE INDEX</code> required</strong> for the primary-key index:</p>
+<ul>
+<li>It is <strong>built lazily</strong> on the first primary-key query against a table.</li>
+<li>It is <strong>invalidated by snapshot id</strong> — when a write produces a new snapshot the index is
+  refreshed automatically (see <em>Maintenance</em> below). No cron job, no manual rebuild.</li>
+<li>It is <strong>scoped by catalog index patterns</strong> (see <em>Governance</em> below), so a catalog with
+  thousands of tables never indexes anything unintentionally.</li>
+</ul>
+<h3 id="persistence-across-restart">Persistence across restart</h3>
+<p>The index is persisted to a local RocksDB store under
+<code>&lt;neorunbase.base.data.dir&gt;/iceberg-pk-index</code>. On a coordinator restart the index is
+<strong>restored from local disk</strong> (when it still matches the current snapshot) instead of
+re-reading every data file from S3. Only <code>(file, row)</code> locations and a small file dictionary
+are stored — never row data.</p>
+<p>Toggle with <code>neorunbase.iceberg.pk.index.persist</code> (default <code>true</code>).</p>
+<h2 id="maintenance-eager-incremental">Maintenance: eager + incremental</h2>
+<p>The index always reflects the table's current snapshot. Two mechanisms keep that cheap:</p>
+<p><strong>Eager invalidation.</strong> After a write commits a new snapshot — a native→Iceberg sync, a
+<code>MERGE INTO</code>, an append, or a CTAS — NeorunBase eagerly evicts the cached snapshot for that
+table across <strong>every catalog</strong> that exposes it, so the <em>next</em> read sees fresh data without
+waiting out the metadata cache TTL.</p>
+<p><strong>Incremental update.</strong> When the snapshot advances and every snapshot in between is a plain
+<strong>append</strong> (no deletes/overwrites/replaces), NeorunBase indexes <strong>only the newly added data
+files</strong> and merges them into the existing index — it does not re-read the whole table. If a
+delete or overwrite appears in the range, it safely falls back to a full rebuild.</p>
+<p>Between explicit writes the snapshot is immutable, so the index needs no work at all.</p>
 <div class="admonition note">
-<p class="admonition-title">Iceberg catalogs are first-class</p>
-<p>An Iceberg connection is registered as a named <a href="../catalogs/">catalog</a>. You can register more than one (e.g. <code>iceberg-east</code>, <code>iceberg-west</code>); tables in each are addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>. This page uses <code>iceberg</code> as the example catalog name.</p>
+<p class="admonition-title">Leader-master</p>
+<p>All DDL and declarations (<code>CREATE INDEX</code>, catalog changes) are performed by the cluster
+<strong>leader</strong> (followers transparently forward them), and declarations are written to the
+replicated metadata store, so they are honored cluster-wide.</p>
 </div>
-<h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
-<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via <code>CREATE CATALOG</code> SQL, or seeded at startup from <code>neorunbase.iceberg.*</code>. Each catalog supplies:</p>
+<h2 id="manual-secondary-indexes">Manual secondary indexes</h2>
+<p>For columns that are <strong>not</strong> the primary key — or for external Iceberg tables that do not
+declare an identifier field at all — you can declare a secondary index explicitly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_grp</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="p">(</span><span class="n">grp</span><span class="p">);</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">DROP</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">grp</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="p">;</span><span class="w">   </span><span class="c1">-- the index name is the column name</span>
+</code></pre></div>
+<p>A secondary index is <strong>non-unique</strong> (a value maps to many rows) and supports the same point
+and range predicates as the primary-key index. The declaration is stored in the replicated
+metadata store, so a <code>CREATE INDEX</code> issued on one coordinator is honored by all of them; the
+index itself builds lazily on the next query. Manual secondary indexes are <strong>always honored</strong>,
+independent of the catalog's auto-index patterns.</p>
+<h2 id="governance-which-tables-get-indexed">Governance: which tables get indexed</h2>
+<p>A single Iceberg catalog can expose <strong>thousands of tables</strong>. Automatically indexing all of
+them would be wasteful, so the automatic primary-key index is <strong>scoped by a per-catalog table
+pattern</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">CATALOG</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;ice&quot;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s1">&#39;type&#39;</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;rest&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="s1">&#39;uri&#39;</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;http://polaris:8181/api/catalog&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="s1">&#39;index.patterns&#39;</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;sales.*, users.tuser*, ops.events&#39;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
+</code></pre></div>
+<p><code>index.patterns</code> is a comma-separated list of <code>namespace.tableGlob</code> patterns where <code>*</code> matches
+any run of characters and <code>?</code> matches one character:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sales.*</code></td>
+<td>every table in the <code>sales</code> namespace</td>
+</tr>
+<tr>
+<td><code>users.tuser*</code></td>
+<td>tables in <code>users</code> whose name starts with <code>tuser</code></td>
+</tr>
+<tr>
+<td><code>ops.events</code></td>
+<td>exactly <code>ops.events</code></td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li>Polaris URI and OAuth token endpoint</li>
-<li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
-<li>OAuth2 client ID / client secret, realm, scope</li>
-<li>S3 endpoint, access key, secret key, region</li>
+<li><strong>Blank (the default) = opt-in OFF</strong>: no table in the catalog is auto-indexed. This makes a
+  large catalog safe by default.</li>
+<li>Changing the patterns (via <code>ALTER CATALOG</code> or the Admin UI) takes effect on the next query:
+  newly matching tables get indexed, no-longer-matching tables stop using the index.</li>
+<li>Manually declared secondary indexes ignore this setting (they are an explicit opt-in for
+  their table).</li>
 </ul>
-<p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
-<p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
-<h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
-<p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
+<p>The pattern can also be set in the <strong>Admin UI → Catalogs</strong> form ("Index table patterns"), or
+for the startup default catalog via <code>neorunbase.iceberg.index.patterns</code> in
+<code>neorunbase.properties</code>.</p>
+<h2 id="configuration">Configuration</h2>
+<p>All serving knobs live in <code>neorunbase.properties</code> (and may be overridden with a matching <code>-D</code>
+JVM flag, which always wins):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iceberg.pk.index.enabled</code></td>
+<td><code>true</code></td>
+<td>Enable the PK point/range index.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.pk.index.persist</code></td>
+<td><code>true</code></td>
+<td>Persist the index to local RocksDB for restart restore.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.index.patterns</code></td>
+<td><em>(blank)</em></td>
+<td>Auto-index table patterns for the <strong>default</strong> catalog (named catalogs set their own).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.read.cache.ttl.ms</code></td>
+<td><code>30000</code></td>
+<td>Metadata cache TTL; bounds freshness for changes made by <em>other</em> engines (own writes evict eagerly).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.data.cache.rows</code></td>
+<td><code>2000000</code></td>
+<td>Max rows held in the in-memory data-file cache (LRU). <code>0</code> disables.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.eqdelete.cache.files</code></td>
+<td><code>1024</code></td>
+<td>Max equality-delete files whose keys are cached (LRU).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.plan.cache.enabled</code></td>
+<td><code>true</code></td>
+<td>Cache the per-snapshot file plan + do in-memory min/max pruning.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.scan.threads</code></td>
+<td><code>16</code></td>
+<td>Parallel scan pool for delete-bearing table reads.</td>
+</tr>
+<tr>
+<td><code>neorunbase.plan.cache.size</code></td>
+<td><code>2000</code></td>
+<td>Coordinator SQL plan cache size (parsed non-aggregation SELECTs).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-stays-in-iceberg">What stays in Iceberg</h2>
+<p>The index and caches are <strong>acceleration structures, not a copy of the data</strong>:</p>
 <ul>
-<li><strong>First sync</strong> writes the full table as a single Iceberg snapshot.</li>
-<li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
+<li>Row data is never moved into NeorunBase storage; the index holds only keys and
+  <code>(file, row)</code> locations.</li>
+<li>Other engines continue to read and write the table normally.</li>
+<li>A dropped index, a disabled index, or a cold cache only affects latency — never
+  correctness. The serving query transparently falls back to scanning Iceberg.</li>
 </ul>
-<p>Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.</p>
-<p>A per-shard <strong>high-water mark</strong> (the source changelog position) is stamped into the incremental commit's <strong>snapshot summary</strong>, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.</p>
-<h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
-<p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
-<p>Tables are also automatically:</p>
+<h2 id="see-also">See also</h2>
 <ul>
-<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
-<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
-</ul>
-<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
-<h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
-<p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
-<p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
-<h2 id="reading-iceberg-tables-icebergnstable">Reading Iceberg Tables (<code>iceberg.&lt;ns&gt;.&lt;table&gt;</code>)</h2>
-<p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
-<ul>
-<li>WHERE-clause and column-projection pushdown to data nodes</li>
-<li><strong>Equality deletes</strong>, <strong>position deletes</strong>, and Iceberg <strong>format-version 3 deletion vectors</strong> are all applied at read time, so external tools writing into the same table stay compatible</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Low-latency serving (LakeBase)</p>
-<p>A <code>WHERE</code> on the table's primary key (<code>= / IN / BETWEEN / &lt;,&lt;=,&gt;,&gt;=</code>) is answered by an
-automatic per-snapshot <strong>point/range index</strong> in single-digit milliseconds at thousands of
-QPS, instead of a multi-file scan — turning NeorunBase into a serving layer over the open
-lakehouse without copying data. See <strong><a href="../iceberg-serving/">Iceberg Serving (LakeBase)</a></strong>
-for the index, persistence, maintenance, manual <code>CREATE INDEX</code>, and governance patterns.</p>
-</div>
-<h3 id="format-version-2-and-3-deletion-vectors">Format version 2 and 3 (deletion vectors)</h3>
-<p>NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes <strong>equality deletes</strong>, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use <strong>deletion vectors</strong> — a roaring bitmap of deleted row positions stored in a <a href="https://iceberg.apache.org/puffin-spec/">Puffin</a> <code>deletion-vector-v1</code> blob instead of position-delete files — and NeorunBase reads and applies these transparently.</p>
-<p>New tables created by NeorunBase are v2 by default; opt into v3 with <code>-Dneorunbase.iceberg.format.version=3</code> (or <code>NEORUNBASE_ICEBERG_FORMAT_VERSION=3</code>).</p>
-<h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
-<p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
-<p>Multi-format read applies everywhere an external Iceberg table is read:</p>
-<ul>
-<li>The distributed data-node scan</li>
-<li>The coordinator-local scan</li>
-<li>Loading an external Iceberg table into LakeBase</li>
-</ul>
-<p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
-<p><code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; …</code> is supported as a copy-on-write merge. Direct <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or <code>MERGE INTO</code>.</p>
-<h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
-<p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
-<h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
-<ul>
-<li>Direct <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> on Iceberg tables (use <code>MERGE INTO</code> or the native table)</li>
-<li><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, type promotion in schema evolution</li>
-<li>Snapshot expiration and small-file / manifest compaction</li>
-<li>Time travel (<code>AS OF SNAPSHOT</code> / <code>AS OF TIMESTAMP</code>)</li>
-<li>Branching and tagging</li>
-<li>Iceberg REST catalogs other than Polaris</li>
+<li><a href="../iceberg-integration/">Iceberg Integration</a> — sync, partitioning, multi-format reads.</li>
+<li><a href="../catalogs/">Catalogs</a> — registering and governing Iceberg catalogs.</li>
 </ul>
 
 
