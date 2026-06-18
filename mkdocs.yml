@@ -63,6 +63,7 @@ nav:
       - "Geospatial Support": features/geospatial.md
       - "Identity and Access Management": features/iam.md
       - "IAM Policy Reference": features/iam-policy.md
+      - "IAM Federation (ontul)": features/iam-federation.md
       - "Admin Password Recovery": features/admin-password-recovery.md
       - "Admin UI": features/admin-ui.md
       - "NIC Silent-Fail Safety": features/nic-fail-safety.md

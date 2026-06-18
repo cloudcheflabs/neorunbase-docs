@@ -1,5 +1,10 @@
 # Identity and Access Management
 
+!!! tip "Running alongside ontul?"
+    In a federated deployment, **ontul** is the IAM authority and NeorunBase pulls its users, groups, and
+    policies (read-only) to enforce them for clients connecting directly to NeorunBase. See
+    [IAM Federation (ontul)](iam-federation.md).
+
 NeorunBase includes a built-in Identity and Access Management (IAM) system that provides authentication, authorization, and fine-grained access control.
 
 ## User Management
