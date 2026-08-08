@@ -1896,7 +1896,7 @@ changed, so bad or partial data never reaches consumers.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-Dneorunbase.iceberg.wap.branch<span class="o">=</span>audit
 </code></pre></div>
 <p>(equivalently <code>NEORUNBASE_ICEBERG_WAP_BRANCH=audit</code>). This is what the end-to-end test
-<a href="#references"><code>tests/test-iceberg-wap-e2e.sh</code></a> injects into coordinator-1.</p>
+<code>tests/test-iceberg-wap-e2e.sh</code> injects into coordinator-1.</p>
 <h4 id="full-precedence-most-specific-wins">Full precedence (most specific wins)</h4>
 <p>The branch for a given write is resolved in this exact order — the first source that
 yields a non-empty, non-<code>main</code> branch wins:</p>
