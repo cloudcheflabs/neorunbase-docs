@@ -15,23 +15,27 @@ You can connect to NeorunBase using any standard PostgreSQL client, including:
 
 NeorunBase supports standard SQL operations with PostgreSQL conformance:
 
-- **DML**: `SELECT`, `INSERT`, `UPDATE`, `DELETE`
-- **DDL**: `CREATE TABLE`, `DROP TABLE`, `ALTER TABLE`, `CREATE INDEX`, `DROP INDEX`, `CREATE SCHEMA`, `DROP SCHEMA`
-- **Transactions**: `BEGIN`, `COMMIT`, `ROLLBACK`
-- **Queries**: `JOIN`, `GROUP BY`, `ORDER BY`, `LIMIT`, `HAVING`, subqueries, aggregation functions, `CASE WHEN`, `CAST`, and more
+- **DML**: `SELECT`, `INSERT`, `UPDATE`, `DELETE`, and `MERGE INTO` (upsert / copy-on-write)
+- **DDL**: `CREATE TABLE` (incl. `FOREIGN KEY (...) REFERENCES ...` with `ON DELETE` / `ON UPDATE` `CASCADE` / `SET NULL` / `RESTRICT` / `NO ACTION`), `DROP TABLE`, `ALTER TABLE`, `CREATE INDEX`, `DROP INDEX`, `CREATE SCHEMA`, `DROP SCHEMA`
+- **Transactions**: `BEGIN` (or `START TRANSACTION`), `COMMIT`, `ROLLBACK`
+- **Queries**: `JOIN`, `GROUP BY`, `ORDER BY`, `LIMIT`, `HAVING`, subqueries, aggregation functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), scalar functions (`ABS`, `ROUND`, `LENGTH`, `UPPER`, `LOWER`, `COALESCE`, …), `CASE WHEN`, `CAST`, and more
 
 ## Data Types
 
 NeorunBase supports a wide range of data types:
 
-- **Numeric**: `INTEGER`, `BIGINT`, `SMALLINT`, `FLOAT`, `DOUBLE`, `DECIMAL`
+- **Numeric**: `INTEGER` (`INT`/`INT4`), `BIGINT` (`INT8`), `SMALLINT` (`INT2`), `FLOAT` (`FLOAT4`), `REAL`, `DOUBLE` (`FLOAT8`/`DOUBLE PRECISION`), `NUMERIC`, `DECIMAL`
+- **Auto-increment**: `SERIAL`, `BIGSERIAL`
 - **String**: `VARCHAR`, `TEXT`, `CHAR`
-- **Temporal**: `DATE`, `TIME`, `TIMESTAMP`
-- **Boolean**: `BOOLEAN`
+- **Temporal**: `DATE`, `TIME`, `TIMESTAMP` (`TIMESTAMPTZ` / `TIMESTAMP WITH TIME ZONE` are accepted and mapped to `TIMESTAMP`), `INTERVAL`
+- **Boolean**: `BOOLEAN` (`BOOL`)
 - **Binary**: `BYTEA`
-- **Geospatial**: `POINT`, `LINESTRING`, `POLYGON`, `GEOMETRY`
+- **JSON**: `JSON`, `JSONB`
+- **Arrays**: `INT[]`, `BIGINT[]`, `TEXT[]`, `FLOAT[]`
+- **Geospatial**: `POINT`, `LINESTRING`, `POLYGON`, `GEOMETRY` (PostGIS-style, with `ST_*` functions such as `ST_Point`, `ST_Distance`, `ST_Contains`, `ST_GeomFromText`)
+- **Full-text search**: `TSVECTOR`, `TSQUERY` (native PostgreSQL FTS OIDs `3614` / `3615`)
 - **Vector**: `VECTOR(dim)` (pgvector-compatible; see [Vector Database](vector-database.md))
-- **Other**: `JSON`, `UUID`
+- **Other**: `UUID`
 
 ## Table-Valued Functions
 
@@ -49,7 +53,7 @@ All five take named arguments (PostgreSQL `name => value` form). See [Graph Trav
 
 ## Virtual Catalog
 
-NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands such as `\d`, `\dt`, and `\di` in `psql`. The same catalog patterns also drive JDBC `DatabaseMetaData.getSchemas()` / `getTables()` / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.
+NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands in `psql` — including `\d`, `\dt`, `\dt+`, `\di`, `\dv`, `\ds`, `\dn` (schemas), `\du` (roles), `\df` (functions), `\dp` (privileges), and `\l` (databases). The same catalog patterns also drive JDBC `DatabaseMetaData.getSchemas()` / `getTables()` / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.
 
 ## Extended Query Protocol
 

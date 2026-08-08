@@ -70,10 +70,10 @@ A naive BFS hop is `WHERE src_id IN (1,2,3,…)` — one B-tree lookup per sourc
 
 ### Enabling CSR
 
-CSR is opt-in per table and configured via three properties:
+CSR is opt-in per table (the shipped default is `neorunbase.csr.enabled=false` — the original row-scan traversal path is unchanged until you turn it on) and configured via the following properties:
 
 ```properties
-# Master toggle.
+# Master toggle. Ships false; set true to enable the CSR path.
 neorunbase.csr.enabled=true
 
 # Comma-separated list of qualified edge tables to materialize.
@@ -81,6 +81,16 @@ neorunbase.csr.enabled.tables=public.relations,public.eligibility
 
 # Background compaction interval — rebuilds CSR from edge rows.
 neorunbase.csr.compaction.interval.seconds=3600
+
+# Trigger an early out-of-band compaction once this many edge rows have
+# been added since the last CSR build — bounds staleness under heavy ingest.
+neorunbase.csr.max.delta.rows.before.compaction=100000
+
+# CSR segment-file rollover size (bytes). Default 64 MiB.
+neorunbase.csr.segment.size=67108864
+
+# Per-node RPC timeout (ms) for one BFS hop expansion through CSR.
+neorunbase.csr.neighbor.timeout.ms=30000
 ```
 
 Enabling CSR for a table does three things:
@@ -177,7 +187,23 @@ FROM PAGERANK(table      => 'public.relations',
 | Centralised  | Edge count fits in coordinator memory (~10 M edges typical) | Coordinator fetches all edges via `SELECT src_id, dst_id, weight FROM table`, builds in-memory adjacency, runs power iteration |
 | Distributed  | Larger graphs; multi-shard parallelism       | BSP / Pregel-lite — coordinator broadcasts the rank vector, each data node walks its local CSR adjacency, returns a sparse contribution map; the coordinator applies teleport + dangling redistribution and converges |
 
-The distributed mode produces ranks that match the centralised result within `1e-6` (max abs diff) on identical edge sets — the algorithm is mathematically the same, only the data movement changes. Subsequent supersteps send only **deltas** (entries that moved by more than `1e-3 × epsilon` since the last broadcast), which collapses the wire footprint as ranks converge.
+The distributed mode produces ranks that match the centralised result within `1e-6` (max abs diff) on identical edge sets — the algorithm is mathematically the same, only the data movement changes. Subsequent supersteps send only **deltas** (entries that moved by more than `max(convergenceThreshold × ratio, floor)` since the last broadcast), which collapses the wire footprint as ranks converge.
+
+The BSP path is tuned by three properties:
+
+```properties
+# Per-superstep RPC timeout (ms) for PAGERANK_LOCAL_STEP_REQ — how long any
+# one data node may take to return its sparse contribution map. Default 60s.
+neorunbase.pagerank.distributed.stage.timeout.ms=60000
+
+# Delta-broadcast threshold ratio. After superstep 1 the coordinator only
+# re-sends rank entries that moved by more than convergenceThreshold × ratio.
+neorunbase.pagerank.distributed.delta.broadcast.ratio=0.001
+
+# Absolute floor on the delta-broadcast threshold — guards the pathological
+# case where a tiny convergence threshold collapses the derived value to ~0.
+neorunbase.pagerank.distributed.delta.broadcast.floor=1e-12
+```
 
 ```sql
 -- Forces the BSP distributed path.

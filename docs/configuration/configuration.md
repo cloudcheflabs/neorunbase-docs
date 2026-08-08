@@ -195,6 +195,30 @@ knobs — see [Iceberg Serving (LakeBase)](../features/iceberg-serving.md).
 | `neorunbase.iceberg.parquet.read.prefetch.threshold.bytes` | `67108864` | Iceberg-data Parquet read pre-fetch threshold (64 MiB). Files at or below this size are pulled in a single GET to avoid per-chunk seeks. |
 | `neorunbase.iceberg.load.batch.size` | `1000` | Bulk-load batch size used when caching an external Iceberg table into LakeBase. Larger batches amortize per-INSERT overhead at the cost of memory. |
 
+### Iceberg Write-Audit-Publish (WAP)
+
+WAP stages every Iceberg write (CTAS, MERGE INTO, CDC sync) on a non-`main` branch so it can be audited in isolation and then published to `main`. See [Iceberg Integration](../features/iceberg-integration.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.iceberg.wap.branch` | (empty) | Cluster-wide default WAP target branch for all Iceberg writes. Empty or `main` writes straight to `main` (WAP off, the default). A non-`main` value lands every write on that branch. Precedence (most specific first): `-Dneorunbase.iceberg.wap.branch.<namespace>.<table>` → `-Dneorunbase.iceberg.wap.branch.<table>` → `CREATE CATALOG ... WITH ('wap.branch'='<branch>')` → this value. Publish a staged branch via `POST /admin/api/iceberg/wap/publish` or `POST /admin/api/iceberg/wap/cherrypick`. |
+
+### Iceberg Serving (LakeBase) Read Path & PK Index Tuning
+
+NeorunBase serves Iceberg tables as a low-latency LakeBase: a `WHERE` on the table's primary key (`=` / `IN` / `BETWEEN` / `<,<=,>,>=`) is answered by an in-memory, per-snapshot pk → (file, row) index instead of a multi-file scan. These knobs tune that path; all have safe defaults. Override only to trade memory/freshness for QPS. See [Iceberg Serving (LakeBase)](../features/iceberg-serving.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.iceberg.index.patterns` | (empty) | Auto-index table scope for the DEFAULT catalog: CSV of `<namespace>.<tableGlob>` patterns (`*` = any run, `?` = one char), e.g. `sales.*, users.tuser*`. **Blank = opt-in OFF** (nothing auto-indexed). Named catalogs set their own via `CREATE/ALTER CATALOG WITH ('index.patterns'=...)` or the Admin UI. Manually declared `CREATE INDEX` secondary indexes are honored regardless of this setting. |
+| `neorunbase.iceberg.pk.index.enabled` | `true` | Enable the PK point/range index (the serving fast path). |
+| `neorunbase.iceberg.pk.index.persist` | `true` | Persist the PK index to a local RocksDB under `<base.data.dir>/iceberg-pk-index` so a coordinator restart restores it from disk instead of re-reading every data file from S3. |
+| `neorunbase.iceberg.read.cache.ttl.ms` | `30000` | Serving metadata cache TTL: how long a loaded table snapshot is reused before an async, single-flight refresh. A local write commit evicts it eagerly, so this only bounds freshness for changes made by other engines. Higher = fewer REST/Polaris round trips. |
+| `neorunbase.iceberg.scan.threads` | `16` | Parallel scan pool size for delete-bearing (serving/upsert) table reads. Per-file work is S3-latency bound, so this over-subscribes cores. |
+| `neorunbase.iceberg.data.cache.rows` | `2000000` | Max total rows cached across all Iceberg data files (the in-memory data-block cache; LRU by total rows). `0` disables. |
+| `neorunbase.iceberg.eqdelete.cache.files` | `1024` | Max number of equality-delete files whose keys are cached (LRU). |
+| `neorunbase.iceberg.plan.cache.enabled` | `true` | Cache the per-snapshot file plan and do in-memory min/max pruning (no manifest S3 read per query). |
+| `neorunbase.plan.cache.size` | `2000` | Coordinator SQL plan cache size (entries) — caches parsed non-aggregation `SELECT` plans (the serving hot path). `0` disables. |
+
 ## S3 Backup
 
 Scheduled cluster backup to S3-compatible storage. See [Backup & Restore](../features/backup-restore.md) for the full feature description.
@@ -259,6 +283,19 @@ The leader Coordinator distributes consumer groups round-robin across the Data N
 | `neorunbase.iam.rocksdb.path` | `${neorunbase.base.data.dir}/iam` | RocksDB store for IAM state (users, roles, grants, policies, STS temp credentials). Owned by the leader, replicated to peers. Must be durable. |
 | `neorunbase.iam.kms.key.id` | `iam-encryption` | Logical KMS key id used to envelope-encrypt the IAM RocksDB store at rest (users, password hashes, access keys, policies, STS credentials). A plaintext IAM DB from an older build is auto-migrated on first save. Changing it after data exists makes the existing IAM store unreadable — set it once at provisioning time. |
 | `neorunbase.iam.sts.cleanup.interval.hours` | `1` | How often to sweep expired STS temporary credentials from the AuthManager keystore. |
+
+### IAM Authority Mode & Federation with ontul
+
+By default NeorunBase IAM is self-authoritative. It can instead **federate** with an external **ontul** IAM authority: NeorunBase pulls the IAM graph (users, groups, policies) from ontul's admin REST API, and the local IAM becomes read-only. Use federated mode when external apps connect directly to NeorunBase (pg-wire / JDBC) but access policies are governed centrally in ontul. The mode is also toggleable at runtime from the Admin UI (IAM page).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.iam.mode` | `standalone` | `standalone` — NeorunBase IAM is self-authoritative (users/groups/policies created and edited here). `federated` — ontul IAM is the authority; NeorunBase pulls the IAM graph from ontul and the local IAM becomes read-only (admin writes are rejected; the federation sync is the only writer). |
+| `neorunbase.iam.federation.ontul.url` | (empty) | ontul admin base URL the federation sync pulls from, e.g. `http://ontul-master:8080`. |
+| `neorunbase.iam.federation.ontul.token` | (empty) | ontul credential used for the pull — a long-lived ontul user token (`Authorization: Token`) or an ontul JWT (`Authorization: Bearer`, auto-detected). The principal should be an ontul "IAM reader" service role. Credential. |
+| `neorunbase.iam.federation.sync.interval.ms` | `60000` | How often to pull the IAM graph from ontul in federated mode. |
+| `neorunbase.iam.federation.ontul.jwt.key` | (empty) | Shared HMAC key for validating ontul-issued JWTs locally (federated SSO): an external app may present an ontul JWT in the pg-wire password field, and NeorunBase verifies it with this key (= ontul's master key, `ONTUL_MASTER_KEY`) without a per-connection round trip to ontul. Blank disables ontul-token SSO. |
+| `neorunbase.iam.federation.catalog.alias` | (empty) | Catalog identity map for federation: CSV of `ontulCatalog=neorunbaseCatalog` (e.g. `sales_cat=ice`). Needed only when ontul and NeorunBase register the same physical catalog under different logical names — it rewrites the catalog segment of synced policy resources. Blank = names already match (the usual case). |
 
 ## Write-Ahead Log (WAL) & Encryption
 
@@ -401,6 +438,38 @@ On every startup, non-leader coordinators and data nodes pull authoritative KMS 
 | `neorunbase.disk.repair.grace.period.seconds` | `600` | How long a disk must remain unhealthy before it is confirmed dead and its shards are repaired elsewhere (10 min). Avoids reacting to transient blips. |
 | `neorunbase.disk.repair.max.concurrent` | `4` | Maximum number of shard repairs running at once. Caps the IO/network impact of recovery. |
 | `neorunbase.disk.repair.min.available.bytes` | `104857600` | Minimum free space for a disk to count as healthy (100 MiB); below this it is excluded from new shard placement. |
+
+## Shard / Disk Repair & Balancing RPC
+
+RPC timeouts and grace period for the per-shard copy/replicate operations that back whole-node shard repair, per-disk repair, and capacity rebalancing. The `enabled` flags, scan intervals, and other tunables live in the [Disk Repair](#disk-repair) section above.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.shard.repair.grace.period.ms` | `600000` | Whole-node loss: grace period a node may be unreachable before its shards are confirmed lost and repair is triggered (10 min). Too low = spurious repairs on a brief network blip; too high = slow recovery. |
+| `neorunbase.shard.repair.rpc.timeout.ms` | `60000` | RPC timeout for each per-shard `SHARD_COPY_REQ` / `SHARD_REPLICATE_REQ` during whole-node shard repair. |
+| `neorunbase.disk.repair.rpc.timeout.ms` | `60000` | RPC timeout for each per-shard copy/replicate during disk repair (the per-disk-loss repair path). |
+| `neorunbase.shard.balancing.rpc.timeout.ms` | `60000` | RPC timeout for each per-shard copy/replicate during shard balancing (capacity rebalance after a node-set change). |
+
+## Reactive Shard Repair
+
+Loop tunables for the divergence-driven reactive shard repair path. The enable flag, scan interval, and divergence fraction are set elsewhere in `NeorunConfig`; these are the inline loop knobs.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.reactive.shard.repair.scan.floor.ms` | `5000` | Floor on the scan interval, so a tiny `scan.interval.seconds` can't turn the divergence detector into a busy-loop. |
+| `neorunbase.reactive.shard.repair.idle.poll.ms` | `1000` | Idle poll in the drain loop when the repair queue is empty or this node is not the leader. |
+| `neorunbase.reactive.shard.repair.failure.backoff.ms` | `5000` | Delay before a failed repair task is re-queued, so a transient error doesn't immediately hot-loop the same shard copy. |
+
+## DR / Site Replication (WAL Streamer)
+
+A leader-only WAL streamer ships `REPLICATE_WAL_BATCH` records to one or more standby clusters over the internal protocol. The peer set and enable flag are managed from the admin UI **Site Replication** page (`SiteReplicationConfig`); the properties below are the streamer-loop tunables. See [Operations](../operations/operations.md#cluster-lifecycle-notes).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.site.replication.streamer.join.timeout.ms` | `2000` | Grace given to each streamer thread to finish on `stop()` before moving on. |
+| `neorunbase.site.replication.tick.floor.ms` | `50` | Floor on the per-tick batch-readiness poll interval. Guards against a misconfigured `SiteReplicationConfig.tickMs` of `0` busy-looping the streamer. |
+| `neorunbase.site.replication.failure.backoff.multiplier` | `5` | After a failed batch ship, the streamer backs off for `tickMs ×` this multiplier before retrying, so a flapping peer doesn't hot-loop the send path. |
+| `neorunbase.site.replication.rpc.timeout.ms` | `30000` | RPC timeout for one `REPLICATE_WAL_BATCH_REQ` to a peer site. A WAL batch can be large and cross a WAN link, so this sits well above intra-cluster RPCs. |
 
 ## JVM Options
 

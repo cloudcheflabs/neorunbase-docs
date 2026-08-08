@@ -64,19 +64,21 @@ Launch the coordinator with:
 (equivalently `NEORUNBASE_ICEBERG_WAP_BRANCH=audit`). This is what the end-to-end test
 [`tests/test-iceberg-wap-e2e.sh`](#references) injects into coordinator-1.
 
-#### Table-scoped overrides
+#### Full precedence (most specific wins)
 
-The system property can be narrowed to specific tables. Most specific wins:
+The branch for a given write is resolved in this exact order — the first source that
+yields a non-empty, non-`main` branch wins:
 
-| Property | Scope |
-| --- | --- |
-| `-Dneorunbase.iceberg.wap.branch.<namespace>.<table>` | one table in one namespace |
-| `-Dneorunbase.iceberg.wap.branch.<table>` | a table by name (any namespace) |
-| `-Dneorunbase.iceberg.wap.branch` | default for all Iceberg writes |
+| # | Source | Scope |
+| --- | --- | --- |
+| 1 | `-Dneorunbase.iceberg.wap.branch.<namespace>.<table>` | one fully-qualified table |
+| 2 | `-Dneorunbase.iceberg.wap.branch.<table>` | a table by name (any namespace) |
+| 3 | `CREATE CATALOG ... WITH ('wap.branch'='<branch>')` | that catalog |
+| 4 | `-Dneorunbase.iceberg.wap.branch` | cluster-wide default for all Iceberg writes |
 
-A catalog's `'wap.branch'` option, when present, takes precedence over the system
-property for that catalog. Leave all of these unset and writes go straight to `main`
-(WAP disabled).
+Note the ordering: the two **table-scoped system properties (1, 2) override a catalog's
+`'wap.branch'` option (3)**, and the catalog option in turn overrides the cluster-wide
+default (4). Leave all four unset and writes go straight to `main` (WAP disabled).
 
 ## Behavior for CTAS / MERGE INTO / CDC sync
 

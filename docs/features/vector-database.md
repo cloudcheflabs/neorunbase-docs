@@ -60,6 +60,8 @@ CREATE INDEX idx_doc_embedding
 | `vector_cosine_ops`  | Cosine distance |
 | `vector_ip_ops`      | Inner product   |
 
+The distance metric may also be supplied inside the `WITH` clause instead of as an opclass — e.g. `USING hnsw (embedding) WITH (op_class = 'cosine')`, the form the hybrid e2e test uses. The DDL parser captures both the trailing opclass and the raw `WITH` options (`DdlParser.parseCreateIndex`), so either spelling of the metric is accepted.
+
 ### Tunables
 
 - **`m`** and **`ef_construction`** — graph build parameters, set at index creation time.
@@ -80,6 +82,8 @@ Because vector search runs inside the same sharded storage layer as the rest of 
 
 An over-fetch factor is applied per shard to compensate for the recall loss that comes from shard-local ANN.
 
+Each per-shard leg of the scatter is bounded by a single wall-clock budget, `neorunbase.search.scatter.stage.timeout.ms` (default 30000). The same property caps FTS and Hybrid scatters, so all three search backends share one timeout knob.
+
 ## Storage Layout — Encrypted Sidecar
 
 An HNSW index cannot live inside RocksDB efficiently: graph traversal performs hundreds of random hops per query, and a RocksDB `get` per hop would destroy latency. NeorunBase stores each HNSW graph as a **sidecar file** in the shard directory — outside RocksDB but inside the shard's encryption boundary.
@@ -98,7 +102,7 @@ Rewriting the sidecar on every row change would be ruinously slow, so NeorunBase
 - **Periodic flush** — a background scheduler writes dirty sidecars back to disk at a configurable interval (`neorunbase.ann.flush.interval.seconds`, default 30s).
 - **Flush on shard close** — the shard close path flushes all of its cached ANN indexes so a graceful shutdown never loses in-memory state.
 - **Lazy rebuild on stale sidecar** — each sidecar records the WAL sequence number it was flushed at. On the next write, the Data Node compares that sequence number to the current WAL seqno and rebuilds the sidecar from RocksDB rows if it is behind (or missing entirely, e.g. on a freshly repaired replica). No admin action is needed to converge after an ungraceful shutdown as long as the shard eventually sees a write.
-- **On-demand rebuild** — `REBUILD INDEX idx_name ON table_name` (SQL) or the admin REST endpoint `POST /admin/ann/rebuild` forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire.
+- **On-demand rebuild** — `REBUILD INDEX idx_name ON table_name` (SQL) or the admin REST endpoint `POST /admin/ann/rebuild` forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire. The fan-out is bounded by `neorunbase.query.ann.rebuild.timeout.ms` (default 300000).
 
 ## Primary Key Requirement for HNSW-Indexed Tables
 

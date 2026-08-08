@@ -95,7 +95,7 @@ SHOW CREATE TABLE "iceberg-east".sales.events;
 
 ## Startup Default Catalog
 
-The startup properties `neorunbase.iceberg.*` (`catalog.type=polaris`/`rest` plus the `polaris.*` / `s3.*` fields) **seed a DEFAULT catalog at boot**. Additional catalogs are then created at runtime via `CREATE CATALOG` or the Admin UI. See [Configuration](../configuration/configuration.md#iceberg-catalog-integration) for the property reference.
+The startup properties `neorunbase.iceberg.*` **seed a DEFAULT catalog at boot**. The startup selector `neorunbase.iceberg.catalog.type` accepts only **`none`** (the default — Iceberg integration disabled) or **`polaris`** (bootstrap the Apache Polaris REST catalog using the `neorunbase.iceberg.polaris.*` + `neorunbase.iceberg.s3.*` fields). No other value — including a generic `rest` — is wired up at startup; the legacy `neorunbase.iceberg.catalog.rest.*` fields are ignored under the Polaris path. Additional catalogs are then created at runtime via `CREATE CATALOG` (whose `'type'='rest'` option registers the same Polaris-backed REST connection) or the Admin UI. See [Configuration](../configuration/configuration.md#iceberg-catalog-integration) for the property reference.
 
 ## Admin REST API
 
