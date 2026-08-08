@@ -1744,13 +1744,16 @@
 <h2 id="management">Management</h2>
 <p>The Admin UI allows administrators to perform operational tasks:</p>
 <ul>
-<li><strong>IAM Management</strong>: Create and manage users, groups, and policies</li>
+<li><strong>IAM Management</strong>: Create and manage users, groups, policies, access keys, and STS sessions. In federated mode this page is read-only and hosts the standalone ↔ federated mode toggle. See <a href="../iam/">Identity and Access Management</a>.</li>
+<li><strong>Security &amp; KMS</strong>: List the KMS key hierarchy, inspect a key's versions, create new keys, and rotate a key to a new version. See <a href="../encryption/">Encryption at Rest</a>.</li>
 <li><strong>pg-wire TLS</strong>: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See <a href="../pg-wire-tls/">pg-wire TLS</a>.</li>
 <li><strong>Catalogs</strong>: List, create, edit, and drop catalogs (the built-in <code>lakebase</code> plus external Iceberg catalogs). Drop is refused for a non-empty catalog and <code>lakebase</code> cannot be removed. See <a href="../catalogs/">Catalogs</a>.</li>
 <li><strong>Iceberg</strong>: Configure the Apache Polaris connection (URI, OAuth client credentials, S3 access/secret key) and monitor sync status. See <a href="../iceberg-integration/">Iceberg Integration</a>.</li>
 <li><strong>S3 Backup</strong>: Configure scheduled cluster backups, view backup history, and trigger restore. See <a href="../backup-restore/">Backup &amp; Restore</a>.</li>
+<li><strong>Site Replication</strong>: Configure disaster-recovery peer sites and monitor the leader-only WAL streamer that ships committed writes to them.</li>
 <li><strong>Kafka Ingestion</strong>: Manage Kafka consumer groups and monitor ingestion pipelines</li>
-<li><strong>Shard Operations</strong>: Monitor shard health, replication status, and repair progress</li>
+<li><strong>Query Runner</strong>: Execute SQL against the cluster directly from the browser, with a local query history.</li>
+<li><strong>Shard Operations</strong>: Monitor shard distribution and health, and drive shard/disk repair progress</li>
 </ul>
 <h2 id="rest-api">REST API</h2>
 <p>All operations available in the Admin UI are also accessible via a REST API, enabling automation and integration with external monitoring and management tools.</p>

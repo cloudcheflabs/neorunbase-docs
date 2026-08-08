@@ -810,6 +810,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Shard Replication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changing-the-replication-factor-online" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing the replication factor online
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1739,15 +1756,33 @@
 <p>NeorunBase provides fault tolerance and high availability through shard replication and automatic failure recovery.</p>
 <p>This page covers <strong>intra-cluster</strong> replication — copies of each shard inside a single cluster, sharing coordinators, KMS, and ZooKeeper. For cross-cluster, cross-site, disaster-recovery streaming, see <a href="../site-replication/">Site Replication (DR)</a>.</p>
 <h2 id="shard-replication">Shard Replication</h2>
-<p>Each shard can be configured with a replication factor. NeorunBase maintains multiple copies of each shard across different Data Nodes. This ensures that data remains available even if one or more Data Nodes go down.</p>
+<p>Each shard can be configured with a replication factor. NeorunBase maintains multiple copies of each shard across different Data Nodes. This ensures that data remains available even if one or more Data Nodes go down. When a table does not override it, the cluster default <code>neorunbase.default.replication.factor</code> (2 — one primary plus one replica) applies (<code>neorunbase.properties</code>, section "Default Settings"). The cluster needs at least <code>replication_factor</code> Data Nodes to place all copies of a shard.</p>
+<p>Set the replication factor at table creation with <code>REPLICAS N</code> or <code>replication_factor=N</code> (see <a href="../distributed-sharding/#creating-a-sharded-table">Distributed Sharding</a>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="nb">INT</span><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">REPLICAS</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="changing-the-replication-factor-online">Changing the replication factor online</h3>
+<p>The replication factor of an existing table can be raised or lowered at runtime through the admin REST API (<code>AdminHttpServer</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>POST<span class="w"> </span>/admin/tables/<span class="o">{</span>name<span class="o">}</span>/replicas
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Content-Type:<span class="w"> </span>application/json
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">{</span><span class="s2">&quot;replicationFactor&quot;</span>:<span class="w"> </span><span class="m">2</span><span class="o">}</span>
+</code></pre></div>
+<p>Raising RF triggers copying the shard to additional Data Nodes; lowering it drops surplus replicas. Confirm with <code>GET /admin/tables/{name}</code> (<code>"replicationFactor"</code>). The per-shard copy/replicate RPC timeout during this and other repair/balancing operations is <code>neorunbase.shard.balancing.rpc.timeout.ms</code> / <code>neorunbase.shard.repair.rpc.timeout.ms</code> (default 60000; <code>neorunbase.properties</code>, section 29).</p>
 <h2 id="automatic-failure-detection">Automatic Failure Detection</h2>
 <p>NeorunBase continuously monitors the health of all Data Nodes. When a Data Node becomes unavailable, the system automatically detects the failure and initiates recovery actions.</p>
 <h2 id="automatic-shard-repair">Automatic Shard Repair</h2>
-<p>When a Data Node failure is detected, NeorunBase automatically replicates the affected shards from surviving replicas to healthy Data Nodes, restoring the desired replication factor without manual intervention.</p>
+<p>When a Data Node failure is detected, NeorunBase automatically replicates the affected shards from surviving replicas to healthy Data Nodes, restoring the desired replication factor without manual intervention. A failed node must stay unreachable for <code>neorunbase.shard.repair.grace.period.ms</code> (default 600000 = 10 min; <code>neorunbase.properties</code>, section 29) before its shards are confirmed lost and repair is triggered — this avoids reacting to transient network blips.</p>
+<p>NeorunBase has three complementary repair paths:</p>
+<ul>
+<li><strong>Whole-node shard repair</strong> (<code>ShardRepairService</code>) — recovers from full Data Node loss after the grace period; also operator-triggerable via <code>POST /admin/maintenance/repair/trigger</code>.</li>
+<li><strong>Disk repair</strong> (<code>DiskRepairService</code>) — re-replicates shards off a failed/full disk on an otherwise healthy node. Off by default (<code>neorunbase.disk.repair.enabled=false</code>); see <code>neorunbase.properties</code>, section 19.</li>
+<li><strong>Reactive shard repair</strong> — a continuous, divergence-driven worker that detects replicas that have silently drifted apart, without waiting for a node to drop. See <a href="../reactive-shard-repair/">Reactive Shard Repair</a>.</li>
+</ul>
 <h2 id="shard-rebalancing">Shard Rebalancing</h2>
 <p>When Data Nodes are added to or removed from the cluster, NeorunBase automatically rebalances shards across the cluster to ensure even data distribution and optimal resource utilization.</p>
 <h2 id="coordinator-high-availability">Coordinator High Availability</h2>
-<p>Multiple Coordinators can run simultaneously. NeorunBase uses leader election to designate a primary Coordinator for metadata management, while all Coordinators can serve client queries. If the leader Coordinator fails, a new leader is automatically elected.</p>
+<p>Multiple Coordinators can run simultaneously. NeorunBase uses ZooKeeper-based leader election (Curator <code>LeaderSelector</code>) to designate a primary Coordinator for metadata management, while all Coordinators can serve client queries. If the leader Coordinator fails, a new leader is automatically elected.</p>
+<p>Leader election is <strong>sticky</strong> by default (<code>neorunbase.cluster.election.sticky.enabled=true</code>; <code>neorunbase.properties</code>, section 22c): the previously-elected leader's node id is persisted to ZooKeeper, and on startup non-incumbent nodes wait <code>neorunbase.cluster.election.deference.window.ms</code> (default 3000) before joining the election queue, so a restarting incumbent reclaims leadership without a leadership toggle — avoiding a double-init of leader-only services (metrics collection, the repair workers, the site-replication streamer). Setting <code>sticky.enabled=false</code> falls back to first-lock-wins.</p>
+<p>On every startup, non-leader coordinators and data nodes perform a mandatory <strong>bootstrap fetch</strong> — they pull authoritative KMS / metadata / IAM snapshots from the leader and overwrite their local RocksDB before signaling ready in ZooKeeper, so a node never serves stale state. If retries are exhausted the process exits with code 1 so the supervisor restarts it (<code>neorunbase.properties</code>, section 22b).</p>
 
 
 

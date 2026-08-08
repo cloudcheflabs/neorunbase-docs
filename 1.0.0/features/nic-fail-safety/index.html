@@ -1496,10 +1496,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-changed-in-the-server" class="md-nav__link">
+  <a href="#the-server-side" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What changed in the server
+        The server side
       
     </span>
   </a>
@@ -1748,7 +1748,7 @@
 
 <h1 id="nic-silent-fail-safety">NIC Silent-Fail Safety</h1>
 <p>NeorunBase's internal NIO plane survives the trickiest failure mode in distributed systems: <strong>a peer whose NIC dies after the socket was opened, but ZooKeeper hasn't expired the session yet</strong>. From ZooKeeper's POV the node is alive. From every neighbour's POV its TCP connection is also alive — the kernel does not surface a half-open peer for tens of seconds, sometimes minutes, while it exhausts its retransmit budget. RPCs that route to that peer hang. Membership-driven failover doesn't fire because membership is still healthy.</p>
-<p>The 1.0.0 release closes this gap on <strong>both ends</strong> of every internal RPC — <code>InternalNioClient</code> (used by every coordinator → data node and data node → coordinator call) and <code>InternalNioServer</code> (the response side).</p>
+<p>The 1.0.0 release bounds this gap on the <strong>caller side</strong> of every internal RPC — <code>InternalNioClient</code>, which every coordinator → data node and data node → coordinator call goes through. Because the caller is the party that actually hangs on a wedged peer, bounding the client is what keeps the cluster responsive. The response side (<code>InternalNioServer</code>) runs a non-blocking <code>Selector</code> reactor for its accept and read paths; its response-write path is covered below.</p>
 <h2 id="why-the-legacy-nio-loop-is-dangerous">Why the legacy NIO loop is dangerous</h2>
 <p>A blocking <code>SocketChannel</code>-based loop in three places hangs on a silently-dead peer:</p>
 <ol>
@@ -1769,16 +1769,14 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>-Dneorunbase.protocol.internal.connect.timeout.seconds=10
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-Dneorunbase.protocol.internal.write.timeout.seconds=10
 </code></pre></div>
-<h2 id="what-changed-in-the-server">What changed in the server</h2>
+<h2 id="the-server-side">The server side</h2>
 <p><code>com.cloudcheflabs.neorunbase.protocol.internal.InternalNioServer</code>:</p>
 <ul>
-<li>The accept path already left client channels non-blocking — the server uses a Selector reactor.</li>
-<li>The <strong>response write</strong> path previously did a bare <code>while (buf.hasRemaining()) channel.write(buf);</code> under a <code>synchronized(channel)</code> block. In non-blocking mode <code>channel.write()</code> returns 0 the moment the send buffer is full — the old loop <strong>busy-spun forever</strong> on a wedged peer because there was no <code>Selector</code> to wait on writability.</li>
-<li>The new path factors response and error-response into a single <code>writeBoundedResponse()</code> helper that opens a per-call <code>Selector(OP_WRITE)</code> and bounds the loop with the same 10s deadline as the client. On timeout it throws <code>IOException</code> and the worker thread frees up.</li>
+<li><strong>Non-blocking selector reactor.</strong> The listening channel registers <code>OP_ACCEPT</code>; every accepted client channel is put in non-blocking mode and registered for <code>OP_READ</code> (<code>accept()</code>). A slow or silent peer can therefore never park the server's accept/read loop.</li>
+<li><strong>Off-selector request handling.</strong> Inbound messages are decoded on the selector thread and dispatched to a worker pool (<code>processRequest</code>), so a slow handler does not stall the reactor.</li>
+<li><strong>Response-write path is not independently deadline-bounded.</strong> The reply is written back in <code>processRequest()</code> under <code>synchronized(channel)</code> with a plain <code>while (encoded.hasRemaining()) channel.write(encoded);</code> loop. There is no per-call <code>OP_WRITE</code> selector or write deadline on this path — the protection against a wedged peer comes from the <em>caller</em> side, <code>InternalNioClient</code>'s bounded <code>sendRequest</code> (above): when the client's own 10s write deadline trips it flips <code>connected=false</code> and re-mints the connection, so callers stop waiting on a dead peer even though the server's response write is not itself bounded.</li>
 </ul>
-<p>Same override:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>-Dneorunbase.protocol.internal.write.timeout.seconds=10
-</code></pre></div>
+<p>Only the client honours <code>-Dneorunbase.protocol.internal.write.timeout.seconds</code>; the server response-write loop above does not read it.</p>
 <h2 id="failure-handling-invariants">Failure-handling invariants</h2>
 <table>
 <thead>
@@ -1813,10 +1811,10 @@
 </table>
 <h2 id="verifying-it-on-your-stack">Verifying it on your stack</h2>
 <p><code>tests/test-nic-failure-channel-health.sh</code> (shipped with the 1.0.0 release) drives the failure on a 2-node compose:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-neorunbase.yml<span class="w"> </span>up<span class="w"> </span>-d
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>pause<span class="w"> </span>neorunbase-worker-2<span class="w">          </span><span class="c1"># silent NIC sim</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>./tests/test-nic-failure-channel-health.sh<span class="w">    </span><span class="c1"># expect PASS</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>docker<span class="w"> </span>unpause<span class="w"> </span>neorunbase-worker-2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-neorunbase.yml<span class="w"> </span>up<span class="w"> </span>-d
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>docker<span class="w"> </span>pause<span class="w"> </span>neorunbase-worker-2<span class="w">          </span><span class="c1"># silent NIC sim</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>./tests/test-nic-failure-channel-health.sh<span class="w">    </span><span class="c1"># expect PASS</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>docker<span class="w"> </span>unpause<span class="w"> </span>neorunbase-worker-2
 </code></pre></div>
 <p>The test hammers the surviving master's admin endpoint while one peer is paused. With the fix the master returns <code>200 OK</code> for every call within sub-second latencies; without it the master would block, often for minutes, on the dead peer's internal RPC.</p>
 <h2 id="operational-notes">Operational notes</h2>

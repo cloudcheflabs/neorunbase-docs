@@ -1909,6 +1909,7 @@
 </tr>
 </tbody>
 </table>
+<p>The distance metric may also be supplied inside the <code>WITH</code> clause instead of as an opclass — e.g. <code>USING hnsw (embedding) WITH (op_class = 'cosine')</code>, the form the hybrid e2e test uses. The DDL parser captures both the trailing opclass and the raw <code>WITH</code> options (<code>DdlParser.parseCreateIndex</code>), so either spelling of the metric is accepted.</p>
 <h3 id="tunables">Tunables</h3>
 <ul>
 <li><strong><code>m</code></strong> and <strong><code>ef_construction</code></strong> — graph build parameters, set at index creation time.</li>
@@ -1925,6 +1926,7 @@
 <li>The Coordinator merges the per-shard results into the global top K and returns them to the client.</li>
 </ul>
 <p>An over-fetch factor is applied per shard to compensate for the recall loss that comes from shard-local ANN.</p>
+<p>Each per-shard leg of the scatter is bounded by a single wall-clock budget, <code>neorunbase.search.scatter.stage.timeout.ms</code> (default 30000). The same property caps FTS and Hybrid scatters, so all three search backends share one timeout knob.</p>
 <h2 id="storage-layout-encrypted-sidecar">Storage Layout — Encrypted Sidecar</h2>
 <p>An HNSW index cannot live inside RocksDB efficiently: graph traversal performs hundreds of random hops per query, and a RocksDB <code>get</code> per hop would destroy latency. NeorunBase stores each HNSW graph as a <strong>sidecar file</strong> in the shard directory — outside RocksDB but inside the shard's encryption boundary.</p>
 <ul>
@@ -1941,7 +1943,7 @@
 <li><strong>Periodic flush</strong> — a background scheduler writes dirty sidecars back to disk at a configurable interval (<code>neorunbase.ann.flush.interval.seconds</code>, default 30s).</li>
 <li><strong>Flush on shard close</strong> — the shard close path flushes all of its cached ANN indexes so a graceful shutdown never loses in-memory state.</li>
 <li><strong>Lazy rebuild on stale sidecar</strong> — each sidecar records the WAL sequence number it was flushed at. On the next write, the Data Node compares that sequence number to the current WAL seqno and rebuilds the sidecar from RocksDB rows if it is behind (or missing entirely, e.g. on a freshly repaired replica). No admin action is needed to converge after an ungraceful shutdown as long as the shard eventually sees a write.</li>
-<li><strong>On-demand rebuild</strong> — <code>REBUILD INDEX idx_name ON table_name</code> (SQL) or the admin REST endpoint <code>POST /admin/ann/rebuild</code> forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire.</li>
+<li><strong>On-demand rebuild</strong> — <code>REBUILD INDEX idx_name ON table_name</code> (SQL) or the admin REST endpoint <code>POST /admin/ann/rebuild</code> forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire. The fan-out is bounded by <code>neorunbase.query.ann.rebuild.timeout.ms</code> (default 300000).</li>
 </ul>
 <h2 id="primary-key-requirement-for-hnsw-indexed-tables">Primary Key Requirement for HNSW-Indexed Tables</h2>
 <p>HNSW nodes are addressed by a numeric id. To keep search hits round-tripping directly through the primary key store without a secondary id→pk map, NeorunBase requires HNSW-indexed tables to have a single-column numeric primary key (<code>INT</code>, <code>BIGINT</code>, or <code>SMALLINT</code>). Attempts to create an HNSW index on a table with a non-numeric or composite primary key are rejected at DDL time.</p>

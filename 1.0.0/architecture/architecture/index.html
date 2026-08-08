@@ -1818,7 +1818,7 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 <h3 id="iceberg-integration">Iceberg Integration</h3>
 <p>NeorunBase synchronizes table data to Apache Iceberg for open lakehouse analytics:</p>
 <ul>
-<li>Connects to an Iceberg REST catalog (e.g., Polaris) with OAuth2 or static token authentication.</li>
+<li>Connects to an Apache Polaris Iceberg REST catalog using OAuth2 client-credentials authentication (<code>polaris</code> is the only wired-up catalog backend besides <code>none</code>; the legacy generic REST-catalog auth fields are ignored under the Polaris path).</li>
 <li>Performs full snapshot sync on initial synchronization, followed by incremental sync via change logs using Iceberg RowDelta (equality deletes + data files).</li>
 <li>Writes Parquet files to S3-compatible object storage.</li>
 <li>Supports reading external Iceberg tables via distributed Parquet/ORC/Avro scan directly from S3.</li>

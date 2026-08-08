@@ -953,10 +953,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cross-shard-transactions" class="md-nav__link">
+  <a href="#how-a-transaction-executes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cross-Shard Transactions
+        How a transaction executes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-shard-transactions-two-phase-commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Shard Transactions (two-phase commit)
       
     </span>
   </a>
@@ -1734,19 +1745,35 @@
 <li><strong>Isolation</strong>: Concurrent transactions do not interfere with each other.</li>
 <li><strong>Durability</strong>: Once a transaction is committed, the changes are permanently stored.</li>
 </ul>
-<h2 id="cross-shard-transactions">Cross-Shard Transactions</h2>
-<p>When a transaction involves data on multiple shards, NeorunBase coordinates the commit across all participating shards using a two-phase commit protocol:</p>
+<h2 id="how-a-transaction-executes">How a transaction executes</h2>
+<p>NeorunBase uses a <strong>buffer-then-commit</strong> model implemented in the pg-wire connection layer (<code>PgConnection.java</code>) and the coordinator (<code>QueryExecutor.executeTransaction</code>):</p>
 <ol>
-<li><strong>Prepare phase</strong>: All participating shards prepare to commit and confirm readiness.</li>
-<li><strong>Commit phase</strong>: Once all shards confirm, the transaction is committed on all shards simultaneously.</li>
+<li><code>BEGIN</code> (or <code>START TRANSACTION</code>) puts the connection into <code>IN_TRANSACTION</code> state and opens an empty statement buffer. The connection reports transaction status <code>T</code> to the client.</li>
+<li>Each subsequent DML statement is <strong>buffered on the connection, not executed immediately</strong> — nothing is written to any shard yet.</li>
+<li><code>COMMIT</code> hands the whole buffer to <code>executeTransaction</code>, which parses and groups the buffered statements by target shard and runs a <strong>two-phase commit</strong> across all participating shards (see below). On success the connection returns to idle status <code>I</code>.</li>
+<li><code>ROLLBACK</code> simply discards the buffer without executing anything, so buffered rows never reach the shards.</li>
 </ol>
-<p>If any shard fails to prepare, the entire transaction is rolled back.</p>
+<p>Because statements are buffered until <code>COMMIT</code>, an aborted or rolled-back transaction has no side effects on the shards.</p>
+<h2 id="cross-shard-transactions-two-phase-commit">Cross-Shard Transactions (two-phase commit)</h2>
+<p>At <code>COMMIT</code>, <code>executeTransaction</code> groups the buffered DML payloads by shard and coordinates an atomic commit across every participating shard <strong>and all of its replicas</strong> using two-phase commit with a per-transaction UUID:</p>
+<ol>
+<li><strong>Prepare phase</strong> — <code>PREPARE_BATCH_DML</code> is sent to every replica of every touched shard. Each shard stages the batch (pending tombstones + staged rows) in its WAL and confirms readiness.</li>
+<li><strong>Commit phase</strong> — once all shards have prepared, <code>COMMIT_PREPARED_TXN</code> is sent to every replica to make the staged writes durable and visible.</li>
+</ol>
+<p>If any shard fails to prepare, the coordinator sends <code>ABORT_PREPARED_TXN</code> to every already-prepared shard and the whole transaction is aborted; the client receives an error (SQLSTATE <code>40001</code>). Because the prepare/commit fan-out includes <strong>all replicas</strong> of each shard, replication of a transaction's writes is synchronous with the commit.</p>
+<p>The same 2PC machinery backs multi-shard bulk operations outside interactive transactions — <code>CREATE TABLE AS SELECT</code> (CTAS) and distributed <code>MERGE</code> each PREPARE/COMMIT across their target shards for atomicity.</p>
 <h2 id="transaction-support">Transaction Support</h2>
-<p>NeorunBase supports standard SQL transaction control statements:</p>
+<p>NeorunBase supports standard SQL transaction control statements over a single connection/session:</p>
 <ul>
-<li><code>BEGIN</code> — Start a new transaction</li>
-<li><code>COMMIT</code> — Commit the current transaction</li>
-<li><code>ROLLBACK</code> — Roll back the current transaction</li>
+<li><code>BEGIN</code> / <code>START TRANSACTION</code> — Start a new transaction (opens the statement buffer)</li>
+<li><code>COMMIT</code> — Execute the buffered statements via 2PC</li>
+<li><code>ROLLBACK</code> — Discard the buffered statements</li>
+</ul>
+<p>Notes and current limitations (from <code>QueryExecutor.executeTransaction</code> and <code>tests/test-transaction.sh</code>):</p>
+<ul>
+<li>Only <strong>DML</strong> — <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> — may appear inside a transaction. Any other buffered operation raises <code>Unsupported operation in transaction</code>.</li>
+<li><strong>DDL is rejected inside a transaction</strong> (e.g. <code>CREATE TABLE</code> between <code>BEGIN</code> and <code>COMMIT</code> returns a "not allowed" error). Run DDL in autocommit mode.</li>
+<li>Transactions are <strong>per-connection</strong>; there is no cross-connection distributed transaction coordinator exposed to clients.</li>
 </ul>
 <h2 id="write-ahead-log">Write-Ahead Log</h2>
 <p>All write operations are recorded in a Write-Ahead Log (WAL) before being applied to the storage engine. This ensures durability even in the event of a crash — uncommitted transactions can be recovered from the WAL upon restart.</p>

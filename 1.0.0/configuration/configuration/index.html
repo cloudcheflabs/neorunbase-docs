@@ -1723,6 +1723,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Iceberg Catalog Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iceberg-write-audit-publish-wap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg Write-Audit-Publish (WAP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iceberg-serving-lakebase-read-path-pk-index-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg Serving (LakeBase) Read Path &amp; PK Index Tuning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1755,6 +1783,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="IAM (Identity &amp; Access Management)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iam-authority-mode-federation-with-ontul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Authority Mode &amp; Federation with ontul
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1928,6 +1973,39 @@
     <span class="md-ellipsis">
       
         Disk Repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-disk-repair-balancing-rpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard / Disk Repair &amp; Balancing RPC
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reactive-shard-repair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reactive Shard Repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dr-site-replication-wal-streamer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DR / Site Replication (WAL Streamer)
       
     </span>
   </a>
@@ -2688,6 +2766,82 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 </tr>
 </tbody>
 </table>
+<h3 id="iceberg-write-audit-publish-wap">Iceberg Write-Audit-Publish (WAP)</h3>
+<p>WAP stages every Iceberg write (CTAS, MERGE INTO, CDC sync) on a non-<code>main</code> branch so it can be audited in isolation and then published to <code>main</code>. See <a href="../../features/iceberg-integration/">Iceberg Integration</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iceberg.wap.branch</code></td>
+<td>(empty)</td>
+<td>Cluster-wide default WAP target branch for all Iceberg writes. Empty or <code>main</code> writes straight to <code>main</code> (WAP off, the default). A non-<code>main</code> value lands every write on that branch. Precedence (most specific first): <code>-Dneorunbase.iceberg.wap.branch.&lt;namespace&gt;.&lt;table&gt;</code> → <code>-Dneorunbase.iceberg.wap.branch.&lt;table&gt;</code> → <code>CREATE CATALOG ... WITH ('wap.branch'='&lt;branch&gt;')</code> → this value. Publish a staged branch via <code>POST /admin/api/iceberg/wap/publish</code> or <code>POST /admin/api/iceberg/wap/cherrypick</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="iceberg-serving-lakebase-read-path-pk-index-tuning">Iceberg Serving (LakeBase) Read Path &amp; PK Index Tuning</h3>
+<p>NeorunBase serves Iceberg tables as a low-latency LakeBase: a <code>WHERE</code> on the table's primary key (<code>=</code> / <code>IN</code> / <code>BETWEEN</code> / <code>&lt;,&lt;=,&gt;,&gt;=</code>) is answered by an in-memory, per-snapshot pk → (file, row) index instead of a multi-file scan. These knobs tune that path; all have safe defaults. Override only to trade memory/freshness for QPS. See <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBase)</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iceberg.index.patterns</code></td>
+<td>(empty)</td>
+<td>Auto-index table scope for the DEFAULT catalog: CSV of <code>&lt;namespace&gt;.&lt;tableGlob&gt;</code> patterns (<code>*</code> = any run, <code>?</code> = one char), e.g. <code>sales.*, users.tuser*</code>. <strong>Blank = opt-in OFF</strong> (nothing auto-indexed). Named catalogs set their own via <code>CREATE/ALTER CATALOG WITH ('index.patterns'=...)</code> or the Admin UI. Manually declared <code>CREATE INDEX</code> secondary indexes are honored regardless of this setting.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.pk.index.enabled</code></td>
+<td><code>true</code></td>
+<td>Enable the PK point/range index (the serving fast path).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.pk.index.persist</code></td>
+<td><code>true</code></td>
+<td>Persist the PK index to a local RocksDB under <code>&lt;base.data.dir&gt;/iceberg-pk-index</code> so a coordinator restart restores it from disk instead of re-reading every data file from S3.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.read.cache.ttl.ms</code></td>
+<td><code>30000</code></td>
+<td>Serving metadata cache TTL: how long a loaded table snapshot is reused before an async, single-flight refresh. A local write commit evicts it eagerly, so this only bounds freshness for changes made by other engines. Higher = fewer REST/Polaris round trips.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.scan.threads</code></td>
+<td><code>16</code></td>
+<td>Parallel scan pool size for delete-bearing (serving/upsert) table reads. Per-file work is S3-latency bound, so this over-subscribes cores.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.data.cache.rows</code></td>
+<td><code>2000000</code></td>
+<td>Max total rows cached across all Iceberg data files (the in-memory data-block cache; LRU by total rows). <code>0</code> disables.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.eqdelete.cache.files</code></td>
+<td><code>1024</code></td>
+<td>Max number of equality-delete files whose keys are cached (LRU).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.plan.cache.enabled</code></td>
+<td><code>true</code></td>
+<td>Cache the per-snapshot file plan and do in-memory min/max pruning (no manifest S3 read per query).</td>
+</tr>
+<tr>
+<td><code>neorunbase.plan.cache.size</code></td>
+<td><code>2000</code></td>
+<td>Coordinator SQL plan cache size (entries) — caches parsed non-aggregation <code>SELECT</code> plans (the serving hot path). <code>0</code> disables.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="s3-backup">S3 Backup</h2>
 <p>Scheduled cluster backup to S3-compatible storage. See <a href="../../features/backup-restore/">Backup &amp; Restore</a> for the full feature description.</p>
 <div class="admonition note">
@@ -2858,6 +3012,49 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td><code>neorunbase.iam.sts.cleanup.interval.hours</code></td>
 <td><code>1</code></td>
 <td>How often to sweep expired STS temporary credentials from the AuthManager keystore.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="iam-authority-mode-federation-with-ontul">IAM Authority Mode &amp; Federation with ontul</h3>
+<p>By default NeorunBase IAM is self-authoritative. It can instead <strong>federate</strong> with an external <strong>ontul</strong> IAM authority: NeorunBase pulls the IAM graph (users, groups, policies) from ontul's admin REST API, and the local IAM becomes read-only. Use federated mode when external apps connect directly to NeorunBase (pg-wire / JDBC) but access policies are governed centrally in ontul. The mode is also toggleable at runtime from the Admin UI (IAM page).</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.iam.mode</code></td>
+<td><code>standalone</code></td>
+<td><code>standalone</code> — NeorunBase IAM is self-authoritative (users/groups/policies created and edited here). <code>federated</code> — ontul IAM is the authority; NeorunBase pulls the IAM graph from ontul and the local IAM becomes read-only (admin writes are rejected; the federation sync is the only writer).</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.url</code></td>
+<td>(empty)</td>
+<td>ontul admin base URL the federation sync pulls from, e.g. <code>http://ontul-master:8080</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.token</code></td>
+<td>(empty)</td>
+<td>ontul credential used for the pull — a long-lived ontul user token (<code>Authorization: Token</code>) or an ontul JWT (<code>Authorization: Bearer</code>, auto-detected). The principal should be an ontul "IAM reader" service role. Credential.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.sync.interval.ms</code></td>
+<td><code>60000</code></td>
+<td>How often to pull the IAM graph from ontul in federated mode.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.ontul.jwt.key</code></td>
+<td>(empty)</td>
+<td>Shared HMAC key for validating ontul-issued JWTs locally (federated SSO): an external app may present an ontul JWT in the pg-wire password field, and NeorunBase verifies it with this key (= ontul's master key, <code>ONTUL_MASTER_KEY</code>) without a per-connection round trip to ontul. Blank disables ontul-token SSO.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.federation.catalog.alias</code></td>
+<td>(empty)</td>
+<td>Catalog identity map for federation: CSV of <code>ontulCatalog=neorunbaseCatalog</code> (e.g. <code>sales_cat=ice</code>). Needed only when ontul and NeorunBase register the same physical catalog under different logical names — it rewrites the catalog segment of synced policy resources. Blank = names already match (the usual case).</td>
 </tr>
 </tbody>
 </table>
@@ -3342,6 +3539,100 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td><code>neorunbase.disk.repair.min.available.bytes</code></td>
 <td><code>104857600</code></td>
 <td>Minimum free space for a disk to count as healthy (100 MiB); below this it is excluded from new shard placement.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="shard-disk-repair-balancing-rpc">Shard / Disk Repair &amp; Balancing RPC</h2>
+<p>RPC timeouts and grace period for the per-shard copy/replicate operations that back whole-node shard repair, per-disk repair, and capacity rebalancing. The <code>enabled</code> flags, scan intervals, and other tunables live in the <a href="#disk-repair">Disk Repair</a> section above.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.shard.repair.grace.period.ms</code></td>
+<td><code>600000</code></td>
+<td>Whole-node loss: grace period a node may be unreachable before its shards are confirmed lost and repair is triggered (10 min). Too low = spurious repairs on a brief network blip; too high = slow recovery.</td>
+</tr>
+<tr>
+<td><code>neorunbase.shard.repair.rpc.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>RPC timeout for each per-shard <code>SHARD_COPY_REQ</code> / <code>SHARD_REPLICATE_REQ</code> during whole-node shard repair.</td>
+</tr>
+<tr>
+<td><code>neorunbase.disk.repair.rpc.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>RPC timeout for each per-shard copy/replicate during disk repair (the per-disk-loss repair path).</td>
+</tr>
+<tr>
+<td><code>neorunbase.shard.balancing.rpc.timeout.ms</code></td>
+<td><code>60000</code></td>
+<td>RPC timeout for each per-shard copy/replicate during shard balancing (capacity rebalance after a node-set change).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reactive-shard-repair">Reactive Shard Repair</h2>
+<p>Loop tunables for the divergence-driven reactive shard repair path. The enable flag, scan interval, and divergence fraction are set elsewhere in <code>NeorunConfig</code>; these are the inline loop knobs.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.scan.floor.ms</code></td>
+<td><code>5000</code></td>
+<td>Floor on the scan interval, so a tiny <code>scan.interval.seconds</code> can't turn the divergence detector into a busy-loop.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.idle.poll.ms</code></td>
+<td><code>1000</code></td>
+<td>Idle poll in the drain loop when the repair queue is empty or this node is not the leader.</td>
+</tr>
+<tr>
+<td><code>neorunbase.reactive.shard.repair.failure.backoff.ms</code></td>
+<td><code>5000</code></td>
+<td>Delay before a failed repair task is re-queued, so a transient error doesn't immediately hot-loop the same shard copy.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dr-site-replication-wal-streamer">DR / Site Replication (WAL Streamer)</h2>
+<p>A leader-only WAL streamer ships <code>REPLICATE_WAL_BATCH</code> records to one or more standby clusters over the internal protocol. The peer set and enable flag are managed from the admin UI <strong>Site Replication</strong> page (<code>SiteReplicationConfig</code>); the properties below are the streamer-loop tunables. See <a href="../../operations/operations/#cluster-lifecycle-notes">Operations</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.site.replication.streamer.join.timeout.ms</code></td>
+<td><code>2000</code></td>
+<td>Grace given to each streamer thread to finish on <code>stop()</code> before moving on.</td>
+</tr>
+<tr>
+<td><code>neorunbase.site.replication.tick.floor.ms</code></td>
+<td><code>50</code></td>
+<td>Floor on the per-tick batch-readiness poll interval. Guards against a misconfigured <code>SiteReplicationConfig.tickMs</code> of <code>0</code> busy-looping the streamer.</td>
+</tr>
+<tr>
+<td><code>neorunbase.site.replication.failure.backoff.multiplier</code></td>
+<td><code>5</code></td>
+<td>After a failed batch ship, the streamer backs off for <code>tickMs ×</code> this multiplier before retrying, so a flapping peer doesn't hot-loop the send path.</td>
+</tr>
+<tr>
+<td><code>neorunbase.site.replication.rpc.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>RPC timeout for one <code>REPLICATE_WAL_BATCH_REQ</code> to a peer site. A WAL batch can be large and cross a WAN link, so this sits well above intra-cluster RPCs.</td>
 </tr>
 </tbody>
 </table>

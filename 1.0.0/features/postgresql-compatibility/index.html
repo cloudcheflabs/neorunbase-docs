@@ -1759,22 +1759,26 @@
 <h2 id="sql-support">SQL Support</h2>
 <p>NeorunBase supports standard SQL operations with PostgreSQL conformance:</p>
 <ul>
-<li><strong>DML</strong>: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></li>
-<li><strong>DDL</strong>: <code>CREATE TABLE</code>, <code>DROP TABLE</code>, <code>ALTER TABLE</code>, <code>CREATE INDEX</code>, <code>DROP INDEX</code>, <code>CREATE SCHEMA</code>, <code>DROP SCHEMA</code></li>
-<li><strong>Transactions</strong>: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code></li>
-<li><strong>Queries</strong>: <code>JOIN</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>HAVING</code>, subqueries, aggregation functions, <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
+<li><strong>DML</strong>: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, and <code>MERGE INTO</code> (upsert / copy-on-write)</li>
+<li><strong>DDL</strong>: <code>CREATE TABLE</code> (incl. <code>FOREIGN KEY (...) REFERENCES ...</code> with <code>ON DELETE</code> / <code>ON UPDATE</code> <code>CASCADE</code> / <code>SET NULL</code> / <code>RESTRICT</code> / <code>NO ACTION</code>), <code>DROP TABLE</code>, <code>ALTER TABLE</code>, <code>CREATE INDEX</code>, <code>DROP INDEX</code>, <code>CREATE SCHEMA</code>, <code>DROP SCHEMA</code></li>
+<li><strong>Transactions</strong>: <code>BEGIN</code> (or <code>START TRANSACTION</code>), <code>COMMIT</code>, <code>ROLLBACK</code></li>
+<li><strong>Queries</strong>: <code>JOIN</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>HAVING</code>, subqueries, aggregation functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>), scalar functions (<code>ABS</code>, <code>ROUND</code>, <code>LENGTH</code>, <code>UPPER</code>, <code>LOWER</code>, <code>COALESCE</code>, …), <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
 </ul>
 <h2 id="data-types">Data Types</h2>
 <p>NeorunBase supports a wide range of data types:</p>
 <ul>
-<li><strong>Numeric</strong>: <code>INTEGER</code>, <code>BIGINT</code>, <code>SMALLINT</code>, <code>FLOAT</code>, <code>DOUBLE</code>, <code>DECIMAL</code></li>
+<li><strong>Numeric</strong>: <code>INTEGER</code> (<code>INT</code>/<code>INT4</code>), <code>BIGINT</code> (<code>INT8</code>), <code>SMALLINT</code> (<code>INT2</code>), <code>FLOAT</code> (<code>FLOAT4</code>), <code>REAL</code>, <code>DOUBLE</code> (<code>FLOAT8</code>/<code>DOUBLE PRECISION</code>), <code>NUMERIC</code>, <code>DECIMAL</code></li>
+<li><strong>Auto-increment</strong>: <code>SERIAL</code>, <code>BIGSERIAL</code></li>
 <li><strong>String</strong>: <code>VARCHAR</code>, <code>TEXT</code>, <code>CHAR</code></li>
-<li><strong>Temporal</strong>: <code>DATE</code>, <code>TIME</code>, <code>TIMESTAMP</code></li>
-<li><strong>Boolean</strong>: <code>BOOLEAN</code></li>
+<li><strong>Temporal</strong>: <code>DATE</code>, <code>TIME</code>, <code>TIMESTAMP</code> (<code>TIMESTAMPTZ</code> / <code>TIMESTAMP WITH TIME ZONE</code> are accepted and mapped to <code>TIMESTAMP</code>), <code>INTERVAL</code></li>
+<li><strong>Boolean</strong>: <code>BOOLEAN</code> (<code>BOOL</code>)</li>
 <li><strong>Binary</strong>: <code>BYTEA</code></li>
-<li><strong>Geospatial</strong>: <code>POINT</code>, <code>LINESTRING</code>, <code>POLYGON</code>, <code>GEOMETRY</code></li>
+<li><strong>JSON</strong>: <code>JSON</code>, <code>JSONB</code></li>
+<li><strong>Arrays</strong>: <code>INT[]</code>, <code>BIGINT[]</code>, <code>TEXT[]</code>, <code>FLOAT[]</code></li>
+<li><strong>Geospatial</strong>: <code>POINT</code>, <code>LINESTRING</code>, <code>POLYGON</code>, <code>GEOMETRY</code> (PostGIS-style, with <code>ST_*</code> functions such as <code>ST_Point</code>, <code>ST_Distance</code>, <code>ST_Contains</code>, <code>ST_GeomFromText</code>)</li>
+<li><strong>Full-text search</strong>: <code>TSVECTOR</code>, <code>TSQUERY</code> (native PostgreSQL FTS OIDs <code>3614</code> / <code>3615</code>)</li>
 <li><strong>Vector</strong>: <code>VECTOR(dim)</code> (pgvector-compatible; see <a href="../vector-database/">Vector Database</a>)</li>
-<li><strong>Other</strong>: <code>JSON</code>, <code>UUID</code></li>
+<li><strong>Other</strong>: <code>UUID</code></li>
 </ul>
 <h2 id="table-valued-functions">Table-Valued Functions</h2>
 <p>NeorunBase ships a small set of table-valued functions (TVFs) that are usable anywhere a table reference is legal — typically inside <code>FROM</code> and JOINed against entity / metadata tables. Each one is rewritten on the Coordinator before SQL parsing so the rest of the query (JOINs, <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code>) plans through the standard pipeline.</p>
@@ -1816,7 +1820,7 @@
 </table>
 <p>All five take named arguments (PostgreSQL <code>name =&gt; value</code> form). See <a href="../graph/">Graph Traversal &amp; Analytics</a> and <a href="../hybrid-search/">Hybrid Search</a> for argument reference and example SQL.</p>
 <h2 id="virtual-catalog">Virtual Catalog</h2>
-<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands such as <code>\d</code>, <code>\dt</code>, and <code>\di</code> in <code>psql</code>. The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
+<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands in <code>psql</code> — including <code>\d</code>, <code>\dt</code>, <code>\dt+</code>, <code>\di</code>, <code>\dv</code>, <code>\ds</code>, <code>\dn</code> (schemas), <code>\du</code> (roles), <code>\df</code> (functions), <code>\dp</code> (privileges), and <code>\l</code> (databases). The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
 <h2 id="extended-query-protocol">Extended Query Protocol</h2>
 <p>The pg-wire implementation supports the full extended query flow — Parse / Bind / Describe / Execute / Sync — so JDBC clients using <code>PreparedStatement</code> work the same as simple-mode <code>Statement</code>s. Bound parameters are accepted in either text or binary format; the server decodes the binary wire format per the type OID declared in Parse (covering <code>INT2</code>/<code>INT4</code>/<code>INT8</code>, <code>FLOAT4</code>/<code>FLOAT8</code>, <code>BOOL</code>, <code>TEXT</code>/<code>VARCHAR</code>/<code>BPCHAR</code>, <code>BYTEA</code>, <code>UUID</code>, <code>DATE</code>, <code>TIMESTAMP</code>, <code>TIMESTAMPTZ</code>).</p>
 

@@ -1790,6 +1790,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#admin-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin CLI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Admin CLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#password-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Password Recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cluster-lifecycle-notes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1987,13 +2015,83 @@
 <li>Keep the master key out of <code>conf/neorunbase.properties</code> and out of process listings — pass it through the env var only.</li>
 <li>Treat the master key as cluster-critical: losing it makes encrypted on-disk state unrecoverable.</li>
 </ul>
+<h2 id="admin-cli">Admin CLI</h2>
+<p>The release ships a small administrative CLI, <code>bin/neorunbase-cli.sh</code> (<code>neorunbase-cli</code>), for local operations against a running Coordinator. Unlike the Admin UI / REST API, the CLI does <strong>not</strong> authenticate over the network: it connects to the Coordinator's local <strong>Unix domain socket</strong>, and authentication is purely OS-level (the socket is created with file mode <code>600</code>). You must run it as the <strong>same OS user</strong> as the Coordinator process (or <code>root</code>) on the <strong>same host or container</strong>.</p>
+<p>The socket path is resolved in this order:</p>
+<ol>
+<li><code>$NEORUNBASE_ADMIN_SOCKET</code> (or the <code>--socket PATH</code> option).</li>
+<li>The path the running Coordinator published to <code>bin/coordinator.socket</code>.</li>
+<li>The default <code>data/admin.sock</code> under the install directory.</li>
+</ol>
+<p>The CLI supports exactly two commands:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ping</code></td>
+<td>Check that the local admin socket is reachable (prints <code>pong</code>).</td>
+</tr>
+<tr>
+<td><code>iam:reset-password</code></td>
+<td>Reset a user's password — the recovery path when the admin password is lost and you cannot log into the Admin UI.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="password-recovery">Password Recovery</h3>
+<p><code>iam:reset-password</code> resets a user's password without needing an existing login. Options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--user USER</code></td>
+<td><code>admin</code></td>
+<td>The user whose password to reset.</td>
+</tr>
+<tr>
+<td><code>--new-password PWD</code></td>
+<td>(generated)</td>
+<td>Set an explicit new password. Use <code>--new-password -</code> to read the password from stdin (one line). If omitted, the Coordinator generates a temporary password and prints it.</td>
+</tr>
+<tr>
+<td><code>--interactive</code></td>
+<td>—</td>
+<td>Prompt for the new password on the TTY (hidden, with confirmation).</td>
+</tr>
+<tr>
+<td><code>--socket PATH</code></td>
+<td>(see above)</td>
+<td>Override the admin socket path.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># Reachability check
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>bin/neorunbase-cli.sh ping
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a># Reset the admin password to a server-generated temporary value (printed to the terminal)
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>bin/neorunbase-cli.sh iam:reset-password --user admin
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a># Reset to an explicit password read from stdin
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>printf &#39;my-new-secret&#39; | bin/neorunbase-cli.sh iam:reset-password --user admin --new-password -
+</code></pre></div>
+<p>The reset account is flagged to require a password change on next login.</p>
 <h2 id="cluster-lifecycle-notes">Cluster Lifecycle Notes</h2>
 <ul>
 <li><strong>Bootstrap order.</strong> Start ZooKeeper first, then Data Nodes, then Coordinators. The example launcher follows this sequence with brief sleeps; in production, leave Data Nodes time to register in ZooKeeper before bringing up Coordinators so the leader's startup discovery loop completes promptly.</li>
 <li><strong>Coordinator HA.</strong> When more than one Coordinator is running, ZooKeeper elects a leader for metadata and KMS ownership. Non-leader Coordinators forward write-side admin operations to the leader and serve PG wire traffic locally.</li>
 <li><strong>Shard repair &amp; rebalancing.</strong> When a Data Node leaves the cluster, the leader Coordinator detects the absence via ZooKeeper ephemeral nodes and replicates affected shards onto healthy Data Nodes (provided <code>neorunbase.disk.repair.enabled=true</code> for the disk-level case). When new Data Nodes join, the cluster rebalances shards toward them. See <a href="../../features/replication-ha/">Replication &amp; High Availability</a>.</li>
 <li><strong>Disaster recovery (cross-site).</strong> A separate, <strong>leader-only</strong> streamer ships WAL records to one or more standby clusters via <code>REPLICATE_WAL_BATCH</code> over the internal protocol. Configure peers under <code>/admin/api/site-replication/config</code> and monitor <code>lastAppliedSeq</code> and per-peer queue depth under <code>/admin/api/site-replication/status</code>. See <a href="../../features/site-replication/">Site Replication (DR)</a>.</li>
-<li><strong>Iceberg sync.</strong> Set <code>neorunbase.iceberg.catalog.type=rest</code> and <code>neorunbase.iceberg.sync.auto.start=true</code> to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see <a href="../../configuration/configuration/#iceberg-catalog-integration">Configuration</a>.</li>
+<li><strong>Iceberg sync.</strong> Set <code>neorunbase.iceberg.catalog.type=polaris</code> (the only supported catalog backend besides <code>none</code>) and <code>neorunbase.iceberg.sync.auto.start=true</code> to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see <a href="../../configuration/configuration/#iceberg-catalog-integration">Configuration</a>.</li>
 <li><strong>Kafka ingestion.</strong> Set <code>neorunbase.kafka.consumer.enabled=true</code> and define one or more consumer groups. The leader Coordinator distributes the configured groups round-robin across Data Nodes; each worker forwards parsed inserts back to the leader Coordinator over the internal protocol so the standard shard routing path applies. See <a href="../../features/kafka-integration/">Kafka Integration</a>.</li>
 <li><strong>CSR adjacency for graph workloads.</strong> Set <code>neorunbase.csr.enabled=true</code> and list edge tables in <code>neorunbase.csr.enabled.tables</code> to opt into the CSR fast path. The leader Coordinator schedules background compactions every <code>neorunbase.csr.compaction.interval.seconds</code>; force a rebuild after bulk inserts via <code>POST /admin/graph/csr/compact</code>, and inspect per-shard segment counts / <code>src_id</code> totals via <code>GET /admin/graph/csr/status</code>. See <a href="../../features/graph/#csr-adjacency-phase-1-acceleration-layer">Graph Traversal &amp; Analytics</a>.</li>
 </ul>

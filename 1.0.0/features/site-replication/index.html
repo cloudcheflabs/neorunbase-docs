@@ -1960,7 +1960,7 @@
 <h1 id="site-replication-dr">Site Replication (DR)</h1>
 <p>NeorunBase 1.0.0 introduces <strong>cross-site (disaster-recovery) replication</strong>: a leader-coordinator on the <strong>primary</strong> site streams its WAL to one or more <strong>standby</strong> sites in near-real time, so a failover site can keep serving reads (and, after promotion, writes) when the primary site is lost.</p>
 <p>Site replication is distinct from <a href="../replication-ha/">intra-cluster replication</a>. Intra-cluster replication keeps multiple copies of each shard inside the <strong>same</strong> cluster, behind the same coordinators, sharing the same KMS. Site replication crosses cluster boundaries — every standby site has its own ZooKeeper ensemble, its own coordinator quorum, its own data nodes, and its own KMS.</p>
-<p>The 1.0.0 release ships the wire path, the leader-only streamer, and the admin surface. It does <strong>not</strong> ship the WAL-tail tap on the production DML commit path — that lands in 1.1.0. v1 is the foundation: it is fully observable, exercised end-to-end in CI, and ready for operators to wire into bespoke flows via the test-enqueue hook.</p>
+<p>The 1.0.0 release ships the wire path, the leader-only streamer, the admin surface, and <strong>automatic DDL replication</strong> — a successful <code>CREATE TABLE</code> / <code>DROP TABLE</code> on the primary leader is shipped to peer sites so their catalogs mirror the primary without a manual DDL (<code>QueryExecutor.shipDdlToPeers</code>, <code>neorunbase-coordinator/.../QueryExecutor.java</code>). It does <strong>not</strong> yet ship an automatic WAL-tail tap on the production <strong>DML</strong> commit path — no <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> is auto-captured into a peer outbox. The only producers of data-plane records in 1.0.0 are the DDL hook above and the <code>test-enqueue</code> admin endpoint. v1 is the foundation: it is fully observable, exercised end-to-end in CI, and ready for operators to wire DML into bespoke flows via the test-enqueue hook. The receiver, wire path, and outbox all handle INSERT/UPDATE/DELETE today — only the automatic primary-side capture of committed DML is outstanding.</p>
 <h2 id="the-model">The model</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+----------------------- primary site (role=primary) ---------+
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|                                                             |
@@ -1987,6 +1987,7 @@
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>|                                                             |
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>+-------------------------------------------------------------+
 </code></pre></div>
+<p>The diagram shows the intended full data path. In 1.0.0, <code>enqueue()</code> is fed by two producers only — the automatic DDL hook (<code>CREATE TABLE</code> / <code>DROP TABLE</code>) and the <code>test-enqueue</code> admin endpoint; the <code>WalManager.write</code> → <code>enqueue</code> tap for committed DML is the outstanding 1.1.0 piece.</p>
 <p>The streamer is <strong>leader-only</strong> — only the elected leader coordinator runs the per-peer threads. Followers carry the same code but their <code>leaderSupplier</code> returns <code>false</code>, so the <code>streamLoop</code> sleeps in a tight idle. Leader handover is sticky-aware: the new leader picks up streaming from its own in-memory queue (which is empty on a cold leader); records that were buffered on the <em>old</em> leader but not yet shipped are <em>lost on cold restart</em>. v1 accepts this trade-off — the recovery flow on the standby is "restore from the latest standby-side backup, then resume streaming", which closes any gap the in-memory queue could have introduced.</p>
 <h2 id="wire-format">Wire format</h2>
 <p>Each batch is a single <code>REPLICATE_WAL_BATCH_REQ</code> (opcode <code>300</code>). The response is <code>REPLICATE_WAL_BATCH_RES</code> (opcode <code>301</code>).</p>
@@ -2176,7 +2177,7 @@
 <a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s1">     }&#39;</span>
 </code></pre></div>
 <ol>
-<li>Verify with <code>GET /admin/api/site-replication/status</code> — <code>enabled:true</code>, <code>leader:true</code>, and <code>peers.site-b.queueDepth</code> initially <code>0</code> (no traffic since v1's WAL-tail tap is not yet wired into the DML commit hook — see "What v1 ships vs. v1.1").</li>
+<li>Verify with <code>GET /admin/api/site-replication/status</code> — <code>enabled:true</code>, <code>leader:true</code>, and <code>peers.site-b.queueDepth</code> initially <code>0</code> (DDL you issue on the primary will flow automatically, but no <code>INSERT</code>/<code>UPDATE</code>/<code>DELETE</code> traffic is auto-captured in 1.0.0 — see "What 1.0.0 ships").</li>
 <li>Use the test-enqueue endpoint to confirm the wire path works end-to-end. The standby's data-node log should show one <code>REPLICATE_WAL_BATCH</code> apply entry per shipped batch.</li>
 </ol>
 <h3 id="monitoring-lag">Monitoring lag</h3>
@@ -2201,7 +2202,7 @@
 <p>If you also want the standby to stream back to the primary (active-active is not supported in v1 — there is no conflict-resolution layer — but operators sometimes pre-open the reverse direction so promotion is a config-only operation), open the symmetric path too.</p>
 <p>Latency: the streamer's <code>tickMs</code> (default 200 ms) is the <strong>idle</strong> wake interval, not the per-RPC latency. A batch leaves immediately as records enqueue. End-to-end replication lag is dominated by the network RTT between sites + the receiver's RocksDB write latency. The wire ships records as a single batch, so a coast-to-coast RTT of ~70ms produces ~70ms lag for the first record and amortises down for the rest of a batch.</p>
 <h2 id="what-100-ships">What 1.0.0 ships</h2>
-<p>The 1.0.0 release is now <strong>end-to-end DML+DDL replication</strong>, not just the wire path:</p>
+<p>The 1.0.0 release ships the full wire path plus <strong>automatic DDL replication</strong>. Automatic DML replication is <strong>not</strong> in 1.0.0 — the data plane is exercised through the test-enqueue hook:</p>
 <table>
 <thead>
 <tr>
@@ -2239,20 +2240,25 @@
 <td>✅</td>
 </tr>
 <tr>
-<td><strong>Production WAL-tail tap</strong> — every successful <code>RocksDBShard.put</code> ships to peer</td>
+<td><strong>DDL replication</strong> — successful <code>CREATE TABLE</code> / <code>DROP TABLE</code> on the primary leader auto-ships and is re-applied on the standby via its local leader (<code>QueryExecutor.shipDdlToPeers</code> → receiver <code>ddlForwarder</code>)</td>
 <td>✅</td>
 </tr>
 <tr>
-<td><strong>DDL replication</strong> — CREATE TABLE / DROP TABLE flows over the same pipeline</td>
+<td><strong>Receiver-side apply</strong> of INSERT/UPDATE/DELETE + PREPARE/COMMIT/ROLLBACK (the last three are seq-ack markers, no RocksDB side-effect) — the standby <em>can</em> apply DML it receives</td>
 <td>✅</td>
 </tr>
 <tr>
-<td><strong>Receiver-side index reconcile</strong> — after apply, ANN (HNSW) + FTS (Lucene) caches on the standby are invalidated so the next query rebuilds incrementally from the freshly replicated rows</td>
+<td><strong>Receiver-side index reconcile</strong> — after DML apply, ANN (HNSW) + FTS (Lucene) caches on the standby are invalidated so the next query rebuilds incrementally from the freshly replicated rows; CSR adjacency rebuilds on <code>CsrCompactor</code>'s own tick</td>
 <td>✅</td>
+</tr>
+<tr>
+<td><strong>Automatic production DML WAL-tail tap</strong> — every committed <code>INSERT</code>/<code>UPDATE</code>/<code>DELETE</code> auto-enqueues to peers</td>
+<td>❌ not in 1.0.0 — only the DDL hook and <code>test-enqueue</code> produce records; automatic DML capture is a follow-up</td>
 </tr>
 </tbody>
 </table>
 <p>Out of scope for 1.0.0 and tracked as follow-ups:
+- <strong>Automatic DML tail-tap</strong> — auto-capture every committed INSERT/UPDATE/DELETE into the peer outbox. Today only DDL auto-ships; DML must be driven through the test-enqueue hook (the receiver/wire/outbox already handle DML, so this is a primary-side capture hook, not a protocol change).
 - Persistent outbox (resume after coordinator restart without losing in-flight records).
 - HMAC challenge-response over the wire (currently relies on TLS at the transport layer).
 - Reverse direction (peer → primary) for active-active (requires conflict resolution — research phase).

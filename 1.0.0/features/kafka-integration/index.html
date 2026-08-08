@@ -1755,20 +1755,146 @@
 <h2 id="where-consumers-run">Where Consumers Run</h2>
 <p>Kafka consumer workers run on <strong>Data Nodes</strong>, not on Coordinators. The leader Coordinator computes a round-robin assignment of consumer groups across the live Data Nodes and broadcasts it via the internal protocol; each Data Node then starts only the workers it has been assigned. Each worker pulls from its Kafka partitions and forwards the parsed INSERT to the leader Coordinator over the internal protocol, so the Coordinator's normal shard routing, replication, and transaction handling apply uniformly to ingested rows. Adding or removing Data Nodes triggers a re-assignment automatically.</p>
 <h2 id="configuration">Configuration</h2>
-<p>Each Kafka consumer group can be configured with:</p>
-<ul>
-<li>Kafka broker addresses</li>
-<li>Topic name</li>
-<li>Consumer group ID</li>
-<li>Target NeorunBase table</li>
-<li>Batch size for efficient bulk inserts</li>
-<li>Auto offset reset policy</li>
-<li>Additional Kafka consumer properties</li>
-</ul>
+<p>Kafka ingestion is configured in <code>neorunbase.properties</code> (or the matching <code>-D</code> /
+environment overrides). Two top-level keys turn it on and list the groups to run:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.kafka.consumer.enabled</code></td>
+<td><code>false</code></td>
+<td>Master switch. When <code>true</code>, the groups listed below are started.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kafka.consumer.groups</code></td>
+<td><em>(empty)</em></td>
+<td>Comma-separated list of consumer-group names to start. Empty = no consumers even when <code>enabled=true</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.kafka.consumer.leader.rpc.timeout.ms</code></td>
+<td><code>30000</code></td>
+<td>RPC timeout for a Data Node's Kafka worker forwarding a batch INSERT/DDL to the leader Coordinator.</td>
+</tr>
+</tbody>
+</table>
+<p>Each name <code>&lt;name&gt;</code> in <code>...consumer.groups</code> expands to a block of
+<code>neorunbase.kafka.consumer.group.&lt;name&gt;.*</code> keys that fully describe that pipeline:</p>
+<table>
+<thead>
+<tr>
+<th>Per-group key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.brokers</code></td>
+<td><code>localhost:9092</code></td>
+<td>Kafka bootstrap servers.</td>
+</tr>
+<tr>
+<td><code>.topics</code></td>
+<td><em>(empty)</em></td>
+<td>Comma-separated topics to consume.</td>
+</tr>
+<tr>
+<td><code>.group-id</code></td>
+<td><code>neorunbase-&lt;name&gt;</code></td>
+<td>Kafka <code>group.id</code>.</td>
+</tr>
+<tr>
+<td><code>.target-table</code></td>
+<td><em>(empty)</em></td>
+<td>NeorunBase table to ingest into.</td>
+</tr>
+<tr>
+<td><code>.id-columns</code></td>
+<td><em>(empty)</em></td>
+<td>Primary-key / upsert columns (enables upsert semantics on matching rows).</td>
+</tr>
+<tr>
+<td><code>.num-shards</code></td>
+<td><code>2</code></td>
+<td>Shard count if the target table is auto-created.</td>
+</tr>
+<tr>
+<td><code>.format</code></td>
+<td><code>json</code></td>
+<td>Record format.</td>
+</tr>
+<tr>
+<td><code>.batch-size</code></td>
+<td><code>100</code></td>
+<td>Records buffered per INSERT batch.</td>
+</tr>
+<tr>
+<td><code>.poll-timeout-ms</code></td>
+<td><code>1000</code></td>
+<td><code>KafkaConsumer.poll</code> timeout (ms).</td>
+</tr>
+<tr>
+<td><code>.auto-offset-reset</code></td>
+<td><code>latest</code></td>
+<td><code>earliest</code> or <code>latest</code>.</td>
+</tr>
+<tr>
+<td><code>.extra.properties</code></td>
+<td><em>(empty)</em></td>
+<td>Raw <code>KafkaConsumer</code> props as <code>k=v,k=v</code> (e.g. <code>max.poll.records=500</code>).</td>
+</tr>
+<tr>
+<td><code>.max-consumers</code></td>
+<td><code>3</code></td>
+<td>Max parallel consumer threads for the group.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="json-message-format">JSON Message Format</h2>
-<p>NeorunBase consumes JSON-formatted messages from Kafka topics. Messages are parsed and batch-inserted into the target table, matching JSON fields to table columns.</p>
+<p><code>format=json</code> (the default) consumes JSON-formatted messages from Kafka topics. Messages
+are parsed and batch-inserted into the target table, matching JSON fields to table columns.
+When <code>id-columns</code> is set, matching rows are upserted rather than blindly inserted.</p>
 <h2 id="management">Management</h2>
-<p>Kafka consumer groups can be managed through the NeorunBase Admin API, allowing you to start, stop, and monitor ingestion pipelines at runtime.</p>
+<p>Kafka consumer groups can be managed at runtime through the JWT-authenticated admin REST
+API (leader-forwarded from any coordinator):</p>
+<table>
+<thead>
+<tr>
+<th>Method &amp; Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /admin/api/kafka/config</code></td>
+<td>Fetch the current Kafka consumer configuration.</td>
+</tr>
+<tr>
+<td><code>POST /admin/api/kafka/config</code></td>
+<td>Update the configuration (enable/disable, groups, per-group keys).</td>
+</tr>
+<tr>
+<td><code>GET /admin/api/kafka/status</code></td>
+<td>Report per-group running status.</td>
+</tr>
+<tr>
+<td><code>POST /admin/api/kafka/groups/&lt;name&gt;/start</code></td>
+<td>Start a consumer group.</td>
+</tr>
+<tr>
+<td><code>POST /admin/api/kafka/groups/&lt;name&gt;/stop</code></td>
+<td>Stop a consumer group.</td>
+</tr>
+</tbody>
+</table>
+<p>Because consumers run on the Data Nodes, these leader endpoints fan out the start/stop and
+config changes to the Data Nodes over the internal protocol.</p>
 
 
 

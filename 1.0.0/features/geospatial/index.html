@@ -1306,10 +1306,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#geospatial-data-types" class="md-nav__link">
+  <a href="#geometry-data-types" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Geospatial Data Types
+        Geometry Data Types
       
     </span>
   </a>
@@ -1325,6 +1325,78 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Spatial Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructors-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructors &amp; I/O
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predicates-return-boolean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predicates (return BOOLEAN)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#measurements-return-double-numeric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measurements (return DOUBLE / numeric)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constructive-operations-return-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructive operations (return geometry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#srid-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SRID management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1332,6 +1404,17 @@
     <span class="md-ellipsis">
       
         Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notable-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notable Limits
       
     </span>
   </a>
@@ -1714,31 +1797,231 @@
 
 
 <h1 id="geospatial-support">Geospatial Support</h1>
-<p>NeorunBase provides PostGIS-compatible geospatial SQL functions, enabling location-based queries and spatial analysis directly within the database.</p>
-<h2 id="geospatial-data-types">Geospatial Data Types</h2>
-<p>NeorunBase supports the following geospatial data types:</p>
-<ul>
-<li><strong>POINT</strong>: A single location in 2D space (longitude, latitude)</li>
-<li><strong>LINESTRING</strong>: A sequence of connected points forming a line</li>
-<li><strong>POLYGON</strong>: A closed shape defined by a series of points</li>
-<li><strong>GEOMETRY</strong>: A generic type that can hold any of the above</li>
-</ul>
+<p>NeorunBase provides a PostGIS-style set of <code>ST_*</code> spatial SQL functions, so location data and spatial predicates work directly inside the same PostgreSQL-wire database as the rest of your schema. The geometry engine is the <a href="https://locationtech.github.io/jts/">LocationTech JTS Topology Suite</a> (<code>org.locationtech.jts</code>), so WKT parsing, predicate evaluation, and constructive operations follow the same semantics as most JTS/GEOS-based stacks.</p>
+<p>The functions are registered as scalar SQL functions in the engine's <code>FunctionRegistry</code> (see <code>neorunbase-common/.../func/GeoFunctions.java</code>), which means they compose with <code>WHERE</code>, <code>SELECT</code> expressions, <code>JOIN</code>, and the rest of the planner like any other built-in function.</p>
+<h2 id="geometry-data-types">Geometry Data Types</h2>
+<p>Four geometry types are added to the type system (<code>neorunbase-common/.../DataType.java</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POINT</code></td>
+<td>A single location in 2D space <code>(x, y)</code></td>
+</tr>
+<tr>
+<td><code>LINESTRING</code></td>
+<td>A sequence of connected points forming a line</td>
+</tr>
+<tr>
+<td><code>POLYGON</code></td>
+<td>A closed ring (with optional holes)</td>
+</tr>
+<tr>
+<td><code>GEOMETRY</code></td>
+<td>Generic geometry that can hold any of the above</td>
+</tr>
+</tbody>
+</table>
+<p>On the PostgreSQL wire, <code>POINT</code> is surfaced as the native <code>point</code> type (OID <code>600</code>); <code>LINESTRING</code>, <code>POLYGON</code>, and <code>GEOMETRY</code> are carried as <code>bytea</code> (WKB). Values are normally produced and consumed through the <code>ST_*</code> constructor / accessor functions rather than typed literally.</p>
 <h2 id="spatial-functions">Spatial Functions</h2>
-<p>NeorunBase includes a set of spatial functions compatible with PostGIS conventions:</p>
-<ul>
-<li><strong>Distance</strong>: Calculate the distance between two geometries</li>
-<li><strong>Contains / Within</strong>: Check if one geometry contains or is within another</li>
-<li><strong>Intersects</strong>: Determine if two geometries intersect</li>
-<li><strong>Area / Length</strong>: Compute the area of polygons or length of lines</li>
-<li><strong>Buffer</strong>: Create a buffer zone around a geometry</li>
-<li>And more standard spatial operations</li>
-</ul>
+<p>All of the functions below are registered and callable today. Names are case-insensitive.</p>
+<h3 id="constructors-io">Constructors &amp; I/O</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ST_GeomFromText</code></td>
+<td><code>ST_GeomFromText(wkt [, srid])</code></td>
+<td>Parse a WKT string into a geometry</td>
+</tr>
+<tr>
+<td><code>ST_GeomFromGeoJSON</code></td>
+<td><code>ST_GeomFromGeoJSON(json)</code></td>
+<td>Parse a GeoJSON <code>Point</code> / <code>LineString</code> / <code>Polygon</code></td>
+</tr>
+<tr>
+<td><code>ST_Point</code></td>
+<td><code>ST_Point(x, y)</code></td>
+<td>Build a <code>POINT</code> from coordinates</td>
+</tr>
+<tr>
+<td><code>ST_MakePoint</code></td>
+<td><code>ST_MakePoint(x, y)</code></td>
+<td>Alias of <code>ST_Point</code></td>
+</tr>
+<tr>
+<td><code>ST_AsText</code></td>
+<td><code>ST_AsText(geom)</code></td>
+<td>Geometry → WKT string</td>
+</tr>
+<tr>
+<td><code>ST_AsGeoJSON</code></td>
+<td><code>ST_AsGeoJSON(geom)</code></td>
+<td>Geometry → GeoJSON string</td>
+</tr>
+</tbody>
+</table>
+<h3 id="predicates-return-boolean">Predicates (return <code>BOOLEAN</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ST_Contains(a, b)</code></td>
+<td><code>a</code> contains <code>b</code></td>
+</tr>
+<tr>
+<td><code>ST_Within(a, b)</code></td>
+<td><code>a</code> is within <code>b</code></td>
+</tr>
+<tr>
+<td><code>ST_Intersects(a, b)</code></td>
+<td><code>a</code> and <code>b</code> intersect</td>
+</tr>
+</tbody>
+</table>
+<h3 id="measurements-return-double-numeric">Measurements (return <code>DOUBLE</code> / numeric)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ST_Distance(a, b)</code></td>
+<td>Cartesian (Euclidean) distance between two geometries in coordinate units</td>
+</tr>
+<tr>
+<td><code>ST_Area(geom)</code></td>
+<td>Area of a polygon</td>
+</tr>
+<tr>
+<td><code>ST_Length(geom)</code></td>
+<td>Length of a linestring</td>
+</tr>
+<tr>
+<td><code>ST_X(point)</code></td>
+<td>X coordinate of a point</td>
+</tr>
+<tr>
+<td><code>ST_Y(point)</code></td>
+<td>Y coordinate of a point</td>
+</tr>
+</tbody>
+</table>
+<h3 id="constructive-operations-return-geometry">Constructive operations (return geometry)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ST_Buffer(geom, distance)</code></td>
+<td>Buffer zone of <code>distance</code> around a geometry</td>
+</tr>
+<tr>
+<td><code>ST_Centroid(geom)</code></td>
+<td>Centroid point of a geometry</td>
+</tr>
+<tr>
+<td><code>ST_Union(a, b)</code></td>
+<td>Union of two geometries</td>
+</tr>
+<tr>
+<td><code>ST_Intersection(a, b)</code></td>
+<td>Intersection of two geometries</td>
+</tr>
+<tr>
+<td><code>ST_Envelope(geom)</code></td>
+<td>Bounding-box polygon of a geometry</td>
+</tr>
+</tbody>
+</table>
+<h3 id="srid-management">SRID management</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ST_SetSRID(geom, srid)</code></td>
+<td>Return a copy of the geometry tagged with <code>srid</code></td>
+</tr>
+<tr>
+<td><code>ST_SRID(geom)</code></td>
+<td>Read back the geometry's SRID</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Distance is Cartesian, not geodesic.</strong> <code>ST_Distance</code> returns straight-line distance in the geometry's own coordinate units (JTS <code>Geometry.distance</code>). <code>ST_Distance(ST_Point(0,0), ST_Point(3,4))</code> is <code>5.0</code>. There is no geography type and no metres-on-a-sphere mode; SRID is stored and echoed back but is not used to reproject or to switch to great-circle math. If you need metric distances, project your coordinates before storing them.</p>
+</blockquote>
+<h2 id="examples">Examples</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- WKT round-trip.</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">ST_AsText</span><span class="p">(</span><span class="n">ST_Point</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="mi">0</span><span class="p">));</span><span class="w">       </span><span class="c1">-- POINT (1 2)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">-- Cartesian distance — 3-4-5 triangle.</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">ST_Distance</span><span class="p">(</span><span class="n">ST_Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">ST_Point</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">));</span><span class="w">   </span><span class="c1">-- 5</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">-- Point-in-polygon.</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">ST_Contains</span><span class="p">(</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">         </span><span class="n">ST_GeomFromText</span><span class="p">(</span><span class="s1">&#39;POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))&#39;</span><span class="p">),</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">         </span><span class="n">ST_Point</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">));</span><span class="w">                     </span><span class="c1">-- t</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">ST_Intersects</span><span class="p">(</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">         </span><span class="n">ST_Point</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">),</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">         </span><span class="n">ST_GeomFromText</span><span class="p">(</span><span class="s1">&#39;POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))&#39;</span><span class="p">));</span><span class="w">  </span><span class="c1">-- t</span>
+</code></pre></div>
+<p>Spatial predicates and measurements work over table columns like any other expression. The convention for <code>ST_Point(x, y)</code> is <code>x = longitude</code>, <code>y = latitude</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">geo_locations</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">id</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">lat</span><span class="w">  </span><span class="nb">FLOAT</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">lon</span><span class="w">  </span><span class="nb">FLOAT</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">geo_locations</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">lat</span><span class="p">,</span><span class="w"> </span><span class="n">lon</span><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Office&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">37</span><span class="p">.</span><span class="mi">7749</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">122</span><span class="p">.</span><span class="mi">4194</span><span class="p">);</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1">-- Distance from a stored point to a fixed coordinate.</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">ST_Distance</span><span class="p">(</span><span class="n">ST_Point</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span><span class="w"> </span><span class="n">lat</span><span class="p">),</span><span class="w"> </span><span class="n">ST_Point</span><span class="p">(</span><span class="o">-</span><span class="mi">122</span><span class="p">.</span><span class="mi">4094</span><span class="p">,</span><span class="w"> </span><span class="mi">37</span><span class="p">.</span><span class="mi">7849</span><span class="p">))</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">FROM</span><span class="w"> </span><span class="n">geo_locations</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
 <h2 id="use-cases">Use Cases</h2>
 <ul>
-<li><strong>Location-based services</strong>: Find points of interest near a given location</li>
-<li><strong>Geofencing</strong>: Determine if a point falls within a defined geographic boundary</li>
-<li><strong>Spatial analytics</strong>: Analyze geographic distribution of data</li>
-<li><strong>Fleet tracking</strong>: Track and query moving objects across regions</li>
+<li><strong>Location-based services</strong> — find points of interest near a location with <code>ST_Distance</code> in a <code>WHERE</code> / <code>ORDER BY</code>.</li>
+<li><strong>Geofencing</strong> — <code>ST_Contains</code> / <code>ST_Within</code> test whether a point falls inside a boundary polygon.</li>
+<li><strong>Spatial analytics</strong> — <code>ST_Area</code>, <code>ST_Length</code>, <code>ST_Centroid</code>, <code>ST_Union</code>, <code>ST_Intersection</code> for geographic aggregation.</li>
+</ul>
+<h2 id="notable-limits">Notable Limits</h2>
+<ul>
+<li><strong>No spatial index.</strong> The engine's <code>CREATE INDEX ... USING</code> accepts only <code>btree</code>, <code>hnsw</code>, and <code>fts</code> (<code>DdlParser.validateIndexType</code>). There is no GiST / R-tree spatial index; spatial predicates are evaluated as scalar functions during the scan, so filter selectivity comes from other indexed columns rather than the geometry itself.</li>
+<li><strong>Planar math only.</strong> As noted above, distances and areas are Cartesian in coordinate units; there is no geography (geodesic) type.</li>
+<li><strong>GeoJSON parsing covers <code>Point</code>, <code>LineString</code>, and <code>Polygon</code>.</strong> Other GeoJSON geometry types are not parsed by <code>ST_GeomFromGeoJSON</code>.</li>
 </ul>
 
 

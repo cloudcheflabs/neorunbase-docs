@@ -1156,10 +1156,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-scoped-overrides" class="md-nav__link">
+  <a href="#full-precedence-most-specific-wins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table-scoped overrides
+        Full precedence (most specific wins)
       
     </span>
   </a>
@@ -1897,33 +1897,43 @@ changed, so bad or partial data never reaches consumers.</p>
 </code></pre></div>
 <p>(equivalently <code>NEORUNBASE_ICEBERG_WAP_BRANCH=audit</code>). This is what the end-to-end test
 <a href="#references"><code>tests/test-iceberg-wap-e2e.sh</code></a> injects into coordinator-1.</p>
-<h4 id="table-scoped-overrides">Table-scoped overrides</h4>
-<p>The system property can be narrowed to specific tables. Most specific wins:</p>
+<h4 id="full-precedence-most-specific-wins">Full precedence (most specific wins)</h4>
+<p>The branch for a given write is resolved in this exact order — the first source that
+yields a non-empty, non-<code>main</code> branch wins:</p>
 <table>
 <thead>
 <tr>
-<th>Property</th>
+<th>#</th>
+<th>Source</th>
 <th>Scope</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>1</td>
 <td><code>-Dneorunbase.iceberg.wap.branch.&lt;namespace&gt;.&lt;table&gt;</code></td>
-<td>one table in one namespace</td>
+<td>one fully-qualified table</td>
 </tr>
 <tr>
+<td>2</td>
 <td><code>-Dneorunbase.iceberg.wap.branch.&lt;table&gt;</code></td>
 <td>a table by name (any namespace)</td>
 </tr>
 <tr>
+<td>3</td>
+<td><code>CREATE CATALOG ... WITH ('wap.branch'='&lt;branch&gt;')</code></td>
+<td>that catalog</td>
+</tr>
+<tr>
+<td>4</td>
 <td><code>-Dneorunbase.iceberg.wap.branch</code></td>
-<td>default for all Iceberg writes</td>
+<td>cluster-wide default for all Iceberg writes</td>
 </tr>
 </tbody>
 </table>
-<p>A catalog's <code>'wap.branch'</code> option, when present, takes precedence over the system
-property for that catalog. Leave all of these unset and writes go straight to <code>main</code>
-(WAP disabled).</p>
+<p>Note the ordering: the two <strong>table-scoped system properties (1, 2) override a catalog's
+<code>'wap.branch'</code> option (3)</strong>, and the catalog option in turn overrides the cluster-wide
+default (4). Leave all four unset and writes go straight to <code>main</code> (WAP disabled).</p>
 <h2 id="behavior-for-ctas-merge-into-cdc-sync">Behavior for CTAS / MERGE INTO / CDC sync</h2>
 <p>When a WAP branch is active, the branch is created if missing (branched off the current
 <code>main</code>) and <strong>all</strong> of these write to it, never to <code>main</code>:</p>

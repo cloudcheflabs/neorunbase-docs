@@ -785,6 +785,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#creating-a-sharded-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating a Sharded Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#shard-key" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1738,20 +1749,53 @@
 <h1 id="distributed-sharding">Distributed Sharding</h1>
 <p>NeorunBase distributes table data across multiple Data Nodes through hash-based sharding, providing horizontal scalability for both reads and writes.</p>
 <h2 id="how-sharding-works">How Sharding Works</h2>
-<p>When a table is created, NeorunBase assigns a configurable number of shards and distributes them across the available Data Nodes. Each row is assigned to a shard based on a hash of the designated shard key column, ensuring even data distribution.</p>
-<h2 id="shard-key">Shard Key</h2>
-<p>The shard key is a column specified at table creation time. NeorunBase uses the shard key value to determine which shard a row belongs to. Queries that include the shard key in their <code>WHERE</code> clause can be routed directly to the relevant shard(s), significantly improving query performance.</p>
-<h2 id="query-routing">Query Routing</h2>
-<p>NeorunBase automatically routes queries to the appropriate shards:</p>
+<p>When a table is created, NeorunBase assigns a configurable number of shards and distributes them across the available Data Nodes. Each row is assigned to a shard based on a hash of the designated shard key column, ensuring even data distribution. When <code>CREATE TABLE</code> does not specify a shard count, the cluster default <code>neorunbase.default.num.shards</code> (16) is used (<code>neorunbase.properties</code>, section "Default Settings").</p>
+<h2 id="creating-a-sharded-table">Creating a Sharded Table</h2>
+<p>The shard count, shard key, and replication factor are specified as table options in <code>CREATE TABLE</code>. NeorunBase's <code>DdlParser</code> (<code>neorunbase-sql/.../DdlParser.java</code>) accepts two equivalent syntaxes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Positional option syntax</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">customer</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="nb">INT</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span><span class="w"> </span><span class="n">SHARD</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">REPLICAS</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">-- WITH-clause syntax (equivalent)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">customer</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="nb">INT</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">num_shards</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">replication_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">shard_key</span><span class="o">=</span><span class="n">id</span><span class="p">);</span>
+</code></pre></div>
 <ul>
-<li><strong>Point queries</strong>: When the shard key value is specified, the query is routed to a single shard.</li>
-<li><strong>Range queries</strong>: Queries are routed only to the shards that may contain matching data.</li>
-<li><strong>Full scan queries</strong>: When the shard key is not specified, the query is scattered to all shards in parallel and results are merged.</li>
+<li><code>SHARD KEY (col)</code> / <code>shard_key=col</code> — the column hashed to place each row. If omitted, the table's primary key column is used.</li>
+<li><code>SHARDS N</code> / <code>num_shards=N</code> — number of shards. Defaults to <code>neorunbase.default.num.shards</code> (16).</li>
+<li><code>REPLICAS N</code> / <code>replication_factor=N</code> — copies of each shard. Defaults to <code>neorunbase.default.replication.factor</code> (2). See <a href="../replication-ha/">Replication &amp; High Availability</a>.</li>
 </ul>
+<p>If a table is created without any <code>PRIMARY KEY</code>, NeorunBase auto-generates a hidden <code>_rowid BIGINT</code> primary key and shards on it (<code>DdlParser.java</code> — "No PRIMARY KEY specified … auto-generating _rowid column").</p>
+<h2 id="shard-key">Shard Key</h2>
+<p>The shard key is a column specified at table creation time. NeorunBase uses the shard key value to determine which shard a row belongs to (<code>ShardKeyUtils.computeShardId</code>). Queries that include the shard key in their <code>WHERE</code> clause can be routed directly to the relevant shard(s), significantly improving query performance.</p>
+<h2 id="query-routing">Query Routing</h2>
+<p>NeorunBase's <code>ShardRouter</code> (<code>neorunbase-sql/.../ShardRouter.java</code>) inspects the query's <code>WHERE</code> clause and routes accordingly:</p>
+<ul>
+<li><strong>Point queries</strong> (<code>shard_key = value</code>): routed to a single shard.</li>
+<li><strong>IN queries</strong> (<code>shard_key IN (v1, v2, …)</code>): routed to only the shards those values hash to (the router hashes each value and unions the shard set).</li>
+<li><strong>Everything else</strong> — including range predicates (<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>) on the shard key, or a <code>WHERE</code> that doesn't constrain the shard key at all: scattered to <strong>all</strong> shards in parallel and results are merged. Because sharding is <strong>hash-based</strong>, the hash does not preserve value order, so range predicates on the shard key cannot be pruned to a subset of shards.</li>
+</ul>
+<p>Range and non-shard-key predicates can still benefit from <a href="#shard-pruning">Shard Pruning</a> via Bloom filters where a per-column filter is available.</p>
 <h2 id="shard-pruning">Shard Pruning</h2>
-<p>NeorunBase maintains Bloom filter caches for shards, allowing it to skip shards that definitely do not contain the queried values. This reduces unnecessary I/O and improves query latency.</p>
+<p>The coordinator maintains per-column Bloom filter caches for shards (<code>ShardBloomCache</code>, <code>neorunbase-coordinator/.../ShardBloomCache.java</code> — keyed <code>table#column → shardId → BloomFilter</code>), allowing it to skip shards that definitely do not contain the queried values. This reduces unnecessary I/O and improves query latency.</p>
 <h2 id="resharding">Resharding</h2>
-<p>NeorunBase supports online resharding, allowing you to change the number of shards for a table. During resharding, data is transparently migrated to the new shard layout without downtime.</p>
+<p>NeorunBase supports online resharding, allowing you to change the number of shards for a table. During resharding, data is transparently migrated to the new shard layout without downtime, and the table stays read-write.</p>
+<p>Trigger a reshard with SQL:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">SHARDS</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+</code></pre></div>
+<p>or via the admin REST API:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Kick off a reshard</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>POST<span class="w"> </span>/admin/tables/<span class="o">{</span>name<span class="o">}</span>/reshard
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Poll progress (returns {&quot;status&quot;:&quot;idle&quot;} when none is in progress)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>GET<span class="w">  </span>/admin/tables/<span class="o">{</span>name<span class="o">}</span>/reshard
+</code></pre></div>
+<p>Both are handled by <code>AdminHttpServer</code> (<code>/admin/tables/{name}/reshard</code>). The per-shard copy/replicate RPCs during a reshard are governed by <code>neorunbase.reshard.shard.operation.timeout.ms</code> (default 120000) and <code>neorunbase.reshard.ddl.operation.timeout.ms</code> (default 60000) — see <code>neorunbase.properties</code>, section 24. Confirm the new count with <code>GET /admin/tables/{name}</code> (<code>"numShards"</code>).</p>
 
 
 
