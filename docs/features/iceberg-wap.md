@@ -62,7 +62,7 @@ Launch the coordinator with:
 ```
 
 (equivalently `NEORUNBASE_ICEBERG_WAP_BRANCH=audit`). This is what the end-to-end test
-[`tests/test-iceberg-wap-e2e.sh`](#references) injects into coordinator-1.
+`tests/test-iceberg-wap-e2e.sh` injects into coordinator-1.
 
 #### Full precedence (most specific wins)
 
