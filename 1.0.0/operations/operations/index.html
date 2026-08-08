@@ -1952,7 +1952,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bin/stop-coordinator.sh
 </code></pre></div>
 <p>To stop a specific Coordinator instance running with a non-default port (e.g. when multiple Coordinators are colocated on the same host for testing):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/stop-coordinator.sh &lt;pg-port&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/stop-coordinator.sh<span class="w"> </span>&lt;pg-port&gt;
 </code></pre></div>
 <p>The stop script sends <code>SIGTERM</code> and waits up to 30 seconds for the process to exit before falling back to <code>SIGKILL</code>.</p>
 <h3 id="data-node">Data Node</h3>
@@ -1963,7 +1963,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bin/stop-datanode.sh
 </code></pre></div>
 <p>or, for a specific instance by port:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>bin/stop-datanode.sh &lt;internal-port&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>bin/stop-datanode.sh<span class="w"> </span>&lt;internal-port&gt;
 </code></pre></div>
 <h3 id="zookeeper">ZooKeeper</h3>
 <p>The release ships a single-node example ZooKeeper for evaluation:</p>
@@ -1973,7 +1973,7 @@
 <p>Production clusters should point <code>neorunbase.zookeeper.server.list</code> at a dedicated, separately managed ZooKeeper ensemble rather than the bundled example.</p>
 <h3 id="bringing-up-the-whole-example-cluster">Bringing Up the Whole Example Cluster</h3>
 <p>The example launcher boots ZooKeeper, two Data Nodes, and one Coordinator on a single host:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">NEORUNBASE_MASTER_KEY</span><span class="o">=</span>test-master-key-for-integration-tests-12345
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bin/start-example-servers.sh
 </code></pre></div>
 <p>The corresponding teardown:</p>
@@ -1982,14 +1982,14 @@
 <h2 id="process-control-tuning">Process Control &amp; Tuning</h2>
 <h3 id="foreground-vs-background">Foreground vs. Background</h3>
 <p>By default the start scripts daemonize the Java process. Set <code>NEORUNBASE_FOREGROUND=true</code> to run in the foreground instead — required when NeorunBase is supervised by <code>systemd</code>, <code>runit</code>, or another process manager that expects the child to stay attached.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>NEORUNBASE_FOREGROUND=true bin/start-coordinator.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">NEORUNBASE_FOREGROUND</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>bin/start-coordinator.sh
 </code></pre></div>
 <h3 id="per-instance-overrides">Per-instance Overrides</h3>
 <p>The start scripts forward every <code>-D</code> and <code>-X</code> argument on the command line to the JVM, and forward any other arguments to the server's main method. This is how <code>start-example-servers.sh</code> runs two Data Nodes from a single config file:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>bin/start-datanode.sh \
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    -Dneorunbase.datanode.internal.port=7002 \
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    -Dneorunbase.base.data.dir=data/datanode-1 \
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    -Dneorunbase.log.path=logs/datanode-1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>bin/start-datanode.sh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span>-Dneorunbase.datanode.internal.port<span class="o">=</span><span class="m">7002</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span>-Dneorunbase.base.data.dir<span class="o">=</span>data/datanode-1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span>-Dneorunbase.log.path<span class="o">=</span>logs/datanode-1
 </code></pre></div>
 <p>Per-instance system properties take precedence over <code>neorunbase.properties</code> and over <code>NEORUNBASE_*</code> environment variables.</p>
 <h3 id="log-path">Log Path</h3>
@@ -2019,10 +2019,23 @@
 <p>The release ships a small administrative CLI, <code>bin/neorunbase-cli.sh</code> (<code>neorunbase-cli</code>), for local operations against a running Coordinator. Unlike the Admin UI / REST API, the CLI does <strong>not</strong> authenticate over the network: it connects to the Coordinator's local <strong>Unix domain socket</strong>, and authentication is purely OS-level (the socket is created with file mode <code>600</code>). You must run it as the <strong>same OS user</strong> as the Coordinator process (or <code>root</code>) on the <strong>same host or container</strong>.</p>
 <p>The socket path is resolved in this order:</p>
 <ol>
-<li><code>$NEORUNBASE_ADMIN_SOCKET</code> (or the <code>--socket PATH</code> option).</li>
-<li>The path the running Coordinator published to <code>bin/coordinator.socket</code>.</li>
-<li>The default <code>data/admin.sock</code> under the install directory.</li>
+<li><code>--socket PATH</code> on the command line — always wins.</li>
+<li><code>$NEORUNBASE_ADMIN_SOCKET</code>, if exported in the caller's shell.</li>
+<li>The path the running Coordinator published to <code>bin/coordinator.socket</code>. The
+   marker file name comes from <code>neorunbase.admin.socket.marker.file</code>, so both the
+   Coordinator and the CLI pick up a rename from the same properties file.</li>
+<li><code>neorunbase.admin.socket.path</code> in <code>conf/neorunbase.properties</code>, with
+   <code>${neorunbase.base.data.dir}</code> expanded (a value left holding a <code>${...}</code>
+   placeholder is rejected rather than used literally).</li>
+<li>The default <code>data/admin.sock</code> under the install directory, then <code>/data/admin.sock</code>.</li>
 </ol>
+<p>Step 3 matters whenever the data dir was moved: launching with
+<code>-Dneorunbase.base.data.dir=data/coordinator-1</code> puts the socket at
+<code>data/coordinator-1/admin.sock</code> while <code>conf/neorunbase.properties</code> still reads
+<code>./data</code>, and only the published marker records where the live process bound.</p>
+<p><code>NEORUNBASE_MASTER_KEY</code> is <strong>not</strong> needed to run the CLI — the Coordinator holds the
+unsealed key and performs the work. The variable is required by the Coordinator
+process itself.</p>
 <p>The CLI supports exactly two commands:</p>
 <table>
 <thead>
@@ -2075,14 +2088,14 @@
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># Reachability check
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>bin/neorunbase-cli.sh ping
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Reachability check</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>bin/neorunbase-cli.sh<span class="w"> </span>ping
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a># Reset the admin password to a server-generated temporary value (printed to the terminal)
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>bin/neorunbase-cli.sh iam:reset-password --user admin
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Reset the admin password to a server-generated temporary value (printed to the terminal)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>bin/neorunbase-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>admin
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a># Reset to an explicit password read from stdin
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>printf &#39;my-new-secret&#39; | bin/neorunbase-cli.sh iam:reset-password --user admin --new-password -
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># Reset to an explicit password read from stdin</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;my-new-secret&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/neorunbase-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>admin<span class="w"> </span>--new-password<span class="w"> </span>-
 </code></pre></div>
 <p>The reset account is flagged to require a password change on next login.</p>
 <h2 id="cluster-lifecycle-notes">Cluster Lifecycle Notes</h2>
