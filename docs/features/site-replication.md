@@ -4,7 +4,7 @@ NeorunBase 1.0.0 introduces **cross-site (disaster-recovery) replication**: a le
 
 Site replication is distinct from [intra-cluster replication](replication-ha.md). Intra-cluster replication keeps multiple copies of each shard inside the **same** cluster, behind the same coordinators, sharing the same KMS. Site replication crosses cluster boundaries — every standby site has its own ZooKeeper ensemble, its own coordinator quorum, its own data nodes, and its own KMS.
 
-The 1.0.0 release ships the wire path, the leader-only streamer, and the admin surface. It does **not** ship the WAL-tail tap on the production DML commit path — that lands in 1.1.0. v1 is the foundation: it is fully observable, exercised end-to-end in CI, and ready for operators to wire into bespoke flows via the test-enqueue hook.
+The 1.0.0 release ships the wire path, the leader-only streamer, the admin surface, and **automatic DDL replication** — a successful `CREATE TABLE` / `DROP TABLE` on the primary leader is shipped to peer sites so their catalogs mirror the primary without a manual DDL (`QueryExecutor.shipDdlToPeers`, `neorunbase-coordinator/.../QueryExecutor.java`). It does **not** yet ship an automatic WAL-tail tap on the production **DML** commit path — no `INSERT` / `UPDATE` / `DELETE` is auto-captured into a peer outbox. The only producers of data-plane records in 1.0.0 are the DDL hook above and the `test-enqueue` admin endpoint. v1 is the foundation: it is fully observable, exercised end-to-end in CI, and ready for operators to wire DML into bespoke flows via the test-enqueue hook. The receiver, wire path, and outbox all handle INSERT/UPDATE/DELETE today — only the automatic primary-side capture of committed DML is outstanding.
 
 ## The model
 
@@ -34,6 +34,8 @@ The 1.0.0 release ships the wire path, the leader-only streamer, and the admin s
 |                                                             |
 +-------------------------------------------------------------+
 ```
+
+The diagram shows the intended full data path. In 1.0.0, `enqueue()` is fed by two producers only — the automatic DDL hook (`CREATE TABLE` / `DROP TABLE`) and the `test-enqueue` admin endpoint; the `WalManager.write` → `enqueue` tap for committed DML is the outstanding 1.1.0 piece.
 
 The streamer is **leader-only** — only the elected leader coordinator runs the per-peer threads. Followers carry the same code but their `leaderSupplier` returns `false`, so the `streamLoop` sleeps in a tight idle. Leader handover is sticky-aware: the new leader picks up streaming from its own in-memory queue (which is empty on a cold leader); records that were buffered on the *old* leader but not yet shipped are *lost on cold restart*. v1 accepts this trade-off — the recovery flow on the standby is "restore from the latest standby-side backup, then resume streaming", which closes any gap the in-memory queue could have introduced.
 
@@ -217,7 +219,7 @@ Returns `{"status":"enqueued"}`. Watch `totalSent` and `peers.<siteId>.lastAppli
         }'
    ```
 
-4. Verify with `GET /admin/api/site-replication/status` — `enabled:true`, `leader:true`, and `peers.site-b.queueDepth` initially `0` (no traffic since v1's WAL-tail tap is not yet wired into the DML commit hook — see "What v1 ships vs. v1.1").
+4. Verify with `GET /admin/api/site-replication/status` — `enabled:true`, `leader:true`, and `peers.site-b.queueDepth` initially `0` (DDL you issue on the primary will flow automatically, but no `INSERT`/`UPDATE`/`DELETE` traffic is auto-captured in 1.0.0 — see "What 1.0.0 ships").
 5. Use the test-enqueue endpoint to confirm the wire path works end-to-end. The standby's data-node log should show one `REPLICATE_WAL_BATCH` apply entry per shipped batch.
 
 ### Monitoring lag
@@ -251,7 +253,7 @@ Latency: the streamer's `tickMs` (default 200 ms) is the **idle** wake interval,
 
 ## What 1.0.0 ships
 
-The 1.0.0 release is now **end-to-end DML+DDL replication**, not just the wire path:
+The 1.0.0 release ships the full wire path plus **automatic DDL replication**. Automatic DML replication is **not** in 1.0.0 — the data plane is exercised through the test-enqueue hook:
 
 | Capability | Status |
 |---|---|
@@ -262,11 +264,13 @@ The 1.0.0 release is now **end-to-end DML+DDL replication**, not just the wire p
 | Admin REST (config, status, test-enqueue) | ✅ |
 | Admin UI page (`/site-replication`) | ✅ |
 | Plaintext at protocol layer; terminate over TLS in production | ✅ |
-| **Production WAL-tail tap** — every successful `RocksDBShard.put` ships to peer | ✅ |
-| **DDL replication** — CREATE TABLE / DROP TABLE flows over the same pipeline | ✅ |
-| **Receiver-side index reconcile** — after apply, ANN (HNSW) + FTS (Lucene) caches on the standby are invalidated so the next query rebuilds incrementally from the freshly replicated rows | ✅ |
+| **DDL replication** — successful `CREATE TABLE` / `DROP TABLE` on the primary leader auto-ships and is re-applied on the standby via its local leader (`QueryExecutor.shipDdlToPeers` → receiver `ddlForwarder`) | ✅ |
+| **Receiver-side apply** of INSERT/UPDATE/DELETE + PREPARE/COMMIT/ROLLBACK (the last three are seq-ack markers, no RocksDB side-effect) — the standby *can* apply DML it receives | ✅ |
+| **Receiver-side index reconcile** — after DML apply, ANN (HNSW) + FTS (Lucene) caches on the standby are invalidated so the next query rebuilds incrementally from the freshly replicated rows; CSR adjacency rebuilds on `CsrCompactor`'s own tick | ✅ |
+| **Automatic production DML WAL-tail tap** — every committed `INSERT`/`UPDATE`/`DELETE` auto-enqueues to peers | ❌ not in 1.0.0 — only the DDL hook and `test-enqueue` produce records; automatic DML capture is a follow-up |
 
 Out of scope for 1.0.0 and tracked as follow-ups:
+- **Automatic DML tail-tap** — auto-capture every committed INSERT/UPDATE/DELETE into the peer outbox. Today only DDL auto-ships; DML must be driven through the test-enqueue hook (the receiver/wire/outbox already handle DML, so this is a primary-side capture hook, not a protocol change).
 - Persistent outbox (resume after coordinator restart without losing in-flight records).
 - HMAC challenge-response over the wire (currently relies on TLS at the transport layer).
 - Reverse direction (peer → primary) for active-active (requires conflict resolution — research phase).

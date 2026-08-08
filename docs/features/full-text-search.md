@@ -159,7 +159,7 @@ CREATE INDEX idx_desc_ko  ON products USING fts (description) WITH (lang='korean
 
 ## Distributed BM25 Across Shards
 
-A FTS-indexed table has **one Lucene index per shard**. On a top-K query, the Coordinator scatters an `FTS_SEARCH_REQ` to each shard owner; every Data Node runs its local Lucene search, applies `WHERE` pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25.
+A FTS-indexed table has **one Lucene index per shard**. On a top-K query, the Coordinator scatters an `FTS_SEARCH_REQ` to each shard owner; every Data Node runs its local Lucene search, applies `WHERE` pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25. Each per-shard leg is bounded by `neorunbase.search.scatter.stage.timeout.ms` (default 30000) — the same knob shared by the Vector and Hybrid scatters.
 
 NeorunBase uses **shard-local BM25** scoring by default — each shard scores against its own document frequency. This matches OpenSearch's default `query_then_fetch` mode and trades a small recall hit on heavily-skewed data distributions for one fewer network round-trip. A future `dfs_query_then_fetch` mode (coordinator collects global df first, then re-scores) is on the roadmap; the wire protocol leaves room for it without breaking changes.
 

@@ -2,7 +2,7 @@
 
 NeorunBase's internal NIO plane survives the trickiest failure mode in distributed systems: **a peer whose NIC dies after the socket was opened, but ZooKeeper hasn't expired the session yet**. From ZooKeeper's POV the node is alive. From every neighbour's POV its TCP connection is also alive — the kernel does not surface a half-open peer for tens of seconds, sometimes minutes, while it exhausts its retransmit budget. RPCs that route to that peer hang. Membership-driven failover doesn't fire because membership is still healthy.
 
-The 1.0.0 release closes this gap on **both ends** of every internal RPC — `InternalNioClient` (used by every coordinator → data node and data node → coordinator call) and `InternalNioServer` (the response side).
+The 1.0.0 release bounds this gap on the **caller side** of every internal RPC — `InternalNioClient`, which every coordinator → data node and data node → coordinator call goes through. Because the caller is the party that actually hangs on a wedged peer, bounding the client is what keeps the cluster responsive. The response side (`InternalNioServer`) runs a non-blocking `Selector` reactor for its accept and read paths; its response-write path is covered below.
 
 ## Why the legacy NIO loop is dangerous
 
@@ -30,19 +30,15 @@ Both deadlines are overridable per JVM:
 -Dneorunbase.protocol.internal.write.timeout.seconds=10
 ```
 
-## What changed in the server
+## The server side
 
 `com.cloudcheflabs.neorunbase.protocol.internal.InternalNioServer`:
 
-- The accept path already left client channels non-blocking — the server uses a Selector reactor.
-- The **response write** path previously did a bare `while (buf.hasRemaining()) channel.write(buf);` under a `synchronized(channel)` block. In non-blocking mode `channel.write()` returns 0 the moment the send buffer is full — the old loop **busy-spun forever** on a wedged peer because there was no `Selector` to wait on writability.
-- The new path factors response and error-response into a single `writeBoundedResponse()` helper that opens a per-call `Selector(OP_WRITE)` and bounds the loop with the same 10s deadline as the client. On timeout it throws `IOException` and the worker thread frees up.
+- **Non-blocking selector reactor.** The listening channel registers `OP_ACCEPT`; every accepted client channel is put in non-blocking mode and registered for `OP_READ` (`accept()`). A slow or silent peer can therefore never park the server's accept/read loop.
+- **Off-selector request handling.** Inbound messages are decoded on the selector thread and dispatched to a worker pool (`processRequest`), so a slow handler does not stall the reactor.
+- **Response-write path is not independently deadline-bounded.** The reply is written back in `processRequest()` under `synchronized(channel)` with a plain `while (encoded.hasRemaining()) channel.write(encoded);` loop. There is no per-call `OP_WRITE` selector or write deadline on this path — the protection against a wedged peer comes from the *caller* side, `InternalNioClient`'s bounded `sendRequest` (above): when the client's own 10s write deadline trips it flips `connected=false` and re-mints the connection, so callers stop waiting on a dead peer even though the server's response write is not itself bounded.
 
-Same override:
-
-```text
--Dneorunbase.protocol.internal.write.timeout.seconds=10
-```
+Only the client honours `-Dneorunbase.protocol.internal.write.timeout.seconds`; the server response-write loop above does not read it.
 
 ## Failure-handling invariants
 

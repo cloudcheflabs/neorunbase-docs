@@ -135,13 +135,54 @@ Edit `conf/jvm.conf` to set heap size, direct memory cap, GC flags, and any othe
 - Keep the master key out of `conf/neorunbase.properties` and out of process listings — pass it through the env var only.
 - Treat the master key as cluster-critical: losing it makes encrypted on-disk state unrecoverable.
 
+## Admin CLI
+
+The release ships a small administrative CLI, `bin/neorunbase-cli.sh` (`neorunbase-cli`), for local operations against a running Coordinator. Unlike the Admin UI / REST API, the CLI does **not** authenticate over the network: it connects to the Coordinator's local **Unix domain socket**, and authentication is purely OS-level (the socket is created with file mode `600`). You must run it as the **same OS user** as the Coordinator process (or `root`) on the **same host or container**.
+
+The socket path is resolved in this order:
+
+1. `$NEORUNBASE_ADMIN_SOCKET` (or the `--socket PATH` option).
+2. The path the running Coordinator published to `bin/coordinator.socket`.
+3. The default `data/admin.sock` under the install directory.
+
+The CLI supports exactly two commands:
+
+| Command | Purpose |
+| --- | --- |
+| `ping` | Check that the local admin socket is reachable (prints `pong`). |
+| `iam:reset-password` | Reset a user's password — the recovery path when the admin password is lost and you cannot log into the Admin UI. |
+
+### Password Recovery
+
+`iam:reset-password` resets a user's password without needing an existing login. Options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--user USER` | `admin` | The user whose password to reset. |
+| `--new-password PWD` | (generated) | Set an explicit new password. Use `--new-password -` to read the password from stdin (one line). If omitted, the Coordinator generates a temporary password and prints it. |
+| `--interactive` | — | Prompt for the new password on the TTY (hidden, with confirmation). |
+| `--socket PATH` | (see above) | Override the admin socket path. |
+
+```agsl
+# Reachability check
+bin/neorunbase-cli.sh ping
+
+# Reset the admin password to a server-generated temporary value (printed to the terminal)
+bin/neorunbase-cli.sh iam:reset-password --user admin
+
+# Reset to an explicit password read from stdin
+printf 'my-new-secret' | bin/neorunbase-cli.sh iam:reset-password --user admin --new-password -
+```
+
+The reset account is flagged to require a password change on next login.
+
 ## Cluster Lifecycle Notes
 
 - **Bootstrap order.** Start ZooKeeper first, then Data Nodes, then Coordinators. The example launcher follows this sequence with brief sleeps; in production, leave Data Nodes time to register in ZooKeeper before bringing up Coordinators so the leader's startup discovery loop completes promptly.
 - **Coordinator HA.** When more than one Coordinator is running, ZooKeeper elects a leader for metadata and KMS ownership. Non-leader Coordinators forward write-side admin operations to the leader and serve PG wire traffic locally.
 - **Shard repair & rebalancing.** When a Data Node leaves the cluster, the leader Coordinator detects the absence via ZooKeeper ephemeral nodes and replicates affected shards onto healthy Data Nodes (provided `neorunbase.disk.repair.enabled=true` for the disk-level case). When new Data Nodes join, the cluster rebalances shards toward them. See [Replication & High Availability](../features/replication-ha.md).
 - **Disaster recovery (cross-site).** A separate, **leader-only** streamer ships WAL records to one or more standby clusters via `REPLICATE_WAL_BATCH` over the internal protocol. Configure peers under `/admin/api/site-replication/config` and monitor `lastAppliedSeq` and per-peer queue depth under `/admin/api/site-replication/status`. See [Site Replication (DR)](../features/site-replication.md).
-- **Iceberg sync.** Set `neorunbase.iceberg.catalog.type=rest` and `neorunbase.iceberg.sync.auto.start=true` to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see [Configuration](../configuration/configuration.md#iceberg-catalog-integration).
+- **Iceberg sync.** Set `neorunbase.iceberg.catalog.type=polaris` (the only supported catalog backend besides `none`) and `neorunbase.iceberg.sync.auto.start=true` to have the leader Coordinator run background incremental sync. Per-table filters and the changelog batch size are tunable — see [Configuration](../configuration/configuration.md#iceberg-catalog-integration).
 - **Kafka ingestion.** Set `neorunbase.kafka.consumer.enabled=true` and define one or more consumer groups. The leader Coordinator distributes the configured groups round-robin across Data Nodes; each worker forwards parsed inserts back to the leader Coordinator over the internal protocol so the standard shard routing path applies. See [Kafka Integration](../features/kafka-integration.md).
 - **CSR adjacency for graph workloads.** Set `neorunbase.csr.enabled=true` and list edge tables in `neorunbase.csr.enabled.tables` to opt into the CSR fast path. The leader Coordinator schedules background compactions every `neorunbase.csr.compaction.interval.seconds`; force a rebuild after bulk inserts via `POST /admin/graph/csr/compact`, and inspect per-shard segment counts / `src_id` totals via `GET /admin/graph/csr/status`. See [Graph Traversal & Analytics](../features/graph.md#csr-adjacency-phase-1-acceleration-layer).
 

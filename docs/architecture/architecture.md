@@ -65,7 +65,7 @@ See [Graph Traversal & Analytics](../features/graph.md) and [Hybrid Search](../f
 
 NeorunBase synchronizes table data to Apache Iceberg for open lakehouse analytics:
 
-- Connects to an Iceberg REST catalog (e.g., Polaris) with OAuth2 or static token authentication.
+- Connects to an Apache Polaris Iceberg REST catalog using OAuth2 client-credentials authentication (`polaris` is the only wired-up catalog backend besides `none`; the legacy generic REST-catalog auth fields are ignored under the Polaris path).
 - Performs full snapshot sync on initial synchronization, followed by incremental sync via change logs using Iceberg RowDelta (equality deletes + data files).
 - Writes Parquet files to S3-compatible object storage.
 - Supports reading external Iceberg tables via distributed Parquet/ORC/Avro scan directly from S3.
