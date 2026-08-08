@@ -16,7 +16,7 @@ All three are managed by shell scripts under `bin/` in the release archive.
 
 ### Coordinator
 
-```agsl
+```bash
 bin/start-coordinator.sh
 ```
 
@@ -24,13 +24,13 @@ The script launches `com.cloudcheflabs.neorunbase.server.CoordinatorServer` with
 
 To stop the Coordinator gracefully:
 
-```agsl
+```bash
 bin/stop-coordinator.sh
 ```
 
 To stop a specific Coordinator instance running with a non-default port (e.g. when multiple Coordinators are colocated on the same host for testing):
 
-```agsl
+```bash
 bin/stop-coordinator.sh <pg-port>
 ```
 
@@ -38,7 +38,7 @@ The stop script sends `SIGTERM` and waits up to 30 seconds for the process to ex
 
 ### Data Node
 
-```agsl
+```bash
 bin/start-datanode.sh
 ```
 
@@ -46,13 +46,13 @@ This launches `com.cloudcheflabs.neorunbase.server.DataNodeServer` and writes it
 
 Stop with:
 
-```agsl
+```bash
 bin/stop-datanode.sh
 ```
 
 or, for a specific instance by port:
 
-```agsl
+```bash
 bin/stop-datanode.sh <internal-port>
 ```
 
@@ -60,7 +60,7 @@ bin/stop-datanode.sh <internal-port>
 
 The release ships a single-node example ZooKeeper for evaluation:
 
-```agsl
+```bash
 bin/start-zk.sh
 bin/stop-zk.sh
 ```
@@ -71,14 +71,14 @@ Production clusters should point `neorunbase.zookeeper.server.list` at a dedicat
 
 The example launcher boots ZooKeeper, two Data Nodes, and one Coordinator on a single host:
 
-```agsl
+```bash
 export NEORUNBASE_MASTER_KEY=test-master-key-for-integration-tests-12345
 bin/start-example-servers.sh
 ```
 
 The corresponding teardown:
 
-```agsl
+```bash
 bin/stop-example-servers.sh
 ```
 
@@ -88,7 +88,7 @@ bin/stop-example-servers.sh
 
 By default the start scripts daemonize the Java process. Set `NEORUNBASE_FOREGROUND=true` to run in the foreground instead — required when NeorunBase is supervised by `systemd`, `runit`, or another process manager that expects the child to stay attached.
 
-```agsl
+```bash
 NEORUNBASE_FOREGROUND=true bin/start-coordinator.sh
 ```
 
@@ -96,7 +96,7 @@ NEORUNBASE_FOREGROUND=true bin/start-coordinator.sh
 
 The start scripts forward every `-D` and `-X` argument on the command line to the JVM, and forward any other arguments to the server's main method. This is how `start-example-servers.sh` runs two Data Nodes from a single config file:
 
-```agsl
+```bash
 bin/start-datanode.sh \
     -Dneorunbase.datanode.internal.port=7002 \
     -Dneorunbase.base.data.dir=data/datanode-1 \
@@ -141,9 +141,24 @@ The release ships a small administrative CLI, `bin/neorunbase-cli.sh` (`neorunba
 
 The socket path is resolved in this order:
 
-1. `$NEORUNBASE_ADMIN_SOCKET` (or the `--socket PATH` option).
-2. The path the running Coordinator published to `bin/coordinator.socket`.
-3. The default `data/admin.sock` under the install directory.
+1. `--socket PATH` on the command line — always wins.
+2. `$NEORUNBASE_ADMIN_SOCKET`, if exported in the caller's shell.
+3. The path the running Coordinator published to `bin/coordinator.socket`. The
+   marker file name comes from `neorunbase.admin.socket.marker.file`, so both the
+   Coordinator and the CLI pick up a rename from the same properties file.
+4. `neorunbase.admin.socket.path` in `conf/neorunbase.properties`, with
+   `${neorunbase.base.data.dir}` expanded (a value left holding a `${...}`
+   placeholder is rejected rather than used literally).
+5. The default `data/admin.sock` under the install directory, then `/data/admin.sock`.
+
+Step 3 matters whenever the data dir was moved: launching with
+`-Dneorunbase.base.data.dir=data/coordinator-1` puts the socket at
+`data/coordinator-1/admin.sock` while `conf/neorunbase.properties` still reads
+`./data`, and only the published marker records where the live process bound.
+
+`NEORUNBASE_MASTER_KEY` is **not** needed to run the CLI — the Coordinator holds the
+unsealed key and performs the work. The variable is required by the Coordinator
+process itself.
 
 The CLI supports exactly two commands:
 
@@ -163,7 +178,7 @@ The CLI supports exactly two commands:
 | `--interactive` | — | Prompt for the new password on the TTY (hidden, with confirmation). |
 | `--socket PATH` | (see above) | Override the admin socket path. |
 
-```agsl
+```bash
 # Reachability check
 bin/neorunbase-cli.sh ping
 
