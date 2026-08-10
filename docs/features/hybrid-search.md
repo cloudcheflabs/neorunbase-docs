@@ -157,7 +157,7 @@ The agent submits a candidate set whose every member has a graph-verified eligib
 
 ## How It Runs
 
-1. The coordinator's TVF rewriter detects `HYBRID_SEARCH(...)` *before* SQL parsing, parses the named arguments, and resolves the table's schema (`pkTypeId`, shard map, owning data nodes).
+1. The coordinator's TVF rewriter detects `HYBRID_SEARCH(...)` *before* SQL parsing, parses the named arguments, and resolves the table's schema (`pkTypeId`, shard map, owning data nodes). Each shard is assigned to **exactly one** node for the scatter — the replica the read router picks — so a replicated shard is searched once, not once per replica. It also reads the FTS index's `WITH (lang=...)` from the catalog and carries it on the request, so the BM25 half analyses the query text with the analyzer its index was built with.
 2. The `HybridSearchExecutor` issues two parallel scatter-gather searches — one over the FTS index, one over the HNSW index — at oversampled depth (`per_mode_k`). Both reuse the standard `FtsSearchExecutor` / `VectorSearchExecutor` paths, so encryption / IAM / shard pruning all apply unchanged. The Hybrid path propagates one per-stage timeout, `neorunbase.search.scatter.stage.timeout.ms` (default 30000), down to both inner executors so all three backends share a single wall-clock budget.
 3. The executor blends the two top-K lists into a single sorted hybrid top-K according to the chosen strategy.
 4. The blended result is inlined back into the original SQL as a derived table (`(SELECT 1 AS id, 0.92 AS score UNION ALL …) AS h`). The rest of the query — JOINs, WHERE, ORDER BY, LIMIT — plans through NeorunBase's normal pipeline.

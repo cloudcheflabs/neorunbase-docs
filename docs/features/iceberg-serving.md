@@ -110,6 +110,39 @@ Between explicit writes the snapshot is immutable, so the index needs no work at
     **leader** (followers transparently forward them), and declarations are written to the
     replicated metadata store, so they are honored cluster-wide.
 
+## Scan-path pruning for everything else
+
+A predicate the index cannot answer — a non-indexed column, or a `WHERE` touching more than
+one column — falls back to the scan path, which still prunes at **file** granularity before
+anything is read from S3.
+
+The file plan is built once per snapshot and cached (`neorunbase.iceberg.plan.cache.enabled`),
+and the predicate is then evaluated **in memory** against each file's per-column min/max
+bounds, so a selective query never re-reads the manifests. Files whose bounds cannot overlap
+the predicate are dropped from the plan:
+
+```sql
+-- two data files, id [1,50] and id [51,100]
+SELECT count(*) FROM ice.public.events WHERE id <= 30 AND val > 0;
+-- plans 1 file split, not 2
+```
+
+The coordinator logs the outcome, which is the quickest way to confirm pruning is doing work:
+
+```
+Planned 1 file splits for public.events (hasDeleteFiles=false, pushdown=true)
+```
+
+For this to work the cached plan must retain the per-column statistics. Iceberg strips column
+bounds from a scan that carries no filter — they would be dead weight — so NeorunBase asks for
+them explicitly when it builds the cached plan. The cost is a modest amount of coordinator
+memory per file; the benefit is that the plan can be reused across queries with completely
+different predicates and still prune each one.
+
+!!! note
+    A predicate on the primary key alone never reaches this path — the PK index answers it
+    before a plan is consulted at all. Pruning matters for the other predicates.
+
 ## Manual secondary indexes
 
 For columns that are **not** the primary key — or for external Iceberg tables that do not

@@ -297,6 +297,17 @@ By default NeorunBase IAM is self-authoritative. It can instead **federate** wit
 | `neorunbase.iam.federation.ontul.jwt.key` | (empty) | Shared HMAC key for validating ontul-issued JWTs locally (federated SSO): an external app may present an ontul JWT in the pg-wire password field, and NeorunBase verifies it with this key (= ontul's master key, `ONTUL_MASTER_KEY`) without a per-connection round trip to ontul. Blank disables ontul-token SSO. |
 | `neorunbase.iam.federation.catalog.alias` | (empty) | Catalog identity map for federation: CSV of `ontulCatalog=neorunbaseCatalog` (e.g. `sales_cat=ice`). Needed only when ontul and NeorunBase register the same physical catalog under different logical names — it rewrites the catalog segment of synced policy resources. Blank = names already match (the usual case). |
 
+### Admin Recovery Socket
+
+The out-of-band channel that lets an operator reset the `admin` password on a running coordinator when nobody can log in. It is a **Unix domain socket only** — no HTTP endpoint, no network surface. The socket file's OS permission (mode `600`) is the entire authentication: any process that can open it already shares the coordinator process's filesystem identity. See [Admin Password Recovery](../features/admin-password-recovery.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.admin.socket.enabled` | `true` | Expose the recovery socket. Set `false` to remove that recovery path entirely — after which a forgotten admin password can only be fixed by a restart with a re-seeded account. |
+| `neorunbase.admin.socket.path` | `${neorunbase.base.data.dir}/admin.sock` | Filesystem path of the socket. Must sit on a local filesystem that supports Unix domain sockets (not NFS or another networked mount). Recreated on every coordinator start. |
+| `neorunbase.admin.socket.marker.file` | `coordinator.socket` | File under `<neorunbase.home>/bin/` into which the coordinator writes the socket path it *actually* bound to. `neorunbase-cli.sh` prefers this over re-deriving the path from the properties file, because `neorunbase.base.data.dir` can be overridden with `-D` at launch or edited after startup. Removed on shutdown. |
+| `neorunbase.iam.audit.dir` | `${neorunbase.base.data.dir}/iam-audit` | Directory holding the append-only audit log of admin-socket operations (who reset which password, and when). |
+
 ## Write-Ahead Log (WAL) & Encryption
 
 | Property | Default | Description |
@@ -361,6 +372,30 @@ By default NeorunBase IAM is self-authoritative. It can instead **federate** wit
 | `neorunbase.fts.storage.default` | `encrypted_disk` | FTS storage backend for new `CREATE INDEX … USING fts`: `encrypted_disk` (KMS-enveloped Lucene segments on disk, PB-class scale) or `memory` (entire index in heap, flushed to one encrypted byte[] sidecar; bounded by RAM). |
 | `neorunbase.fts.plaintext.cache.bytes` | `268435456` | Per-FTS-index plaintext (decrypted segment) LRU cache cap when `storage=encrypted_disk` (256 MiB). Cold segments are re-decrypted on demand. |
 | `neorunbase.fts.chunk.size.bytes` | `1048576` | AES-GCM chunk size inside each encrypted FTS segment file (1 MiB). Larger chunks reduce GCM tag overhead but increase the per-decrypt memory window. |
+
+### Resident ANN (HNSW) Memory Budget
+
+An HNSW index is deserialized **whole** into the data node's heap — unlike FTS, whose segments stay on encrypted disk behind the bounded plaintext cache above. Without a budget, a node hosting many shards × many vector indexes can only fail by `OutOfMemoryError`. When the estimated working set crosses the budget, the least recently used indexes are flushed to their sidecars and dropped; the next query reloads them. Eviction never loses writes: a dirty index is flushed first, and a write that races an eviction re-resolves its cache entry instead of writing into a dropped one.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.ann.cache.max.bytes` | `0` | Absolute cap on resident HNSW indexes for this data node. `0` means "derive it from the heap fraction below". |
+| `neorunbase.ann.cache.max.heap.fraction` | `0.4` | Fraction of the JVM max heap used as the budget when the absolute cap is `0`. Set to `0` to disable eviction entirely (indexes stay resident forever — the pre-budget behaviour). |
+| `neorunbase.ann.cache.graph.overhead.bytes.per.vector` | `128` | Per-vector allowance used when estimating an index's resident size. The raw payload is `dimensions × 4` bytes; this covers the neighbour lists across levels, the label/id maps and object headers. Raise it for indexes built with a large `M`. |
+| `neorunbase.ann.cache.mutate.max.attempts` | `16` | How many times a vector-index write re-resolves its cache entry when an eviction races it. Exhausting this means the budget cannot hold the working set at all, and the write fails loudly rather than being applied to an index that already left the cache. Raise the budget, not this number. |
+
+Four gauges expose the outcome on the data node's metrics endpoint: `neorunbase.ann.cache.bytes` (estimated resident size), `neorunbase.ann.cache.entries`, `neorunbase.ann.cache.budget.bytes` and `neorunbase.ann.cache.evictions`.
+
+### Index Prewarm
+
+HNSW and Lucene indexes are opened lazily from their encrypted sidecars, so on a freshly started node the **first** search of each `(shard, index)` pays the decrypt + deserialize inside its own latency — a cold-start cliff that lands exactly during a rolling restart. Prewarm moves that cost off the query path: the leading coordinator walks the catalog once and asks every node hosting a shard to open the indexes it will be asked about. Warming targets **every replica**, not just the primary, because read failover and round-robin read placement can route a search to any of them.
+
+Best effort throughout — a node that is down, an index never built on a shard, or an ANN cache already at its memory budget simply reduces how much gets warmed.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.index.prewarm.enabled` | `true` | Run the one-shot prewarm sweep after coordinator startup. Set `false` to keep indexes strictly lazy. |
+| `neorunbase.index.prewarm.delay.seconds` | `30` | Grace period after coordinator startup before the sweep runs, so data nodes have registered and reported their shards first. |
 
 ## Graph Traversal
 
@@ -428,6 +463,27 @@ On every startup, non-leader coordinators and data nodes pull authoritative KMS 
 | `neorunbase.query.merge.prepare.timeout.ms` | `60000` | Distributed merge PREPARE per-shard timeout (1 min). PREPARE writes pending tombstones + staged rows to the shard WAL, which may need to flush significant state. |
 | `neorunbase.reshard.shard.operation.timeout.ms` | `120000` | Internal protocol RPC timeout for shard copy and shard replicate during resharding. |
 | `neorunbase.reshard.ddl.operation.timeout.ms` | `60000` | Internal protocol RPC timeout for DDL fan-out (DROP TABLE, CREATE INDEX) during reshard. |
+
+## Read Placement
+
+Which replica of a shard serves a read. Writes are replicated **synchronously** — a DML waits for every replica of the shard before returning — so any live replica holds the same rows, and the same secondary-index column families, HNSW sidecars and Lucene indexes, as the primary. See [Replication & High Availability](../features/replication-ha.md#read-placement-failover).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.query.read.replica.selection` | `primary` | `primary` reads the shard's primary and uses the other replicas only as failover, preserving the strict read-your-writes path. `round_robin` spreads shards over their replicas so the index copies that replication already keeps resident on every replica also serve queries instead of sitting idle. Failover applies under both settings. |
+
+`round_robin` is opt-in because a replica that restarted and has not finished repair can lag behind the primary; `primary` never reads one.
+
+## Shard Pruning by Bloom Filter
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.query.shard.bloom.prune.enabled` | `false` | Coordinator-local Bloom filter that skips shards for an equality on an indexed column. **Disabled by default** — see the soundness note below. |
+| `neorunbase.query.shard.bloom.expected.insertions` | `1000000` | Sizing for each per-`(table, column, shard)` filter. Memory is roughly `expectedInsertions × 1.2` bytes at fpp `0.01`, per shard per indexed column, on every coordinator. |
+| `neorunbase.query.shard.bloom.fpp` | `0.01` | Target false-positive probability. |
+
+!!! warning "Only sound with a single coordinator"
+    The filter is built **only** from INSERTs that a given coordinator process handled, and lives only in its heap. With two or more coordinators, coordinator B holds a filter for a shard containing just the values *B* inserted, so a lookup for a value *A* inserted answers "definitely absent", B prunes the shard, and the row is silently missing from the result. Rows that reach a shard by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect, and nothing survives a restart. Enable it only for a single-coordinator deployment whose writes all arrive as SQL `INSERT`s. The sound placement for this filter is the data node, which owns the shard index and sees every write regardless of origin.
 
 ## Disk Repair
 

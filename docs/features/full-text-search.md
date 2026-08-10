@@ -79,9 +79,9 @@ The analyzer chosen at `CREATE INDEX` time is **baked into that index** and appl
 
 1. At `CREATE INDEX … WITH (lang='korean')`, the chosen `lang` is recorded in the index definition and travels alongside every shard's sidecar.
 2. Every subsequent `INSERT` that reaches a shard goes through `FtsIndexMaintenance.onInsert`, which loads the same analyzer for that index and tokenises the new document with it before adding to the per-shard Lucene index.
-3. Every `WHERE col @@ q` query on that index parses the right-hand expression through the **same analyzer**. Index-time and query-time tokens always agree by construction — there is no way to mismatch them by accident.
+3. Every `WHERE col @@ q` query on that index parses the right-hand expression through the **same analyzer**. The coordinator reads `lang` from the catalog and carries it on the search request, so the Data Node opens the Lucene index with the analyzer it was *built* with — including when a search is the first thing to touch that index after a restart, before any write has re-opened it. Index-time and query-time tokens always agree by construction.
 
-That's why the `lang` choice flows in the index DDL rather than per-INSERT: keeping it on the index means a single decision at CREATE time governs both writes and reads.
+That's why the `lang` choice flows in the index DDL rather than per-INSERT: keeping it on the index means a single decision at CREATE time governs both writes and reads. The same value is carried on the `HYBRID_SEARCH(...)` path, so the FTS half of a hybrid blend analyses its query text identically to a plain `@@` query.
 
 ### What That Means in Practice
 
@@ -159,7 +159,11 @@ CREATE INDEX idx_desc_ko  ON products USING fts (description) WITH (lang='korean
 
 ## Distributed BM25 Across Shards
 
-A FTS-indexed table has **one Lucene index per shard**. On a top-K query, the Coordinator scatters an `FTS_SEARCH_REQ` to each shard owner; every Data Node runs its local Lucene search, applies `WHERE` pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25. Each per-shard leg is bounded by `neorunbase.search.scatter.stage.timeout.ms` (default 30000) — the same knob shared by the Vector and Hybrid scatters.
+A FTS-indexed table has **one Lucene index per shard**. On a top-K query, the Coordinator scatters an `FTS_SEARCH_REQ` to each shard's reading replica; every Data Node runs its local Lucene search, applies `WHERE` pre-filter pushdown if present, and returns its local top results; the Coordinator merges them into the global top-K by descending BM25. Each per-shard leg is bounded by `neorunbase.search.scatter.stage.timeout.ms` (default 30000) — the same knob shared by the Vector and Hybrid scatters.
+
+Each shard is searched on exactly **one** replica — the one [read placement](replication-ha.md#read-placement-failover) selects — so a replicated shard contributes its documents once. If that node does not answer, its shards are regrouped onto their surviving replicas and retried, so one unreachable Data Node degrades into a retry instead of failing the query. Under `round_robin` read placement the shards spread across replicas, so BM25 scoring for one query runs on more nodes at once.
+
+The index that answers a search is opened with the analyzer recorded at `CREATE INDEX` time — the coordinator carries the index's `lang` on the request — and can be [prewarmed](vector-database.md#resident-memory-budget-eviction-prewarm) at startup so the first query after a restart does not pay the sidecar open.
 
 NeorunBase uses **shard-local BM25** scoring by default — each shard scores against its own document frequency. This matches OpenSearch's default `query_then_fetch` mode and trades a small recall hit on heavily-skewed data distributions for one fewer network round-trip. A future `dfs_query_then_fetch` mode (coordinator collects global df first, then re-scores) is on the roadmap; the wire protocol leaves room for it without breaking changes.
 

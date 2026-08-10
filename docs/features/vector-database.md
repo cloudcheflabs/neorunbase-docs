@@ -104,6 +104,17 @@ Rewriting the sidecar on every row change would be ruinously slow, so NeorunBase
 - **Lazy rebuild on stale sidecar** — each sidecar records the WAL sequence number it was flushed at. On the next write, the Data Node compares that sequence number to the current WAL seqno and rebuilds the sidecar from RocksDB rows if it is behind (or missing entirely, e.g. on a freshly repaired replica). No admin action is needed to converge after an ungraceful shutdown as long as the shard eventually sees a write.
 - **On-demand rebuild** — `REBUILD INDEX idx_name ON table_name` (SQL) or the admin REST endpoint `POST /admin/ann/rebuild` forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire. The fan-out is bounded by `neorunbase.query.ann.rebuild.timeout.ms` (default 300000).
 
+## Resident Memory — Budget, Eviction, Prewarm
+
+An HNSW graph is deserialized **whole** into the Data Node heap; unlike the full-text indexes, whose Lucene segments stay on encrypted disk behind a bounded plaintext cache, there is no partial residency. A node hosting many shards × many vector indexes therefore needs a ceiling.
+
+- **Budget** — `neorunbase.ann.cache.max.bytes`, or `neorunbase.ann.cache.max.heap.fraction` (default `0.4` of max heap) when the absolute cap is `0`. Setting the fraction to `0` disables eviction entirely, which is the pre-budget behaviour.
+- **Eviction** — when a load pushes the estimated working set past the budget, the least recently used indexes are dropped until it fits. A dirty index is flushed to its sidecar *first*, so an eviction only ever costs a reload, never data. An index that cannot be flushed (for example its sidecar manager is unavailable) is kept resident rather than dropped.
+- **Write safety** — a vector-index write that races an eviction re-resolves its cache entry instead of writing into a dropped one, which would have silently lost the row from the index. If every attempt is evicted (`neorunbase.ann.cache.mutate.max.attempts`, default 16) the write fails loudly: the budget cannot hold the working set and needs raising.
+- **Size estimate** — `size × (dimensions × 4 + neorunbase.ann.cache.graph.overhead.bytes.per.vector)`. The overhead term covers neighbour lists, id maps and headers; raise it for indexes built with a large `M`.
+
+**Prewarm.** Sidecars open lazily, so on a freshly started node the first search of each `(shard, index)` pays the decrypt + deserialize inside its own latency. With `neorunbase.index.prewarm.enabled` (default `true`) the leading coordinator walks the catalog `neorunbase.index.prewarm.delay.seconds` after startup (default 30s, so data nodes have registered) and asks every node hosting a shard to open its vector and full-text indexes up front. Warming targets every replica, not just the primary, because read failover and round-robin read placement can route a search to any of them. It is best effort: a down node, an index never built on a shard, or a cache already at its budget simply reduces how much gets warmed.
+
 ## Primary Key Requirement for HNSW-Indexed Tables
 
 HNSW nodes are addressed by a numeric id. To keep search hits round-tripping directly through the primary key store without a secondary id→pk map, NeorunBase requires HNSW-indexed tables to have a single-column numeric primary key (`INT`, `BIGINT`, or `SMALLINT`). Attempts to create an HNSW index on a table with a non-numeric or composite primary key are rejected at DDL time.
@@ -111,6 +122,15 @@ HNSW nodes are addressed by a numeric id. To keep search hits round-tripping dir
 ## Observability
 
 Vector search is instrumented alongside the rest of NeorunBase in the built-in Codahale/Prometheus metrics pipeline. Exposed metrics include search / insert / update / delete / flush / rebuild meters, an error counter, and latency timers for search, flush, and rebuild (p50 / p99 / max). The admin endpoint `GET /admin/ann/status` fans out across all Data Nodes and returns one row per cached `(shard, index)` pair with size, dirty flag, pending WAL seqno, and last flushed seqno — enough to tell at a glance which sidecars are behind.
+
+Four gauges track resident index memory per Data Node, so the budget above is observable rather than guessed:
+
+| Gauge | Meaning |
+| --- | --- |
+| `neorunbase.ann.cache.bytes` | Estimated resident size of all cached HNSW indexes. |
+| `neorunbase.ann.cache.entries` | Number of cached `(shard, index)` pairs. |
+| `neorunbase.ann.cache.budget.bytes` | The effective budget (`0` = unbounded). |
+| `neorunbase.ann.cache.evictions` | Indexes dropped so far to stay inside the budget. A steadily climbing value means the working set does not fit and reloads are being paid repeatedly. |
 
 ## Hybrid Search — Combining Vector with BM25
 

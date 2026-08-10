@@ -26,6 +26,27 @@ Content-Type: application/json
 
 Raising RF triggers copying the shard to additional Data Nodes; lowering it drops surplus replicas. Confirm with `GET /admin/tables/{name}` (`"replicationFactor"`). The per-shard copy/replicate RPC timeout during this and other repair/balancing operations is `neorunbase.shard.balancing.rpc.timeout.ms` / `neorunbase.shard.repair.rpc.timeout.ms` (default 60000; `neorunbase.properties`, section 29).
 
+## Read Placement & Failover
+
+Writes are replicated **synchronously**: a DML fans out to every replica of the shard and waits for all of them before returning, and fails if any replica does not apply it. A live replica therefore holds the same rows — and the same secondary-index column families, HNSW vector sidecars and Lucene full-text indexes — as the primary.
+
+`neorunbase.query.read.replica.selection` decides which of those copies answers a read:
+
+| Value | Behaviour |
+| --- | --- |
+| `primary` (default) | Reads go to the shard's primary. The other replicas are used only as failover. Preserves the strict read-your-writes path. |
+| `round_robin` | Shards are spread over their replicas, so the index copies replication already keeps resident on every replica also serve queries instead of sitting idle. Raises read throughput and search parallelism. |
+
+`round_robin` is opt-in because a replica that restarted and has not finished repair can lag behind the primary; under `primary` a read never lands on one.
+
+**Failover applies under both settings.** A read that fails on one replica is retried on the next — a shard read no longer fails outright just because one Data Node is unreachable. This covers:
+
+- ordinary `SELECT` shard reads (retried down the replica list in order),
+- full-text (BM25) and vector (ANN) scatter search — the failed node's shards are regrouped onto their surviving replicas and retried once,
+- CSR graph neighbour expansion and distributed PageRank, which take whichever replica the router puts first.
+
+A `SELECT` is read-only, so retrying it on another replica is always safe. Only one re-route round is attempted: the replacement nodes are different replicas, so a second failure means the shard has no healthy copy and the query fails with the original error.
+
 ## Automatic Failure Detection
 
 NeorunBase continuously monitors the health of all Data Nodes. When a Data Node becomes unavailable, the system automatically detects the failure and initiates recovery actions.
