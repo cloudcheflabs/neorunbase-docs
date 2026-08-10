@@ -231,6 +231,19 @@ Each NeorunBase process writes:
 
 Setting `neorunbase.log.mode=RING_BUFFER` switches file-based logging off in favor of an in-memory ring buffer of `neorunbase.log.ring.buffer.capacity` lines, which the Admin UI tails directly. This is the recommended mode for environments where local disk is ephemeral or unavailable.
 
+### Vector Index Memory
+
+An HNSW index is loaded whole into the Data Node heap, so it is the one index kind whose growth can take a node down. Four gauges make the working set visible:
+
+| Gauge | Watch for |
+| --- | --- |
+| `neorunbase.ann.cache.bytes` | Estimated resident size of all cached HNSW indexes on that node. |
+| `neorunbase.ann.cache.budget.bytes` | The enforced ceiling (`0` = unbounded). Defaults to 40% of max heap. |
+| `neorunbase.ann.cache.entries` | Number of cached `(shard, index)` pairs. |
+| `neorunbase.ann.cache.evictions` | A **steadily climbing** value means the working set does not fit the budget and queries keep paying reloads. Either raise `neorunbase.ann.cache.max.heap.fraction` (or the JVM heap), or move shards off the node. |
+
+`GET /admin/ann/status` fans out across Data Nodes for the per-`(shard, index)` view (size, dirty flag, flushed vs pending WAL seqno). After a restart, look for `Index prewarm on <node>: N warmed, …` in the Data Node logs to confirm the indexes were opened ahead of the first query rather than inside it.
+
 ### Bitrot Scrubber
 
 Setting `neorunbase.scrubber.enabled=true` turns on a throttled background scanner that re-verifies the AES-GCM auth tag on every record in every closed heap segment file. The scanner paces itself at `neorunbase.scrubber.throttle.bytes.per.sec` (default 50 MB/s) so it does not interfere with OLTP traffic, and surfaces any corruption findings through the Admin UI and the admin REST API. Bitrot is detected on read regardless of this toggle; the scrubber adds proactive scanning.
