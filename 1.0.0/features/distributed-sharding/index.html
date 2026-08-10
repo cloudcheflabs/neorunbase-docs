@@ -1781,9 +1781,16 @@
 <li><strong>IN queries</strong> (<code>shard_key IN (v1, v2, …)</code>): routed to only the shards those values hash to (the router hashes each value and unions the shard set).</li>
 <li><strong>Everything else</strong> — including range predicates (<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>) on the shard key, or a <code>WHERE</code> that doesn't constrain the shard key at all: scattered to <strong>all</strong> shards in parallel and results are merged. Because sharding is <strong>hash-based</strong>, the hash does not preserve value order, so range predicates on the shard key cannot be pruned to a subset of shards.</li>
 </ul>
-<p>Range and non-shard-key predicates can still benefit from <a href="#shard-pruning">Shard Pruning</a> via Bloom filters where a per-column filter is available.</p>
+<p>Once the target shards are chosen, <a href="../replication-ha/#read-placement-failover">read placement</a> decides <strong>which replica</strong> of each shard answers, and retries on another replica if that one does not respond.</p>
 <h2 id="shard-pruning">Shard Pruning</h2>
-<p>The coordinator maintains per-column Bloom filter caches for shards (<code>ShardBloomCache</code>, <code>neorunbase-coordinator/.../ShardBloomCache.java</code> — keyed <code>table#column → shardId → BloomFilter</code>), allowing it to skip shards that definitely do not contain the queried values. This reduces unnecessary I/O and improves query latency.</p>
+<p>The coordinator can keep per-column Bloom filters for shards (<code>ShardBloomCache</code>, keyed <code>table#column → shardId → BloomFilter</code>) and skip shards that definitely do not contain a queried value. It applies to <strong>equality on an indexed column</strong> only — not to range predicates, and not to columns without an index.</p>
+<p>It is <strong>disabled by default</strong> (<code>neorunbase.query.shard.bloom.prune.enabled=false</code>), because the filter is built only from <code>INSERT</code>s that a given coordinator process handled and lives only in that process's heap:</p>
+<ul>
+<li>With two or more coordinators, each one knows only its own inserts, so it can answer "definitely absent" for a value another coordinator wrote, prune the shard that really holds it, and drop rows from the result.</li>
+<li>Rows arriving by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect.</li>
+<li>Nothing survives a coordinator restart.</li>
+</ul>
+<p>Enable it only for a single-coordinator deployment whose writes all arrive as SQL <code>INSERT</code>s; see <a href="../../configuration/configuration/#shard-pruning-by-bloom-filter">Shard Pruning by Bloom Filter</a> for the sizing knobs. The sound placement for this filter is the data node, which owns the shard's index and sees every write regardless of origin — that is where it will move.</p>
 <h2 id="resharding">Resharding</h2>
 <p>NeorunBase supports online resharding, allowing you to change the number of shards for a table. During resharding, data is transparently migrated to the new shard layout without downtime, and the table stays read-write.</p>
 <p>Trigger a reshard with SQL:</p>

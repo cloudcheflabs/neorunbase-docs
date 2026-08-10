@@ -1798,6 +1798,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#admin-recovery-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Admin Recovery Socket
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1877,6 +1888,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Vector ANN &amp; FTS Index Maintenance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resident-ann-hnsw-memory-budget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident ANN (HNSW) Memory Budget
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index-prewarm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index Prewarm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1962,6 +2001,28 @@
     <span class="md-ellipsis">
       
         Distributed Query / DDL Timeouts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read Placement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-pruning-by-bloom-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard Pruning by Bloom Filter
       
     </span>
   </a>
@@ -3058,6 +3119,39 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 </tr>
 </tbody>
 </table>
+<h3 id="admin-recovery-socket">Admin Recovery Socket</h3>
+<p>The out-of-band channel that lets an operator reset the <code>admin</code> password on a running coordinator when nobody can log in. It is a <strong>Unix domain socket only</strong> — no HTTP endpoint, no network surface. The socket file's OS permission (mode <code>600</code>) is the entire authentication: any process that can open it already shares the coordinator process's filesystem identity. See <a href="../../features/admin-password-recovery/">Admin Password Recovery</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.admin.socket.enabled</code></td>
+<td><code>true</code></td>
+<td>Expose the recovery socket. Set <code>false</code> to remove that recovery path entirely — after which a forgotten admin password can only be fixed by a restart with a re-seeded account.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.socket.path</code></td>
+<td><code>${neorunbase.base.data.dir}/admin.sock</code></td>
+<td>Filesystem path of the socket. Must sit on a local filesystem that supports Unix domain sockets (not NFS or another networked mount). Recreated on every coordinator start.</td>
+</tr>
+<tr>
+<td><code>neorunbase.admin.socket.marker.file</code></td>
+<td><code>coordinator.socket</code></td>
+<td>File under <code>&lt;neorunbase.home&gt;/bin/</code> into which the coordinator writes the socket path it <em>actually</em> bound to. <code>neorunbase-cli.sh</code> prefers this over re-deriving the path from the properties file, because <code>neorunbase.base.data.dir</code> can be overridden with <code>-D</code> at launch or edited after startup. Removed on shutdown.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iam.audit.dir</code></td>
+<td><code>${neorunbase.base.data.dir}/iam-audit</code></td>
+<td>Directory holding the append-only audit log of admin-socket operations (who reset which password, and when).</td>
+</tr>
+</tbody>
+</table>
 <h2 id="write-ahead-log-wal-encryption">Write-Ahead Log (WAL) &amp; Encryption</h2>
 <table>
 <thead>
@@ -3292,6 +3386,64 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 </tr>
 </tbody>
 </table>
+<h3 id="resident-ann-hnsw-memory-budget">Resident ANN (HNSW) Memory Budget</h3>
+<p>An HNSW index is deserialized <strong>whole</strong> into the data node's heap — unlike FTS, whose segments stay on encrypted disk behind the bounded plaintext cache above. Without a budget, a node hosting many shards × many vector indexes can only fail by <code>OutOfMemoryError</code>. When the estimated working set crosses the budget, the least recently used indexes are flushed to their sidecars and dropped; the next query reloads them. Eviction never loses writes: a dirty index is flushed first, and a write that races an eviction re-resolves its cache entry instead of writing into a dropped one.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.ann.cache.max.bytes</code></td>
+<td><code>0</code></td>
+<td>Absolute cap on resident HNSW indexes for this data node. <code>0</code> means "derive it from the heap fraction below".</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.max.heap.fraction</code></td>
+<td><code>0.4</code></td>
+<td>Fraction of the JVM max heap used as the budget when the absolute cap is <code>0</code>. Set to <code>0</code> to disable eviction entirely (indexes stay resident forever — the pre-budget behaviour).</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.graph.overhead.bytes.per.vector</code></td>
+<td><code>128</code></td>
+<td>Per-vector allowance used when estimating an index's resident size. The raw payload is <code>dimensions × 4</code> bytes; this covers the neighbour lists across levels, the label/id maps and object headers. Raise it for indexes built with a large <code>M</code>.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.mutate.max.attempts</code></td>
+<td><code>16</code></td>
+<td>How many times a vector-index write re-resolves its cache entry when an eviction races it. Exhausting this means the budget cannot hold the working set at all, and the write fails loudly rather than being applied to an index that already left the cache. Raise the budget, not this number.</td>
+</tr>
+</tbody>
+</table>
+<p>Four gauges expose the outcome on the data node's metrics endpoint: <code>neorunbase.ann.cache.bytes</code> (estimated resident size), <code>neorunbase.ann.cache.entries</code>, <code>neorunbase.ann.cache.budget.bytes</code> and <code>neorunbase.ann.cache.evictions</code>.</p>
+<h3 id="index-prewarm">Index Prewarm</h3>
+<p>HNSW and Lucene indexes are opened lazily from their encrypted sidecars, so on a freshly started node the <strong>first</strong> search of each <code>(shard, index)</code> pays the decrypt + deserialize inside its own latency — a cold-start cliff that lands exactly during a rolling restart. Prewarm moves that cost off the query path: the leading coordinator walks the catalog once and asks every node hosting a shard to open the indexes it will be asked about. Warming targets <strong>every replica</strong>, not just the primary, because read failover and round-robin read placement can route a search to any of them.</p>
+<p>Best effort throughout — a node that is down, an index never built on a shard, or an ANN cache already at its memory budget simply reduces how much gets warmed.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.index.prewarm.enabled</code></td>
+<td><code>true</code></td>
+<td>Run the one-shot prewarm sweep after coordinator startup. Set <code>false</code> to keep indexes strictly lazy.</td>
+</tr>
+<tr>
+<td><code>neorunbase.index.prewarm.delay.seconds</code></td>
+<td><code>30</code></td>
+<td>Grace period after coordinator startup before the sweep runs, so data nodes have registered and reported their shards first.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="graph-traversal">Graph Traversal</h2>
 <table>
 <thead>
@@ -3505,6 +3657,56 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 </tr>
 </tbody>
 </table>
+<h2 id="read-placement">Read Placement</h2>
+<p>Which replica of a shard serves a read. Writes are replicated <strong>synchronously</strong> — a DML waits for every replica of the shard before returning — so any live replica holds the same rows, and the same secondary-index column families, HNSW sidecars and Lucene indexes, as the primary. See <a href="../../features/replication-ha/#read-placement-failover">Replication &amp; High Availability</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.query.read.replica.selection</code></td>
+<td><code>primary</code></td>
+<td><code>primary</code> reads the shard's primary and uses the other replicas only as failover, preserving the strict read-your-writes path. <code>round_robin</code> spreads shards over their replicas so the index copies that replication already keeps resident on every replica also serve queries instead of sitting idle. Failover applies under both settings.</td>
+</tr>
+</tbody>
+</table>
+<p><code>round_robin</code> is opt-in because a replica that restarted and has not finished repair can lag behind the primary; <code>primary</code> never reads one.</p>
+<h2 id="shard-pruning-by-bloom-filter">Shard Pruning by Bloom Filter</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.query.shard.bloom.prune.enabled</code></td>
+<td><code>false</code></td>
+<td>Coordinator-local Bloom filter that skips shards for an equality on an indexed column. <strong>Disabled by default</strong> — see the soundness note below.</td>
+</tr>
+<tr>
+<td><code>neorunbase.query.shard.bloom.expected.insertions</code></td>
+<td><code>1000000</code></td>
+<td>Sizing for each per-<code>(table, column, shard)</code> filter. Memory is roughly <code>expectedInsertions × 1.2</code> bytes at fpp <code>0.01</code>, per shard per indexed column, on every coordinator.</td>
+</tr>
+<tr>
+<td><code>neorunbase.query.shard.bloom.fpp</code></td>
+<td><code>0.01</code></td>
+<td>Target false-positive probability.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Only sound with a single coordinator</p>
+<p>The filter is built <strong>only</strong> from INSERTs that a given coordinator process handled, and lives only in its heap. With two or more coordinators, coordinator B holds a filter for a shard containing just the values <em>B</em> inserted, so a lookup for a value <em>A</em> inserted answers "definitely absent", B prunes the shard, and the row is silently missing from the result. Rows that reach a shard by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect, and nothing survives a restart. Enable it only for a single-coordinator deployment whose writes all arrive as SQL <code>INSERT</code>s. The sound placement for this filter is the data node, which owns the shard index and sees every write regardless of origin.</p>
+</div>
 <h2 id="disk-repair">Disk Repair</h2>
 <table>
 <thead>

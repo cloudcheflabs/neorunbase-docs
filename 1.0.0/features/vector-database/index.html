@@ -1299,6 +1299,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#resident-memory-budget-eviction-prewarm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resident Memory — Budget, Eviction, Prewarm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#primary-key-requirement-for-hnsw-indexed-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1945,10 +1956,46 @@
 <li><strong>Lazy rebuild on stale sidecar</strong> — each sidecar records the WAL sequence number it was flushed at. On the next write, the Data Node compares that sequence number to the current WAL seqno and rebuilds the sidecar from RocksDB rows if it is behind (or missing entirely, e.g. on a freshly repaired replica). No admin action is needed to converge after an ungraceful shutdown as long as the shard eventually sees a write.</li>
 <li><strong>On-demand rebuild</strong> — <code>REBUILD INDEX idx_name ON table_name</code> (SQL) or the admin REST endpoint <code>POST /admin/ann/rebuild</code> forces an unconditional rebuild on every replica of every shard owning the table. This covers read-only or lightly-written shards whose lazy path may not fire. The fan-out is bounded by <code>neorunbase.query.ann.rebuild.timeout.ms</code> (default 300000).</li>
 </ul>
+<h2 id="resident-memory-budget-eviction-prewarm">Resident Memory — Budget, Eviction, Prewarm</h2>
+<p>An HNSW graph is deserialized <strong>whole</strong> into the Data Node heap; unlike the full-text indexes, whose Lucene segments stay on encrypted disk behind a bounded plaintext cache, there is no partial residency. A node hosting many shards × many vector indexes therefore needs a ceiling.</p>
+<ul>
+<li><strong>Budget</strong> — <code>neorunbase.ann.cache.max.bytes</code>, or <code>neorunbase.ann.cache.max.heap.fraction</code> (default <code>0.4</code> of max heap) when the absolute cap is <code>0</code>. Setting the fraction to <code>0</code> disables eviction entirely, which is the pre-budget behaviour.</li>
+<li><strong>Eviction</strong> — when a load pushes the estimated working set past the budget, the least recently used indexes are dropped until it fits. A dirty index is flushed to its sidecar <em>first</em>, so an eviction only ever costs a reload, never data. An index that cannot be flushed (for example its sidecar manager is unavailable) is kept resident rather than dropped.</li>
+<li><strong>Write safety</strong> — a vector-index write that races an eviction re-resolves its cache entry instead of writing into a dropped one, which would have silently lost the row from the index. If every attempt is evicted (<code>neorunbase.ann.cache.mutate.max.attempts</code>, default 16) the write fails loudly: the budget cannot hold the working set and needs raising.</li>
+<li><strong>Size estimate</strong> — <code>size × (dimensions × 4 + neorunbase.ann.cache.graph.overhead.bytes.per.vector)</code>. The overhead term covers neighbour lists, id maps and headers; raise it for indexes built with a large <code>M</code>.</li>
+</ul>
+<p><strong>Prewarm.</strong> Sidecars open lazily, so on a freshly started node the first search of each <code>(shard, index)</code> pays the decrypt + deserialize inside its own latency. With <code>neorunbase.index.prewarm.enabled</code> (default <code>true</code>) the leading coordinator walks the catalog <code>neorunbase.index.prewarm.delay.seconds</code> after startup (default 30s, so data nodes have registered) and asks every node hosting a shard to open its vector and full-text indexes up front. Warming targets every replica, not just the primary, because read failover and round-robin read placement can route a search to any of them. It is best effort: a down node, an index never built on a shard, or a cache already at its budget simply reduces how much gets warmed.</p>
 <h2 id="primary-key-requirement-for-hnsw-indexed-tables">Primary Key Requirement for HNSW-Indexed Tables</h2>
 <p>HNSW nodes are addressed by a numeric id. To keep search hits round-tripping directly through the primary key store without a secondary id→pk map, NeorunBase requires HNSW-indexed tables to have a single-column numeric primary key (<code>INT</code>, <code>BIGINT</code>, or <code>SMALLINT</code>). Attempts to create an HNSW index on a table with a non-numeric or composite primary key are rejected at DDL time.</p>
 <h2 id="observability">Observability</h2>
 <p>Vector search is instrumented alongside the rest of NeorunBase in the built-in Codahale/Prometheus metrics pipeline. Exposed metrics include search / insert / update / delete / flush / rebuild meters, an error counter, and latency timers for search, flush, and rebuild (p50 / p99 / max). The admin endpoint <code>GET /admin/ann/status</code> fans out across all Data Nodes and returns one row per cached <code>(shard, index)</code> pair with size, dirty flag, pending WAL seqno, and last flushed seqno — enough to tell at a glance which sidecars are behind.</p>
+<p>Four gauges track resident index memory per Data Node, so the budget above is observable rather than guessed:</p>
+<table>
+<thead>
+<tr>
+<th>Gauge</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.ann.cache.bytes</code></td>
+<td>Estimated resident size of all cached HNSW indexes.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.entries</code></td>
+<td>Number of cached <code>(shard, index)</code> pairs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.budget.bytes</code></td>
+<td>The effective budget (<code>0</code> = unbounded).</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.evictions</code></td>
+<td>Indexes dropped so far to stay inside the budget. A steadily climbing value means the working set does not fit and reloads are being paid repeatedly.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="hybrid-search-combining-vector-with-bm25">Hybrid Search — Combining Vector with BM25</h2>
 <p>A vector signal alone is rarely the strongest retrieval. NeorunBase exposes <code>HYBRID_SEARCH(...)</code> — a single-SQL TVF that runs an FTS scatter and an ANN scatter in parallel and blends the two top-K lists by min-max + linear combination or by Reciprocal Rank Fusion. The result composes naturally with <code>WHERE</code> (Hard Filter), <code>JOIN</code> (metadata enrichment), and other graph TVFs (re-ranking, fact-check):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">score</span>

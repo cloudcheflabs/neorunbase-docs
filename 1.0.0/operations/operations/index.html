@@ -1874,6 +1874,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#vector-index-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Index Memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#bitrot-scrubber" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2130,6 +2141,35 @@ process itself.</p>
 <li>The Logback-managed log files configured by <code>conf/logback.xml</code>, under <code>neorunbase.log.path</code> (which itself defaults to <code>${neorunbase.base.data.dir}/logs</code>).</li>
 </ul>
 <p>Setting <code>neorunbase.log.mode=RING_BUFFER</code> switches file-based logging off in favor of an in-memory ring buffer of <code>neorunbase.log.ring.buffer.capacity</code> lines, which the Admin UI tails directly. This is the recommended mode for environments where local disk is ephemeral or unavailable.</p>
+<h3 id="vector-index-memory">Vector Index Memory</h3>
+<p>An HNSW index is loaded whole into the Data Node heap, so it is the one index kind whose growth can take a node down. Four gauges make the working set visible:</p>
+<table>
+<thead>
+<tr>
+<th>Gauge</th>
+<th>Watch for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.ann.cache.bytes</code></td>
+<td>Estimated resident size of all cached HNSW indexes on that node.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.budget.bytes</code></td>
+<td>The enforced ceiling (<code>0</code> = unbounded). Defaults to 40% of max heap.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.entries</code></td>
+<td>Number of cached <code>(shard, index)</code> pairs.</td>
+</tr>
+<tr>
+<td><code>neorunbase.ann.cache.evictions</code></td>
+<td>A <strong>steadily climbing</strong> value means the working set does not fit the budget and queries keep paying reloads. Either raise <code>neorunbase.ann.cache.max.heap.fraction</code> (or the JVM heap), or move shards off the node.</td>
+</tr>
+</tbody>
+</table>
+<p><code>GET /admin/ann/status</code> fans out across Data Nodes for the per-<code>(shard, index)</code> view (size, dirty flag, flushed vs pending WAL seqno). After a restart, look for <code>Index prewarm on &lt;node&gt;: N warmed, …</code> in the Data Node logs to confirm the indexes were opened ahead of the first query rather than inside it.</p>
 <h3 id="bitrot-scrubber">Bitrot Scrubber</h3>
 <p>Setting <code>neorunbase.scrubber.enabled=true</code> turns on a throttled background scanner that re-verifies the AES-GCM auth tag on every record in every closed heap segment file. The scanner paces itself at <code>neorunbase.scrubber.throttle.bytes.per.sec</code> (default 50 MB/s) so it does not interfere with OLTP traffic, and surfaces any corruption findings through the Admin UI and the admin REST API. Bitrot is detected on read regardless of this toggle; the scrubber adds proactive scanning.</p>
 <h2 id="shutdown">Shutdown</h2>
