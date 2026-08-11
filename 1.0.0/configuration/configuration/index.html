@@ -2019,17 +2019,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#shard-pruning-by-bloom-filter" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shard Pruning by Bloom Filter
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#disk-repair" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3442,6 +3431,11 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td><code>30</code></td>
 <td>Grace period after coordinator startup before the sweep runs, so data nodes have registered and reported their shards first.</td>
 </tr>
+<tr>
+<td><code>neorunbase.index.prewarm.catalog.wait.seconds</code></td>
+<td><code>120</code></td>
+<td>How long the sweep keeps waiting for the catalog to report any table before giving up. A coordinator can win leadership before its catalog has finished syncing, and a sweep at that moment sees zero tables and warms nothing — "no tables" and "not synced yet" look identical from the coordinator's side. An <strong>empty</strong> table list is therefore treated as not-ready and retried inside this window; a non-empty one is taken at face value, so a cluster whose tables genuinely carry no vector or full-text index finishes at once.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="graph-traversal">Graph Traversal</h2>
@@ -3676,37 +3670,6 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 </tbody>
 </table>
 <p><code>round_robin</code> is opt-in because a replica that restarted and has not finished repair can lag behind the primary; <code>primary</code> never reads one.</p>
-<h2 id="shard-pruning-by-bloom-filter">Shard Pruning by Bloom Filter</h2>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>neorunbase.query.shard.bloom.prune.enabled</code></td>
-<td><code>false</code></td>
-<td>Coordinator-local Bloom filter that skips shards for an equality on an indexed column. <strong>Disabled by default</strong> — see the soundness note below.</td>
-</tr>
-<tr>
-<td><code>neorunbase.query.shard.bloom.expected.insertions</code></td>
-<td><code>1000000</code></td>
-<td>Sizing for each per-<code>(table, column, shard)</code> filter. Memory is roughly <code>expectedInsertions × 1.2</code> bytes at fpp <code>0.01</code>, per shard per indexed column, on every coordinator.</td>
-</tr>
-<tr>
-<td><code>neorunbase.query.shard.bloom.fpp</code></td>
-<td><code>0.01</code></td>
-<td>Target false-positive probability.</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition warning">
-<p class="admonition-title">Only sound with a single coordinator</p>
-<p>The filter is built <strong>only</strong> from INSERTs that a given coordinator process handled, and lives only in its heap. With two or more coordinators, coordinator B holds a filter for a shard containing just the values <em>B</em> inserted, so a lookup for a value <em>A</em> inserted answers "definitely absent", B prunes the shard, and the row is silently missing from the result. Rows that reach a shard by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect, and nothing survives a restart. Enable it only for a single-coordinator deployment whose writes all arrive as SQL <code>INSERT</code>s. The sound placement for this filter is the data node, which owns the shard index and sees every write regardless of origin.</p>
-</div>
 <h2 id="disk-repair">Disk Repair</h2>
 <table>
 <thead>
