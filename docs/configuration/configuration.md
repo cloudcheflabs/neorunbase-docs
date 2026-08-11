@@ -396,6 +396,7 @@ Best effort throughout — a node that is down, an index never built on a shard,
 | --- | --- | --- |
 | `neorunbase.index.prewarm.enabled` | `true` | Run the one-shot prewarm sweep after coordinator startup. Set `false` to keep indexes strictly lazy. |
 | `neorunbase.index.prewarm.delay.seconds` | `30` | Grace period after coordinator startup before the sweep runs, so data nodes have registered and reported their shards first. |
+| `neorunbase.index.prewarm.catalog.wait.seconds` | `120` | How long the sweep keeps waiting for the catalog to report any table before giving up. A coordinator can win leadership before its catalog has finished syncing, and a sweep at that moment sees zero tables and warms nothing — "no tables" and "not synced yet" look identical from the coordinator's side. An **empty** table list is therefore treated as not-ready and retried inside this window; a non-empty one is taken at face value, so a cluster whose tables genuinely carry no vector or full-text index finishes at once. |
 
 ## Graph Traversal
 
@@ -473,17 +474,6 @@ Which replica of a shard serves a read. Writes are replicated **synchronously** 
 | `neorunbase.query.read.replica.selection` | `primary` | `primary` reads the shard's primary and uses the other replicas only as failover, preserving the strict read-your-writes path. `round_robin` spreads shards over their replicas so the index copies that replication already keeps resident on every replica also serve queries instead of sitting idle. Failover applies under both settings. |
 
 `round_robin` is opt-in because a replica that restarted and has not finished repair can lag behind the primary; `primary` never reads one.
-
-## Shard Pruning by Bloom Filter
-
-| Property | Default | Description |
-| --- | --- | --- |
-| `neorunbase.query.shard.bloom.prune.enabled` | `false` | Coordinator-local Bloom filter that skips shards for an equality on an indexed column. **Disabled by default** — see the soundness note below. |
-| `neorunbase.query.shard.bloom.expected.insertions` | `1000000` | Sizing for each per-`(table, column, shard)` filter. Memory is roughly `expectedInsertions × 1.2` bytes at fpp `0.01`, per shard per indexed column, on every coordinator. |
-| `neorunbase.query.shard.bloom.fpp` | `0.01` | Target false-positive probability. |
-
-!!! warning "Only sound with a single coordinator"
-    The filter is built **only** from INSERTs that a given coordinator process handled, and lives only in its heap. With two or more coordinators, coordinator B holds a filter for a shard containing just the values *B* inserted, so a lookup for a value *A* inserted answers "definitely absent", B prunes the shard, and the row is silently missing from the result. Rows that reach a shard by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect, and nothing survives a restart. Enable it only for a single-coordinator deployment whose writes all arrive as SQL `INSERT`s. The sound placement for this filter is the data node, which owns the shard index and sees every write regardless of origin.
 
 ## Disk Repair
 

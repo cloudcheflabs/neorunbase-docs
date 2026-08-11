@@ -66,6 +66,8 @@ NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync
 
 New tables created by NeorunBase are v2 by default; opt into v3 with `-Dneorunbase.iceberg.format.version=3` (or `NEORUNBASE_ICEBERG_FORMAT_VERSION=3`).
 
+Because NeorunBase writes equality deletes even on v3, its own tables never produce a deletion vector — the DV read path can only be exercised by a second engine, so it is verified against one. NeorunBase syncs a v3 table into a Polaris catalog backed by ShannonStore, **Ontul** runs a `DELETE` against that same table (writing one Puffin `deletion-vector-v1` blob per touched data file), and NeorunBase must then return only the surviving rows. Both serving paths are asserted — the scan path and the [PK point/range index](iceberg-serving.md#the-primary-key-index), which is built per snapshot and therefore has to apply the new vectors when it rebuilds.
+
 ### Multi-Format Data Files (Parquet, ORC, Avro)
 
 NeorunBase reads Iceberg data files in all three formats — **PARQUET**, **ORC**, and **AVRO** — including tables written by other engines such as Trino and Spark. The format is detected **per file** from the `DataFile` format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.

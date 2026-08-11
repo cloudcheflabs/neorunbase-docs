@@ -22,7 +22,7 @@ NeorunBase consists of two main deployable components: **Coordinator** and **Dat
 The Coordinator is the SQL-facing entry point that clients connect to via the PostgreSQL wire protocol. It is responsible for:
 
 - **SQL Parsing**: Parses incoming SQL statements using Apache Calcite (for DML) and a custom DDL parser.
-- **Query Routing**: Determines the target shards using Murmur3 hash-based shard routing on the shard key, and prunes shards with Bloom filter caches.
+- **Query Routing**: Determines the target shards using Murmur3 hash-based shard routing on the shard key — an equality or `IN` on the shard key resolves to exactly those shards, anything else scatters — then picks which **replica** of each shard serves the read, failing over to another replica when one does not answer.
 - **Distributed Query Execution**: Scatters queries to the relevant Data Nodes in parallel via an internal binary NIO protocol (with Snappy compression and AES encryption), then merges partial results (sort-merge, aggregation, LIMIT).
 - **Distributed Transactions**: Supports ACID transactions across shards using a two-phase commit protocol (PREPARE + COMMIT).
 - **Cluster Metadata Management**: The leader Coordinator maintains table schemas and shard maps in an encrypted RocksDB-backed metadata store, and synchronizes them to non-leader Coordinators.

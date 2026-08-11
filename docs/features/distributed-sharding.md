@@ -48,15 +48,16 @@ Once the target shards are chosen, [read placement](replication-ha.md#read-place
 
 ## Shard Pruning
 
-The coordinator can keep per-column Bloom filters for shards (`ShardBloomCache`, keyed `table#column → shardId → BloomFilter`) and skip shards that definitely do not contain a queried value. It applies to **equality on an indexed column** only — not to range predicates, and not to columns without an index.
+A scatter query fans out to every target shard. NeorunBase does **not** try to skip shards using a coordinator-side summary of their contents, because no such summary can be made sound:
 
-It is **disabled by default** (`neorunbase.query.shard.bloom.prune.enabled=false`), because the filter is built only from `INSERT`s that a given coordinator process handled and lives only in that process's heap:
+- A negative answer ("this shard definitely has no such value") is only safe if the coordinator's copy is never missing a value that exists. Any staleness at all turns into a pruned shard and a **silently missing row**.
+- Keeping it fresh would require every write — from any coordinator, from Kafka ingest, from restore, from resharding, from replica repair — to synchronously reach every coordinator's copy. That is more coordination than the scatter it was meant to avoid.
 
-- With two or more coordinators, each one knows only its own inserts, so it can answer "definitely absent" for a value another coordinator wrote, prune the shard that really holds it, and drop rows from the result.
-- Rows arriving by any other route — Kafka ingest, restore, resharding, replica repair — are never recorded, with the same effect.
-- Nothing survives a coordinator restart.
+A coordinator-local Bloom filter of this shape did exist and was removed: it was populated only from the `INSERT`s that one coordinator process handled, so a second coordinator would answer "definitely absent" for a value the first had written.
 
-Enable it only for a single-coordinator deployment whose writes all arrive as SQL `INSERT`s; see [Shard Pruning by Bloom Filter](../configuration/configuration.md#shard-pruning-by-bloom-filter) for the sizing knobs. The sound placement for this filter is the data node, which owns the shard's index and sees every write regardless of origin — that is where it will move.
+What actually makes a non-matching shard cheap is that the shard itself answers fast. An equality on an indexed column becomes a single RocksDB seek into that index's column family; a miss returns an empty result without reading a row or touching the heap. The cost that remains is the RPC, and that is the part no correct coordinator-side filter can remove.
+
+Predicates that *can* be narrowed before fan-out are handled by [Query Routing](#query-routing) above: an equality or `IN` on the shard key resolves to the exact shards that can hold those values.
 
 ## Resharding
 
