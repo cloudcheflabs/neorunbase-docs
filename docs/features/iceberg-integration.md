@@ -62,11 +62,18 @@ Adding a column to a NeorunBase table (`ALTER TABLE … ADD COLUMN …`) is prop
 
 ### Format version 2 and 3 (deletion vectors)
 
-NeorunBase reads tables in both Iceberg format-version 2 and 3. Its own CDC sync writes **equality deletes**, which remain valid in v3, so no write change is needed for v3. Tables written by other engines (Ontul, Trino, Spark) on v3 use **deletion vectors** — a roaring bitmap of deleted row positions stored in a [Puffin](https://iceberg.apache.org/puffin-spec/) `deletion-vector-v1` blob instead of position-delete files — and NeorunBase reads and applies these transparently.
+NeorunBase reads **and writes** tables in both Iceberg format-version 2 and 3. On v3, deleted rows are recorded as **deletion vectors** — a roaring bitmap of deleted row positions stored in a [Puffin](https://iceberg.apache.org/puffin-spec/) `deletion-vector-v1` blob, in place of position-delete files. NeorunBase applies vectors written by other engines (Ontul, Trino, Spark) transparently, and writes them itself when a row-level `DELETE` or `UPDATE` runs against a v3 table.
 
 New tables created by NeorunBase are v2 by default; opt into v3 with `-Dneorunbase.iceberg.format.version=3` (or `NEORUNBASE_ICEBERG_FORMAT_VERSION=3`).
 
-Because NeorunBase writes equality deletes even on v3, its own tables never produce a deletion vector — the DV read path can only be exercised by a second engine, so it is verified against one. NeorunBase syncs a v3 table into a Polaris catalog backed by ShannonStore, **Ontul** runs a `DELETE` against that same table (writing one Puffin `deletion-vector-v1` blob per touched data file), and NeorunBase must then return only the surviving rows. Both serving paths are asserted — the scan path and the [PK point/range index](iceberg-serving.md#the-primary-key-index), which is built per snapshot and therefore has to apply the new vectors when it rebuilds.
+Which delete form NeorunBase *writes* depends on the path. The CDC sync writes **equality deletes** on both v2 and v3, because it upserts by primary key and equality deletes remain valid in v3. A row-level `DELETE` or `UPDATE` writes **positional** deletes instead — a parquet position-delete file on v2, a Puffin deletion vector on v3 — see [Row-Level DML on Iceberg Tables](iceberg-dml.md).
+
+Both directions are verified against foreign engines rather than assumed:
+
+| Direction | What is proven | Engine |
+| --- | --- | --- |
+| NeorunBase **reads** another engine's v3 deletion vectors | Ontul `DELETE`s on a shared v3 table; NeorunBase must return only the survivors, on both the scan path and the per-snapshot [PK index](iceberg-serving.md#the-primary-key-index) | Ontul |
+| Another engine **reads** NeorunBase's delete files | NeorunBase `DELETE`/`UPDATE`/`INSERT`s; Trino must report the identical rows | Trino |
 
 ### Multi-Format Data Files (Parquet, ORC, Avro)
 
@@ -80,7 +87,7 @@ Multi-format read applies everywhere an external Iceberg table is read:
 
 NeorunBase still **writes Parquet** for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.
 
-`MERGE INTO iceberg.<ns>.<target> USING <source> …` is supported as a copy-on-write merge. Direct `INSERT`, `UPDATE`, `DELETE` against Iceberg tables are not — use the native NeorunBase table plus CDC sync, or `MERGE INTO`.
+`INSERT`, `UPDATE` and `DELETE` run directly against an Iceberg table, as does `MERGE INTO`. `UPDATE` and `DELETE` are **merge-on-read**: the matched rows are recorded as delete files and the data files are never rewritten. See [Row-Level DML on Iceberg Tables](iceberg-dml.md) for what gets written on each format version and how other engines read it.
 
 ## Open Lakehouse Analytics
 
@@ -88,9 +95,10 @@ Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino
 
 ## What Is Not (Yet) Supported
 
-- Direct `INSERT` / `UPDATE` / `DELETE` on Iceberg tables (use `MERGE INTO` or the native table)
 - `DROP COLUMN`, `RENAME COLUMN`, type promotion in schema evolution
 - Snapshot expiration and small-file / manifest compaction
 - Time travel (`AS OF SNAPSHOT` / `AS OF TIMESTAMP`)
-- Branching and tagging
+- Branch and tag **DDL** (creating, dropping or listing them from SQL). A configured
+  [WAP](iceberg-wap.md) branch is created and fast-forwarded for you; there is no general
+  branching surface beyond that.
 - Iceberg REST catalogs other than Polaris

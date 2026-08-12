@@ -20,6 +20,15 @@ NeorunBase supports standard SQL operations with PostgreSQL conformance:
 - **Transactions**: `BEGIN` (or `START TRANSACTION`), `COMMIT`, `ROLLBACK`
 - **Queries**: `JOIN`, `GROUP BY`, `ORDER BY`, `LIMIT`, `HAVING`, subqueries, aggregation functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), scalar functions (`ABS`, `ROUND`, `LENGTH`, `UPPER`, `LOWER`, `COALESCE`, …), `CASE WHEN`, `CAST`, and more
 
+An aggregate with **no `GROUP BY` is defined over the whole input, so it returns exactly one row even when nothing matched** — `COUNT` yields `0`, the others `NULL`:
+
+```sql
+SELECT count(*) FROM orders WHERE id = -1;   -- one row: 0
+SELECT sum(amount) FROM orders WHERE id = -1; -- one row: NULL
+```
+
+This matters for drivers: a client that reads the value straight off the first row would otherwise find no row at all. With a `GROUP BY`, an empty input genuinely produces no groups and the result is empty, as PostgreSQL does.
+
 ## Data Types
 
 NeorunBase supports a wide range of data types:

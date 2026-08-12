@@ -14,8 +14,9 @@ This builds on the [Iceberg Integration](iceberg-integration.md) catalog and CDC
   ┌──────────────┐     ┌──────────────────┐     ┌───────────────────┐
   │ CTAS /       │     │ readers still see │     │ fast-forward main │
   │ MERGE INTO / │ ──▶ │ main (frozen);    │ ──▶ │ to the audit head │
-  │ CDC sync     │     │ rows staged on    │     │ → rows go live    │
-  │ → audit      │     │ the audit branch  │     │                   │
+  │ DML /        │     │ rows staged on    │     │ → rows go live    │
+  │ CDC sync     │     │ the audit branch  │     │                   │
+  │ → audit      │     │                   │     │                   │
   └──────────────┘     └──────────────────┘     └───────────────────┘
 ```
 
@@ -80,7 +81,7 @@ Note the ordering: the two **table-scoped system properties (1, 2) override a ca
 `'wap.branch'` option (3)**, and the catalog option in turn overrides the cluster-wide
 default (4). Leave all four unset and writes go straight to `main` (WAP disabled).
 
-## Behavior for CTAS / MERGE INTO / CDC sync
+## Behavior for CTAS / MERGE INTO / CDC sync / row-level DML
 
 When a WAP branch is active, the branch is created if missing (branched off the current
 `main`) and **all** of these write to it, never to `main`:
@@ -92,6 +93,10 @@ When a WAP branch is active, the branch is created if missing (branched off the 
 - **CDC sync** — the automatic table mirror (full first sync and incremental
   add-data + equality-delete commits) targets the branch. The sync high-water mark is
   still tracked, so restarts resume correctly.
+- **Row-level `INSERT` / `UPDATE` / `DELETE`** — the merge-on-read `RowDelta` (position
+  deletes on v2, deletion vectors on v3) is committed to the branch, so a delete can be
+  staged and audited before it becomes visible. See
+  [Row-Level DML on Iceberg Tables](iceberg-dml.md).
 
 `main` stays exactly as it was until you publish, so concurrent readers are unaffected.
 

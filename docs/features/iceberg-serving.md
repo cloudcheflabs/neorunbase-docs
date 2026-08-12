@@ -94,9 +94,9 @@ Toggle with `neorunbase.iceberg.pk.index.persist` (default `true`).
 The index always reflects the table's current snapshot. Two mechanisms keep that cheap:
 
 **Eager invalidation.** After a write commits a new snapshot — a native→Iceberg sync, a
-`MERGE INTO`, an append, or a CTAS — NeorunBase eagerly evicts the cached snapshot for that
-table across **every catalog** that exposes it, so the *next* read sees fresh data without
-waiting out the metadata cache TTL.
+`MERGE INTO`, a row-level [`DELETE` / `UPDATE` / `INSERT`](iceberg-dml.md), an append, or a
+CTAS — NeorunBase eagerly evicts the cached snapshot for that table across **every catalog**
+that exposes it, so the *next* read sees fresh data without waiting out the metadata cache TTL.
 
 **Incremental update.** When the snapshot advances and every snapshot in between is a plain
 **append** (no deletes/overwrites/replaces), NeorunBase indexes **only the newly added data
@@ -142,6 +142,22 @@ different predicates and still prune each one.
 !!! note
     A predicate on the primary key alone never reaches this path — the PK index answers it
     before a plan is consulted at all. Pruning matters for the other predicates.
+
+### `count(*)` without a WHERE
+
+An unfiltered `SELECT count(*)` is answered from metadata whenever metadata can answer it
+**exactly** — no data file is read:
+
+| Table state | Answer |
+| --- | --- |
+| No delete files | Sum of each data file's `record_count`. |
+| **v3 deletion vectors only** | `sum(data.record_count) − sum(dv.record_count)`, still exact: a deletion vector is 1:1 with its data file, so no position can be subtracted twice. |
+| v2 position deletes | Scanned. Two position-delete files may legally list the same `(file, pos)`, so subtracting record counts could over-delete. |
+| Equality deletes | Scanned. They match by key; the live-row impact is not in the metadata. |
+
+So a v3 serving table keeps answering `count(*)` in constant time after a `DELETE`, which is
+where a full scan costs the most. See
+[Row-Level DML on Iceberg Tables](iceberg-dml.md#count-after-a-delete).
 
 ## Manual secondary indexes
 
