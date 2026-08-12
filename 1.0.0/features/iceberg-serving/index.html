@@ -14,7 +14,7 @@
         <link rel="prev" href="../iceberg-integration/">
       
       
-        <link rel="next" href="../iceberg-wap/">
+        <link rel="next" href="../iceberg-dml/">
       
       
         
@@ -1162,6 +1162,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Scan-path pruning for everything else">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#count-without-a-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count(*) without a WHERE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1223,6 +1240,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-dml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Row-Level DML on Iceberg
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1917,9 +1962,9 @@ are stored — never row data.</p>
 <h2 id="maintenance-eager-incremental">Maintenance: eager + incremental</h2>
 <p>The index always reflects the table's current snapshot. Two mechanisms keep that cheap:</p>
 <p><strong>Eager invalidation.</strong> After a write commits a new snapshot — a native→Iceberg sync, a
-<code>MERGE INTO</code>, an append, or a CTAS — NeorunBase eagerly evicts the cached snapshot for that
-table across <strong>every catalog</strong> that exposes it, so the <em>next</em> read sees fresh data without
-waiting out the metadata cache TTL.</p>
+<code>MERGE INTO</code>, a row-level <a href="../iceberg-dml/"><code>DELETE</code> / <code>UPDATE</code> / <code>INSERT</code></a>, an append, or a
+CTAS — NeorunBase eagerly evicts the cached snapshot for that table across <strong>every catalog</strong>
+that exposes it, so the <em>next</em> read sees fresh data without waiting out the metadata cache TTL.</p>
 <p><strong>Incremental update.</strong> When the snapshot advances and every snapshot in between is a plain
 <strong>append</strong> (no deletes/overwrites/replaces), NeorunBase indexes <strong>only the newly added data
 files</strong> and merges them into the existing index — it does not re-read the whole table. If a
@@ -1956,6 +2001,38 @@ different predicates and still prune each one.</p>
 <p>A predicate on the primary key alone never reaches this path — the PK index answers it
 before a plan is consulted at all. Pruning matters for the other predicates.</p>
 </div>
+<h3 id="count-without-a-where"><code>count(*)</code> without a WHERE</h3>
+<p>An unfiltered <code>SELECT count(*)</code> is answered from metadata whenever metadata can answer it
+<strong>exactly</strong> — no data file is read:</p>
+<table>
+<thead>
+<tr>
+<th>Table state</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No delete files</td>
+<td>Sum of each data file's <code>record_count</code>.</td>
+</tr>
+<tr>
+<td><strong>v3 deletion vectors only</strong></td>
+<td><code>sum(data.record_count) − sum(dv.record_count)</code>, still exact: a deletion vector is 1:1 with its data file, so no position can be subtracted twice.</td>
+</tr>
+<tr>
+<td>v2 position deletes</td>
+<td>Scanned. Two position-delete files may legally list the same <code>(file, pos)</code>, so subtracting record counts could over-delete.</td>
+</tr>
+<tr>
+<td>Equality deletes</td>
+<td>Scanned. They match by key; the live-row impact is not in the metadata.</td>
+</tr>
+</tbody>
+</table>
+<p>So a v3 serving table keeps answering <code>count(*)</code> in constant time after a <code>DELETE</code>, which is
+where a full scan costs the most. See
+<a href="../iceberg-dml/#count-after-a-delete">Row-Level DML on Iceberg Tables</a>.</p>
 <h2 id="manual-secondary-indexes">Manual secondary indexes</h2>
 <p>For columns that are <strong>not</strong> the primary key — or for external Iceberg tables that do not
 declare an identifier field at all — you can declare a secondary index explicitly:</p>

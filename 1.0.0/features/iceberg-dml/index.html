@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-integration/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-dml/">
       
       
-        <link rel="prev" href="../catalogs/">
+        <link rel="prev" href="../iceberg-serving/">
       
       
-        <link rel="next" href="../iceberg-serving/">
+        <link rel="next" href="../iceberg-wap/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Iceberg Integration - NeorunBase</title>
+        <title>Row-Level DML on Iceberg - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#iceberg-integration" class="md-skip">
+        <a href="#row-level-dml-on-iceberg-tables" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Iceberg Integration
+              Row-Level DML on Iceberg
             
           </span>
         </div>
@@ -991,37 +991,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Iceberg Integration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../iceberg-integration/" class="md-nav__link">
         
   
   
@@ -1037,131 +1010,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#catalog-apache-polaris" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Catalog — Apache Polaris
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automatic-sync-cdc" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automatic Sync (CDC)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#built-in-time-column-partitioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in Time Column + Partitioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schema-evolution-add-column" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Evolution — ADD COLUMN
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reading-iceberg-tables-icebergnstable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Reading Iceberg Tables (iceberg.&lt;ns&gt;.&lt;table&gt;)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#format-version-2-and-3-deletion-vectors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Format version 2 and 3 (deletion vectors)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-format-data-files-parquet-orc-avro" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-Format Data Files (Parquet, ORC, Avro)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#open-lakehouse-analytics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open Lakehouse Analytics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-not-yet-supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Is Not (Yet) Supported
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1199,10 +1047,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../iceberg-dml/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Row-Level DML on Iceberg
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1218,6 +1093,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#merge-on-read-never-a-file-rewrite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge-on-read, never a file rewrite
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-deletion-vector-per-data-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One deletion vector per data file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-matching-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What matching costs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#write-audit-publish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write-Audit-Publish
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#count-after-a-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count(*) after a delete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-engine-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-engine verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements-and-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements and limits
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1813,102 +1785,107 @@
 
 
 
-<h1 id="iceberg-integration">Iceberg Integration</h1>
-<p>NeorunBase syncs transactional tables to Apache Iceberg in the background and reads existing Iceberg tables directly from SQL, so downstream analytics engines (Spark, Trino, Hive, Flink) can work on the same data without an external ETL.</p>
-<div class="admonition note">
-<p class="admonition-title">Iceberg catalogs are first-class</p>
-<p>An Iceberg connection is registered as a named <a href="../catalogs/">catalog</a>. You can register more than one (e.g. <code>iceberg-east</code>, <code>iceberg-west</code>); tables in each are addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>. This page uses <code>iceberg</code> as the example catalog name.</p>
-</div>
-<h2 id="catalog-apache-polaris">Catalog — Apache Polaris</h2>
-<p>NeorunBase currently supports <strong>Apache Polaris</strong> as the Iceberg REST catalog. A catalog connection is configured from the admin UI, via <code>CREATE CATALOG</code> SQL, or seeded at startup from <code>neorunbase.iceberg.*</code>. Each catalog supplies:</p>
-<ul>
-<li>Polaris URI and OAuth token endpoint</li>
-<li>Catalog name (used as the Iceberg <code>prefix</code> and <code>warehouse</code> parameter)</li>
-<li>OAuth2 client ID / client secret, realm, scope</li>
-<li>S3 endpoint, access key, secret key, region</li>
-</ul>
-<p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
-<p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
-<h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
-<p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
-<ul>
-<li><strong>First sync</strong> writes the full table as a single Iceberg snapshot.</li>
-<li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
-</ul>
-<p>Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.</p>
-<p>A per-shard <strong>high-water mark</strong> (the source changelog position) is stamped into the incremental commit's <strong>snapshot summary</strong>, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.</p>
-<h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
-<p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
-<p>Tables are also automatically:</p>
-<ul>
-<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
-<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
-</ul>
-<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
-<h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
-<p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
-<p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
-<h2 id="reading-iceberg-tables-icebergnstable">Reading Iceberg Tables (<code>iceberg.&lt;ns&gt;.&lt;table&gt;</code>)</h2>
-<p><code>SELECT * FROM iceberg.&lt;namespace&gt;.&lt;table&gt;</code> is a federated read against the Iceberg catalog. Queries support:</p>
-<ul>
-<li>WHERE-clause and column-projection pushdown to data nodes</li>
-<li><strong>Equality deletes</strong>, <strong>position deletes</strong>, and Iceberg <strong>format-version 3 deletion vectors</strong> are all applied at read time, so external tools writing into the same table stay compatible</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Low-latency serving (LakeBase)</p>
-<p>A <code>WHERE</code> on the table's primary key (<code>= / IN / BETWEEN / &lt;,&lt;=,&gt;,&gt;=</code>) is answered by an
-automatic per-snapshot <strong>point/range index</strong> in single-digit milliseconds at thousands of
-QPS, instead of a multi-file scan — turning NeorunBase into a serving layer over the open
-lakehouse without copying data. See <strong><a href="../iceberg-serving/">Iceberg Serving (LakeBase)</a></strong>
-for the index, persistence, maintenance, manual <code>CREATE INDEX</code>, and governance patterns.</p>
-</div>
-<h3 id="format-version-2-and-3-deletion-vectors">Format version 2 and 3 (deletion vectors)</h3>
-<p>NeorunBase reads <strong>and writes</strong> tables in both Iceberg format-version 2 and 3. On v3, deleted rows are recorded as <strong>deletion vectors</strong> — a roaring bitmap of deleted row positions stored in a <a href="https://iceberg.apache.org/puffin-spec/">Puffin</a> <code>deletion-vector-v1</code> blob, in place of position-delete files. NeorunBase applies vectors written by other engines (Ontul, Trino, Spark) transparently, and writes them itself when a row-level <code>DELETE</code> or <code>UPDATE</code> runs against a v3 table.</p>
-<p>New tables created by NeorunBase are v2 by default; opt into v3 with <code>-Dneorunbase.iceberg.format.version=3</code> (or <code>NEORUNBASE_ICEBERG_FORMAT_VERSION=3</code>).</p>
-<p>Which delete form NeorunBase <em>writes</em> depends on the path. The CDC sync writes <strong>equality deletes</strong> on both v2 and v3, because it upserts by primary key and equality deletes remain valid in v3. A row-level <code>DELETE</code> or <code>UPDATE</code> writes <strong>positional</strong> deletes instead — a parquet position-delete file on v2, a Puffin deletion vector on v3 — see <a href="../iceberg-dml/">Row-Level DML on Iceberg Tables</a>.</p>
-<p>Both directions are verified against foreign engines rather than assumed:</p>
+<h1 id="row-level-dml-on-iceberg-tables">Row-Level DML on Iceberg Tables</h1>
+<p><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> run directly against a registered Iceberg table, in the same SQL session as everything else:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">201</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">202</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="mi">5</span><span class="p">);</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">21</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">40</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">UPDATE</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;updated&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">61</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">70</span><span class="p">;</span>
+</code></pre></div>
+<p>No copy into a native table first, no <code>MERGE INTO</code> workaround, no external engine.</p>
+<h2 id="merge-on-read-never-a-file-rewrite">Merge-on-read, never a file rewrite</h2>
+<p><code>UPDATE</code> and <code>DELETE</code> do <strong>not</strong> rewrite data files. The rows that matched are recorded by position — <code>(data file, row ordinal)</code> — and written as <strong>delete files</strong>; <code>UPDATE</code> additionally appends the updated copies as a new data file. Everything lands in a single Iceberg <code>RowDelta</code> commit, so a reader sees the statement as one atomic snapshot change.</p>
+<p>Which delete file gets written is decided by the table's format version:</p>
 <table>
 <thead>
 <tr>
-<th>Direction</th>
-<th>What is proven</th>
-<th>Engine</th>
+<th>Format version</th>
+<th>Delete file written</th>
+<th>Layout</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>NeorunBase <strong>reads</strong> another engine's v3 deletion vectors</td>
-<td>Ontul <code>DELETE</code>s on a shared v3 table; NeorunBase must return only the survivors, on both the scan path and the per-snapshot <a href="../iceberg-serving/#the-primary-key-index">PK index</a></td>
-<td>Ontul</td>
+<td><strong>2</strong></td>
+<td>Parquet <strong>position-delete</strong> file, one per partition bundle</td>
+<td>rows of <code>(file_path, pos)</code>, sorted by file then position</td>
 </tr>
 <tr>
-<td>Another engine <strong>reads</strong> NeorunBase's delete files</td>
-<td>NeorunBase <code>DELETE</code>/<code>UPDATE</code>/<code>INSERT</code>s; Trino must report the identical rows</td>
-<td>Trino</td>
+<td><strong>3</strong></td>
+<td>Puffin <strong>deletion vector</strong>, one per data file</td>
+<td>roaring bitmap of deleted positions in a <code>deletion-vector-v1</code> blob</td>
 </tr>
 </tbody>
 </table>
-<h3 id="multi-format-data-files-parquet-orc-avro">Multi-Format Data Files (Parquet, ORC, Avro)</h3>
-<p>NeorunBase reads Iceberg data files in all three formats — <strong>PARQUET</strong>, <strong>ORC</strong>, and <strong>AVRO</strong> — including tables written by other engines such as Trino and Spark. The format is detected <strong>per file</strong> from the <code>DataFile</code> format recorded in the Iceberg manifest, so a single table may mix formats across snapshots and still read correctly.</p>
-<p>Multi-format read applies everywhere an external Iceberg table is read:</p>
+<p>Both are the standard merge-on-read forms, so any engine that reads Iceberg reads the result — see <a href="#cross-engine-verification">Cross-engine verification</a> for what is actually tested, including a Trino version boundary that matters in practice.</p>
+<div class="admonition note">
+<p class="admonition-title">Deletes from the CDC sync are a different shape</p>
+<p>The native→Iceberg <a href="../iceberg-integration/">CDC sync</a> writes <strong>equality deletes</strong>, because it upserts by primary key and an equality delete is the natural expression of "this key is superseded". Equality deletes stay valid in v3. Row-level DML is positional, so it uses position deletes / deletion vectors instead. A table can carry both.</p>
+</div>
+<h2 id="one-deletion-vector-per-data-file">One deletion vector per data file</h2>
+<p>The v3 spec allows a data file <strong>at most one</strong> deletion vector. A second <code>DELETE</code> touching the same data file therefore cannot simply add another vector — NeorunBase:</p>
+<ol>
+<li>reads the existing vector,</li>
+<li>merges the new positions into it,</li>
+<li>writes the merged vector, and</li>
+<li>removes the superseded delete file in the same commit.</li>
+</ol>
+<p>So two deletes of 20 and 10 rows against one data file leave exactly one vector of cardinality 30, not two vectors.</p>
+<p>The <code>RowDelta</code> is validated <strong>from the snapshot the statement planned against</strong> (<code>validateFromSnapshot</code>). This matters: without that scope, the validation window is the table's entire history and the very vector this statement is deliberately superseding is reported as <em>"Found concurrently added DV"</em>, refusing the commit. Scoped correctly, a vector another writer adds for the same data file <strong>after</strong> our snapshot still conflicts — which is what should happen.</p>
+<h2 id="what-matching-costs">What matching costs</h2>
+<p>The matched positions come from reading the candidate data files, which means a <code>DELETE</code>/<code>UPDATE</code> reads the rows it touches:</p>
 <ul>
-<li>The distributed data-node scan</li>
-<li>The coordinator-local scan</li>
-<li>Loading an external Iceberg table into LakeBase</li>
+<li>The <code>WHERE</code> is pushed down first, so files whose min/max bounds cannot match are never opened (same pruning as the <a href="../iceberg-serving/#scan-path-pruning-for-everything-else">scan path</a>).</li>
+<li>Rows already removed by an earlier delete file — equality, position, or a deletion vector — are skipped, so a repeated <code>DELETE</code> reports 0 rather than "matching" rows that are not there.</li>
+<li>Data-file contents are served from the shared per-file cache, so a <code>DELETE</code> immediately after a scan usually re-reads nothing.</li>
 </ul>
-<p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
-<p><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> run directly against an Iceberg table, as does <code>MERGE INTO</code>. <code>UPDATE</code> and <code>DELETE</code> are <strong>merge-on-read</strong>: the matched rows are recorded as delete files and the data files are never rewritten. See <a href="../iceberg-dml/">Row-Level DML on Iceberg Tables</a> for what gets written on each format version and how other engines read it.</p>
-<h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
-<p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
-<h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
+<h2 id="write-audit-publish">Write-Audit-Publish</h2>
+<p>Row-level DML honours the <a href="../iceberg-wap/">WAP branch</a> exactly like the sync and CTAS do: when a WAP branch is configured for the catalog or table, the <code>RowDelta</code> is committed to that branch instead of <code>main</code>, so deletes and updates can be staged and audited before publication.</p>
+<h2 id="count-after-a-delete"><code>count(*)</code> after a delete</h2>
+<p><code>SELECT count(*)</code> with no <code>WHERE</code> is answered from metadata whenever metadata can answer it <em>exactly</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Table state</th>
+<th>How <code>count(*)</code> is answered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No delete files</td>
+<td>Sum of each data file's <code>record_count</code>. No data read.</td>
+</tr>
+<tr>
+<td><strong>v3 deletion vectors only</strong></td>
+<td><code>sum(data.record_count) − sum(dv.record_count)</code>. <strong>Still exact</strong>, because a vector is 1:1 with its data file, so no position can be subtracted twice. No data read.</td>
+</tr>
+<tr>
+<td>v2 position deletes</td>
+<td>Full scan. Two position-delete files may legally list the same <code>(file, pos)</code>, so subtracting their record counts could over-delete.</td>
+</tr>
+<tr>
+<td>Equality deletes</td>
+<td>Full scan. They match by key; how many live rows a delete file removes is not in the metadata at all.</td>
+</tr>
+</tbody>
+</table>
+<p>The snapshot summary's <code>total-records</code> is deliberately not used — it counts rows ever <em>added</em> and subtracts nothing that deletes hide.</p>
+<p>The practical effect: on v3, a serving table keeps answering <code>count(*)</code> in constant time after deletes, which is exactly where a full scan is most wasteful. On v2 the same query scans, and that is the correct trade.</p>
+<h2 id="cross-engine-verification">Cross-engine verification</h2>
+<p>The delete files NeorunBase writes are checked against a foreign reader rather than assumed to be conformant. <code>tests/test-iceberg-write-crossengine-e2e.sh</code> runs, for each format version: 100 rows synced, then <code>DELETE</code> 20 / <code>UPDATE</code> 10 / <code>INSERT</code> 2, then asserts that the delete-file <strong>kind</strong> on disk is right (v2 must produce a position-delete parquet and no <code>.puffin</code>; v3 the opposite) and that NeorunBase and Trino report the identical 82 rows, the same empty band, the same 10 updated rows and the same inserted rows.</p>
+<div class="admonition warning">
+<p class="admonition-title">Trino must be new enough for v3</p>
+<p>OSS <strong>Trino 479</strong> — the version <a href="https://www.cloudchef-labs.com">Chango</a> currently ships — supports Iceberg <strong>v1 and v2 only</strong>. It rejects <code>format_version = 3</code> with <em>"format_version must be between 1 and 2"</em> and fails any read of a deletion vector with <em>"Unexpected PUFFIN file format"</em>. Trino picked v3 up around release 480/481; <strong>483 reads these vectors correctly</strong>. (Starburst Enterprise/Galaxy builds advertise v3 earlier — a different distribution.)</p>
+<p>So the e2e verifies v2 against Trino 479 and v3 against Trino 483 (<code>TRINO_VERSION_V2</code> / <code>TRINO_VERSION_V3</code>). If you need Trino interoperability today, keep tables on <strong>format-version 2</strong> — which is NeorunBase's default (<code>neorunbase.iceberg.format.version</code>).</p>
+</div>
+<p>The opposite direction — NeorunBase reading deletion vectors written by <em>another</em> engine — is covered by <code>tests/test-iceberg-v3-dv-crossengine-e2e.sh</code> using Ontul; see <a href="../iceberg-integration/#format-version-2-and-3-deletion-vectors">Iceberg Integration</a>.</p>
+<h2 id="requirements-and-limits">Requirements and limits</h2>
 <ul>
-<li><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, type promotion in schema evolution</li>
-<li>Snapshot expiration and small-file / manifest compaction</li>
-<li>Time travel (<code>AS OF SNAPSHOT</code> / <code>AS OF TIMESTAMP</code>)</li>
-<li>Branch and tag <strong>DDL</strong> (creating, dropping or listing them from SQL). A configured
-  <a href="../iceberg-wap/">WAP</a> branch is created and fast-forwarded for you; there is no general
-  branching surface beyond that.</li>
-<li>Iceberg REST catalogs other than Polaris</li>
+<li>The table must be registered as a <a href="../catalogs/">catalog</a> and addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>.</li>
+<li><code>INSERT INTO</code> requires an explicit column list.</li>
+<li><code>UPDATE</code> assigns literal values; the updated rows are re-appended, so on a table partitioned by the CDC sync's <code>_neorun_synced_at</code> they move into the current partition.</li>
+<li>Compaction of accumulated delete files is not automatic — see <a href="../iceberg-integration/#what-is-not-yet-supported">What Is Not (Yet) Supported</a>.</li>
 </ul>
 
 

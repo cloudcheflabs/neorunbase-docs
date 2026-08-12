@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/iceberg-wap/">
       
       
-        <link rel="prev" href="../iceberg-serving/">
+        <link rel="prev" href="../iceberg-dml/">
       
       
         <link rel="next" href="../backup-restore/">
@@ -1047,6 +1047,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-dml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Row-Level DML on Iceberg
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1177,10 +1205,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#behavior-for-ctas-merge-into-cdc-sync" class="md-nav__link">
+  <a href="#behavior-for-ctas-merge-into-cdc-sync-row-level-dml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Behavior for CTAS / MERGE INTO / CDC sync
+        Behavior for CTAS / MERGE INTO / CDC sync / row-level DML
       
     </span>
   </a>
@@ -1858,9 +1886,10 @@ changed, so bad or partial data never reaches consumers.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ┌──────────────┐     ┌──────────────────┐     ┌───────────────────┐
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │ CTAS /       │     │ readers still see │     │ fast-forward main │
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  │ MERGE INTO / │ ──▶ │ main (frozen);    │ ──▶ │ to the audit head │
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  │ CDC sync     │     │ rows staged on    │     │ → rows go live    │
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  │ → audit      │     │ the audit branch  │     │                   │
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  └──────────────┘     └──────────────────┘     └───────────────────┘
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  │ DML /        │     │ rows staged on    │     │ → rows go live    │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  │ CDC sync     │     │ the audit branch  │     │                   │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  │ → audit      │     │                   │     │                   │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  └──────────────┘     └──────────────────┘     └───────────────────┘
 </code></pre></div>
 <ol>
 <li><strong>Write</strong> — every Iceberg write lands on the WAP branch (e.g. <code>audit</code>) instead of
@@ -1934,7 +1963,7 @@ yields a non-empty, non-<code>main</code> branch wins:</p>
 <p>Note the ordering: the two <strong>table-scoped system properties (1, 2) override a catalog's
 <code>'wap.branch'</code> option (3)</strong>, and the catalog option in turn overrides the cluster-wide
 default (4). Leave all four unset and writes go straight to <code>main</code> (WAP disabled).</p>
-<h2 id="behavior-for-ctas-merge-into-cdc-sync">Behavior for CTAS / MERGE INTO / CDC sync</h2>
+<h2 id="behavior-for-ctas-merge-into-cdc-sync-row-level-dml">Behavior for CTAS / MERGE INTO / CDC sync / row-level DML</h2>
 <p>When a WAP branch is active, the branch is created if missing (branched off the current
 <code>main</code>) and <strong>all</strong> of these write to it, never to <code>main</code>:</p>
 <ul>
@@ -1945,6 +1974,10 @@ default (4). Leave all four unset and writes go straight to <code>main</code> (W
 <li><strong>CDC sync</strong> — the automatic table mirror (full first sync and incremental
   add-data + equality-delete commits) targets the branch. The sync high-water mark is
   still tracked, so restarts resume correctly.</li>
+<li><strong>Row-level <code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code></strong> — the merge-on-read <code>RowDelta</code> (position
+  deletes on v2, deletion vectors on v3) is committed to the branch, so a delete can be
+  staged and audited before it becomes visible. See
+  <a href="../iceberg-dml/">Row-Level DML on Iceberg Tables</a>.</li>
 </ul>
 <p><code>main</code> stays exactly as it was until you publish, so concurrent readers are unaffected.</p>
 <h2 id="auditing-the-branch">Auditing the branch</h2>

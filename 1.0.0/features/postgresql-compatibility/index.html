@@ -1163,6 +1163,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../iceberg-dml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Row-Level DML on Iceberg
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../iceberg-wap/" class="md-nav__link">
         
   
@@ -1764,6 +1792,11 @@
 <li><strong>Transactions</strong>: <code>BEGIN</code> (or <code>START TRANSACTION</code>), <code>COMMIT</code>, <code>ROLLBACK</code></li>
 <li><strong>Queries</strong>: <code>JOIN</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>HAVING</code>, subqueries, aggregation functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>), scalar functions (<code>ABS</code>, <code>ROUND</code>, <code>LENGTH</code>, <code>UPPER</code>, <code>LOWER</code>, <code>COALESCE</code>, …), <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
 </ul>
+<p>An aggregate with <strong>no <code>GROUP BY</code> is defined over the whole input, so it returns exactly one row even when nothing matched</strong> — <code>COUNT</code> yields <code>0</code>, the others <code>NULL</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w">   </span><span class="c1">-- one row: 0</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">sum</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="c1">-- one row: NULL</span>
+</code></pre></div>
+<p>This matters for drivers: a client that reads the value straight off the first row would otherwise find no row at all. With a <code>GROUP BY</code>, an empty input genuinely produces no groups and the result is empty, as PostgreSQL does.</p>
 <h2 id="data-types">Data Types</h2>
 <p>NeorunBase supports a wide range of data types:</p>
 <ul>
