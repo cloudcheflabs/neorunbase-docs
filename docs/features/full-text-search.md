@@ -34,10 +34,15 @@ CREATE TABLE articles (
     body TEXT
 ) SHARD KEY (id) SHARDS 16;
 
--- English: the default Lucene Standard analyzer.
+-- No language declared: the configured default analyzer (see below).
 CREATE INDEX idx_body
   ON articles
   USING fts (body);
+
+-- PostgreSQL spells a full-text index USING gin; it is accepted and means the same thing.
+CREATE INDEX idx_body_pg
+  ON articles
+  USING gin (body);
 
 -- Korean: Lucene's official Nori morphological analyzer.
 CREATE INDEX idx_body_ko
@@ -46,7 +51,34 @@ CREATE INDEX idx_body_ko
   WITH (lang = 'korean');
 ```
 
-Supported `lang` values include `english` (default), `simple`, and `korean`. Adding a new language is one analyzer wiring — the rest of the path is language-agnostic.
+### `lang` values
+
+`lang` accepts any analyzer NeorunBase registers:
+
+| Group | Names |
+| --- | --- |
+| Generic | `standard`, `simple`, `cjk` |
+| CJK morphology | `korean`/`ko` (Nori), `japanese`/`ja` (Kuromoji), `chinese`/`zh` (SmartCN) |
+| English | `english`/`en` (Porter stemmer + stop words) |
+| European | `french`, `german`, `spanish`, `italian`, `portuguese`, `dutch`, `russian`, `norwegian`, `swedish`, `danish`, `finnish`, `czech`, `hungarian`, `romanian`, `bulgarian`, `greek`, `latvian`, `lithuanian`, `galician`, `catalan`, `basque`, `irish`, `armenian`, `brazilian` |
+| Middle East / South Asia | `arabic`, `persian`, `turkish`, `hindi`, `bengali`, `thai`, `indonesian` |
+
+Two-letter codes (`ko`, `ja`, `de`, …) work as aliases. An unrecognised name falls back to the
+default **and logs a warning** — a typo like `lang = 'korea'` will not silently give you
+whitespace tokenisation.
+
+### The default analyzer
+
+An index that declares no `lang` uses `neorunbase.fts.default.analyzer`, which is **`cjk`**.
+
+That default is deliberate. `cjk` tokenises Latin text the way a standard analyzer does and
+additionally bigrams CJK runs. A standard analyzer cuts Korean on whitespace only, so `방수자재`
+becomes a single token and a search for `방수` does not match it — and it fails to match *only
+once an index exists*, because the unindexed path matches substrings. Adding an index would
+change the query's answer, which is the one thing an index must never do.
+
+For a corpus you can name a language for, **declare it**: `WITH (lang = 'korean')` runs real
+morphological analysis (Nori) rather than bigrams, and gives better recall and smaller indexes.
 
 ### Primary Key Requirement
 
@@ -72,6 +104,37 @@ LIMIT 10;
 ```
 
 Lucene query syntax is accepted in the right operand: plain words, `AND` / `OR` / `NOT`, `"quoted phrases"`, `field:term`, and `+required` / `-excluded` prefixes.
+
+### When the query is *not* pushed down
+
+`@@` is an ordinary operator, exactly as in PostgreSQL: it works without an index, and an index
+only makes it fast. The planner routes a query through the per-shard BM25 index when all of the
+following hold, and evaluates it on the coordinator otherwise:
+
+- an **FTS index covers the column** (a plain `CREATE INDEX` is a BTREE and cannot serve `@@` —
+  check with `\di`, which shows each index's method);
+- the query has a **`LIMIT`** (there is no top-K to fetch without one);
+- the `@@` predicate is the **whole `WHERE` clause**, not one side of an `AND`;
+- there is no `GROUP BY` / aggregation, and any `ORDER BY ts_rank(...)` is `DESC`.
+
+The unindexed path returns the **same rows** — all query terms must be present, CJK terms match
+inside a word — and `ts_rank` still produces a usable relevance ordering, computed locally from
+term frequency and document length rather than corpus-wide BM25. It is slower, not different.
+When a query is declined, the reason is logged at debug by `FtsPlanAnalyzer`, so "why is this
+slow" has an answer that does not require reading the planner.
+
+### Seeing your indexes
+
+```
+\di
+        Schema |   Name    |    Type      | Owner      | Table
+       --------+-----------+--------------+------------+----------
+        public | idx_body  | index (fts)  | neorunbase | articles
+        public | idx_id    | index (btree)| neorunbase | articles
+```
+
+The method matters: an index created **without** a `USING` clause is a BTREE. It will be created
+successfully, it will appear here, and it cannot serve a full-text query.
 
 ## Analyzer Lifecycle — Index-Time and Query-Time
 
