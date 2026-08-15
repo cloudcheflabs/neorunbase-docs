@@ -29,6 +29,20 @@ SELECT sum(amount) FROM orders WHERE id = -1; -- one row: NULL
 
 This matters for drivers: a client that reads the value straight off the first row would otherwise find no row at all. With a `GROUP BY`, an empty input genuinely produces no groups and the result is empty, as PostgreSQL does.
 
+### Predicates and operators
+
+- **Negated predicates** keep their negation everywhere they can appear — standalone, under
+  `AND`/`OR`, in `SELECT`, `UPDATE` and `DELETE`: `NOT LIKE`, `NOT ILIKE`, `NOT BETWEEN`,
+  `NOT IN`, `IS NOT NULL`, `NOT (...)`, `<>`.
+- **String concatenation** uses `||` (`SELECT first_name || ' ' || last_name`), equivalent to
+  `CONCAT(...)`.
+- **A filter is never optional.** If a `WHERE` or `HAVING` clause uses something the engine
+  cannot express — an unknown function, for instance — the statement is **refused**. It is not
+  executed with the clause dropped. This matters most for `UPDATE` and `DELETE`, where running
+  without the predicate would rewrite or remove every row in the table.
+- **An unknown function is an error**, not a value. `SELECT bogus_fn(c)` fails rather than
+  returning something that resembles data.
+
 ## Data Types
 
 NeorunBase supports a wide range of data types:
@@ -62,7 +76,7 @@ All five take named arguments (PostgreSQL `name => value` form). See [Graph Trav
 
 ## Virtual Catalog
 
-NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands in `psql` — including `\d`, `\dt`, `\dt+`, `\di`, `\dv`, `\ds`, `\dn` (schemas), `\du` (roles), `\df` (functions), `\dp` (privileges), and `\l` (databases). The same catalog patterns also drive JDBC `DatabaseMetaData.getSchemas()` / `getTables()` / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.
+NeorunBase implements `pg_catalog` and `information_schema` virtual catalogs, enabling standard PostgreSQL introspection commands in `psql` — including `\d`, `\dt`, `\dt+`, `\di`, `\dv`, `\ds`, `\dn` (schemas), `\du` (roles), `\df` (functions), `\dp` (privileges), and `\l` (databases). `\di` reports each index's **method** (`index (btree)` / `index (fts)` / `index (hnsw)`), so an index created without a `USING` clause — a BTREE that cannot serve `@@` or a vector search — is visible as such rather than indistinguishable from the index you meant to build. The same catalog patterns also drive JDBC `DatabaseMetaData.getSchemas()` / `getTables()` / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.
 
 ## Extended Query Protocol
 
