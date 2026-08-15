@@ -765,6 +765,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="SQL Support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#predicates-and-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predicates and operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1797,6 +1814,20 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">sum</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="c1">-- one row: NULL</span>
 </code></pre></div>
 <p>This matters for drivers: a client that reads the value straight off the first row would otherwise find no row at all. With a <code>GROUP BY</code>, an empty input genuinely produces no groups and the result is empty, as PostgreSQL does.</p>
+<h3 id="predicates-and-operators">Predicates and operators</h3>
+<ul>
+<li><strong>Negated predicates</strong> keep their negation everywhere they can appear — standalone, under
+  <code>AND</code>/<code>OR</code>, in <code>SELECT</code>, <code>UPDATE</code> and <code>DELETE</code>: <code>NOT LIKE</code>, <code>NOT ILIKE</code>, <code>NOT BETWEEN</code>,
+  <code>NOT IN</code>, <code>IS NOT NULL</code>, <code>NOT (...)</code>, <code>&lt;&gt;</code>.</li>
+<li><strong>String concatenation</strong> uses <code>||</code> (<code>SELECT first_name || ' ' || last_name</code>), equivalent to
+  <code>CONCAT(...)</code>.</li>
+<li><strong>A filter is never optional.</strong> If a <code>WHERE</code> or <code>HAVING</code> clause uses something the engine
+  cannot express — an unknown function, for instance — the statement is <strong>refused</strong>. It is not
+  executed with the clause dropped. This matters most for <code>UPDATE</code> and <code>DELETE</code>, where running
+  without the predicate would rewrite or remove every row in the table.</li>
+<li><strong>An unknown function is an error</strong>, not a value. <code>SELECT bogus_fn(c)</code> fails rather than
+  returning something that resembles data.</li>
+</ul>
 <h2 id="data-types">Data Types</h2>
 <p>NeorunBase supports a wide range of data types:</p>
 <ul>
@@ -1853,7 +1884,7 @@
 </table>
 <p>All five take named arguments (PostgreSQL <code>name =&gt; value</code> form). See <a href="../graph/">Graph Traversal &amp; Analytics</a> and <a href="../hybrid-search/">Hybrid Search</a> for argument reference and example SQL.</p>
 <h2 id="virtual-catalog">Virtual Catalog</h2>
-<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands in <code>psql</code> — including <code>\d</code>, <code>\dt</code>, <code>\dt+</code>, <code>\di</code>, <code>\dv</code>, <code>\ds</code>, <code>\dn</code> (schemas), <code>\du</code> (roles), <code>\df</code> (functions), <code>\dp</code> (privileges), and <code>\l</code> (databases). The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
+<p>NeorunBase implements <code>pg_catalog</code> and <code>information_schema</code> virtual catalogs, enabling standard PostgreSQL introspection commands in <code>psql</code> — including <code>\d</code>, <code>\dt</code>, <code>\dt+</code>, <code>\di</code>, <code>\dv</code>, <code>\ds</code>, <code>\dn</code> (schemas), <code>\du</code> (roles), <code>\df</code> (functions), <code>\dp</code> (privileges), and <code>\l</code> (databases). <code>\di</code> reports each index's <strong>method</strong> (<code>index (btree)</code> / <code>index (fts)</code> / <code>index (hnsw)</code>), so an index created without a <code>USING</code> clause — a BTREE that cannot serve <code>@@</code> or a vector search — is visible as such rather than indistinguishable from the index you meant to build. The same catalog patterns also drive JDBC <code>DatabaseMetaData.getSchemas()</code> / <code>getTables()</code> / column-detail queries, so JDBC-based tools (BI/ETL clients, IDE database explorers) can discover NeorunBase tables without any custom shim.</p>
 <h2 id="extended-query-protocol">Extended Query Protocol</h2>
 <p>The pg-wire implementation supports the full extended query flow — Parse / Bind / Describe / Execute / Sync — so JDBC clients using <code>PreparedStatement</code> work the same as simple-mode <code>Statement</code>s. Bound parameters are accepted in either text or binary format; the server decodes the binary wire format per the type OID declared in Parse (covering <code>INT2</code>/<code>INT4</code>/<code>INT8</code>, <code>FLOAT4</code>/<code>FLOAT8</code>, <code>BOOL</code>, <code>TEXT</code>/<code>VARCHAR</code>/<code>BPCHAR</code>, <code>BYTEA</code>, <code>UUID</code>, <code>DATE</code>, <code>TIMESTAMP</code>, <code>TIMESTAMPTZ</code>).</p>
 

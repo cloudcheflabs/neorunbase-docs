@@ -3401,6 +3401,11 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td><code>1048576</code></td>
 <td>AES-GCM chunk size inside each encrypted FTS segment file (1 MiB). Larger chunks reduce GCM tag overhead but increase the per-decrypt memory window.</td>
 </tr>
+<tr>
+<td><code>neorunbase.fts.default.analyzer</code></td>
+<td><code>cjk</code></td>
+<td>Analyzer used by a full-text index that declares no <code>WITH (lang = …)</code>. Accepts any name <a href="../../features/full-text-search/#lang-values">FTS</a> registers (<code>standard</code>, <code>english</code>, <code>korean</code>, <code>japanese</code>, <code>chinese</code>, <code>cjk</code>, and the major European / Middle-Eastern / South-Asian languages). <code>cjk</code> is the default because it tokenises Latin text like a standard analyzer <em>and</em> bigrams CJK runs: under a standard analyzer Korean is cut on whitespace only, so <code>방수자재</code> is one token and a search for <code>방수</code> misses it — and misses it <strong>only once an index exists</strong>, since the unindexed path matches substrings. An unknown name here is refused at startup rather than silently ignored. Declaring the language per index still beats any global default, because it gets real morphology.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="resident-ann-hnsw-memory-budget">Resident ANN (HNSW) Memory Budget</h3>
