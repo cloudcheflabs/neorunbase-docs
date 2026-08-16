@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/admin-ui/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/sql-correctness/">
       
       
-        <link rel="prev" href="../admin-password-recovery/">
+        <link rel="prev" href="../postgresql-compatibility/">
       
       
-        <link rel="next" href="../nic-fail-safety/">
+        <link rel="next" href="../distributed-sharding/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Admin UI - NeorunBase</title>
+        <title>SQL Correctness - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#admin-ui" class="md-skip">
+        <a href="#sql-correctness" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Admin UI
+              SQL Correctness
             
           </span>
         </div>
@@ -711,10 +711,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../sql-correctness/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Correctness
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -730,6 +757,131 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-rule-rules-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the rule rules out
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What the rule rules out">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-clause-that-is-parsed-and-then-dropped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A clause that is parsed and then dropped
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-expression-that-becomes-its-own-sql-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An expression that becomes its own SQL text
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-write-that-stores-null" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A write that stores NULL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-distributed-merge-that-does-not-preserve-meaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A distributed merge that does not preserve meaning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-unknown-name-resolved-to-null" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An unknown name resolved to NULL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is enforced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-refused-and-why-that-is-the-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is refused, and why that is the answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verifying-it-on-your-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying it on your cluster
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1439,37 +1591,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Admin UI
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../admin-ui/" class="md-nav__link">
         
   
   
@@ -1485,70 +1610,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cluster Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Management
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rest-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        REST API
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1780,39 +1841,164 @@
 
 
 
-<h1 id="admin-ui">Admin UI</h1>
-<p>NeorunBase includes a built-in web-based Admin UI for monitoring and managing the cluster.</p>
-<h2 id="cluster-overview">Cluster Overview</h2>
-<p>The Admin UI provides a visual overview of the cluster, including:</p>
+<h1 id="sql-correctness">SQL Correctness</h1>
+<p>A distributed engine can fail a query in two ways. It can say it cannot run the
+statement — noisy, but the client knows. Or it can return something that looks
+like data and is not what the statement asked for. The second kind is worse:
+nothing in the response distinguishes "no rows matched" from "the predicate was
+dropped and matched nothing", or a computed column from a column the engine
+quietly filled with NULL.</p>
+<p>NeorunBase treats the second kind as a defect class in its own right. The rule
+the engine holds to is:</p>
+<blockquote>
+<p><strong>A statement either produces the answer PostgreSQL would produce, or it
+raises. It never produces a different answer silently.</strong></p>
+</blockquote>
+<p>This page documents what that means concretely, what is enforced, and how to
+verify it against your own cluster.</p>
+<h2 id="what-the-rule-rules-out">What the rule rules out</h2>
+<p>Each of the behaviours below existed at some point and is now closed. They are
+listed because they are the shapes this class of bug takes, and because knowing
+them tells you what to check when you extend the engine.</p>
+<h3 id="a-clause-that-is-parsed-and-then-dropped">A clause that is parsed and then dropped</h3>
+<p>The parser accepting a clause is not the same as the executor honouring it. A
+dropped clause is invisible at the wire — the query succeeds, with the wrong
+rows.</p>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>What "dropped" looked like</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SELECT DISTINCT</code></td>
+<td>duplicates returned, as if <code>DISTINCT</code> had not been written</td>
+</tr>
+<tr>
+<td><code>ORDER BY &lt;ordinal&gt;</code></td>
+<td>rows in arbitrary order, no error</td>
+</tr>
+<tr>
+<td><code>TABLESAMPLE BERNOULLI (10)</code></td>
+<td>the whole table returned as the "sample"</td>
+</tr>
+<tr>
+<td><code>SUM(DISTINCT x)</code></td>
+<td>the plain total — a different number</td>
+</tr>
+<tr>
+<td><code>UNIQUE</code> / <code>CHECK</code> / <code>DEFAULT</code> at <code>CREATE TABLE</code></td>
+<td>accepted, then never enforced or applied</td>
+</tr>
+<tr>
+<td><code>OFFSET</code> on a derived table</td>
+<td>the wrong page</td>
+</tr>
+</tbody>
+</table>
+<h3 id="an-expression-that-becomes-its-own-sql-text">An expression that becomes its own SQL text</h3>
+<p>When an expression could not be compiled, the engine used to fall back to
+treating the statement's text as a string literal. <code>WHERE name SIMILAR TO 'a%'</code>
+became a comparison against the characters <code>`name` SIMILAR TO 'a%'</code>,
+which is never true, so the query answered "no rows" — indistinguishable from an
+empty table. In the <code>SELECT</code> list the same fallback returned the SQL text as the
+column value.</p>
+<p>There is no such fallback now. An expression the engine cannot compile is a
+parse error.</p>
+<h3 id="a-write-that-stores-null">A write that stores NULL</h3>
+<p><code>UPDATE t SET cnt = cnt + 1</code> reduced its right-hand side with a literal
+extractor, which answers null for anything that is not a literal. The statement
+reported rows affected and destroyed the column it was meant to compute. The
+same held for <code>INSERT … VALUES (20 + 5)</code>. <code>INSERT … SELECT</code> went further: it
+parsed the source query, dropped it, and reported <code>INSERT 0 0</code> on a statement
+whose purpose was to copy rows.</p>
+<h3 id="a-distributed-merge-that-does-not-preserve-meaning">A distributed merge that does not preserve meaning</h3>
+<p>Some aggregates cannot be merged by combining per-shard results of the same
+shape. <code>COUNT(DISTINCT city)</code> computed a distinct count per shard and added
+them, so a city present on two shards counted twice — a plausible number, larger
+than the number of cities, that changes after a reshard. The partial is now the
+shard's distinct <strong>values</strong>; the coordinator unions them and counts once.</p>
+<p>The same reasoning governs <code>LIMIT</code> pushdown. Whenever the coordinator still has
+work to do over the gathered rows — <code>DISTINCT</code>, a set operator, a window frame,
+<code>TABLESAMPLE</code> — the shard-side limit is withheld, because a shard that returned
+only <code>limit</code> rows would change the result rather than just speed it up.</p>
+<h3 id="an-unknown-name-resolved-to-null">An unknown name resolved to NULL</h3>
+<p><code>WHERE no_such_col = 1</code> matched nothing and <code>SELECT no_such_col</code> returned blanks.
+Both are now errors. A misspelled column is a mistake in the statement, and an
+empty result reads exactly like an empty table.</p>
+<h2 id="what-is-enforced">What is enforced</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Guarantee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Filters</td>
+<td>A <code>WHERE</code> / <code>HAVING</code> clause is never dropped. If it cannot be compiled the statement is refused — this matters most for <code>UPDATE</code> and <code>DELETE</code>, where running without the predicate would rewrite or remove every row.</td>
+</tr>
+<tr>
+<td>Expressions</td>
+<td>An unknown function, operator or column raises. Nothing is answered with the statement's own text.</td>
+</tr>
+<tr>
+<td>Writes</td>
+<td><code>SET col = &lt;expression&gt;</code> and <code>VALUES (&lt;expression&gt;)</code> compute. <code>INSERT … SELECT</code> inserts the rows the query returns.</td>
+</tr>
+<tr>
+<td>Aggregates</td>
+<td><code>DISTINCT</code> forms merge value sets across shards. Result types follow the input: <code>SUM</code> over <code>INT</code> is an integer, not <code>12.0</code>.</td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td><code>PRIMARY KEY</code>, <code>FOREIGN KEY</code>, <code>UNIQUE</code>, <code>CHECK</code> and <code>DEFAULT</code> are upheld on write — see <a href="../postgresql-compatibility/#constraints-and-defaults">PostgreSQL Compatibility</a> for the exact semantics, including the one caveat on <code>UNIQUE</code> under concurrency.</td>
+</tr>
+<tr>
+<td>Ordering</td>
+<td>An <code>ORDER BY</code> key that cannot be resolved raises instead of returning unsorted rows. Derived tables and CTEs sort and page like any other relation.</td>
+</tr>
+<tr>
+<td>Metadata</td>
+<td>A follower coordinator that missed a metadata push re-pulls on an interval, so it cannot keep answering "table not found" for a table that exists.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-is-refused-and-why-that-is-the-answer">What is refused, and why that is the answer</h2>
+<p>These constructs raise rather than returning an approximation:</p>
 <ul>
-<li>List of active Coordinators and Data Nodes</li>
-<li>Node status and health information</li>
-<li>Shard distribution across Data Nodes</li>
+<li><strong>Correlated subqueries</strong> — a subquery referring to a column of the outer
+  query. Uncorrelated ones are executed and folded into the plan; a correlated
+  one would need per-row execution, and reports the column it cannot resolve.</li>
+<li><strong>Explicit window frames</strong> (<code>ROWS BETWEEN …</code>). The default frames — running
+  with an <code>ORDER BY</code> inside the window, whole-partition without — are supported.</li>
+<li><strong><code>UPDATE</code> that computes a <code>UNIQUE</code> column from the row itself.</strong> The value
+  only exists on the data node, per row, so the constraint could not be checked;
+  the statement is refused rather than run unverified.</li>
 </ul>
-<h2 id="monitoring">Monitoring</h2>
-<p>Real-time metrics and monitoring capabilities:</p>
-<ul>
-<li>Query throughput and latency metrics</li>
-<li>Storage usage per node and per table</li>
-<li>Cluster-wide performance dashboards</li>
-<li>Time-series metrics with configurable retention</li>
-</ul>
-<h2 id="management">Management</h2>
-<p>The Admin UI allows administrators to perform operational tasks:</p>
-<ul>
-<li><strong>IAM Management</strong>: Create and manage users, groups, policies, access keys, and STS sessions. In federated mode this page is read-only and hosts the standalone ↔ federated mode toggle. See <a href="../iam/">Identity and Access Management</a>.</li>
-<li><strong>Security &amp; KMS</strong>: List the KMS key hierarchy, inspect a key's versions, create new keys, and rotate a key to a new version. See <a href="../encryption/">Encryption at Rest</a>.</li>
-<li><strong>pg-wire TLS</strong>: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See <a href="../pg-wire-tls/">pg-wire TLS</a>.</li>
-<li><strong>Catalogs</strong>: List, create, edit, and drop catalogs (the built-in <code>lakebase</code> plus external Iceberg catalogs). Drop is refused for a non-empty catalog and <code>lakebase</code> cannot be removed. See <a href="../catalogs/">Catalogs</a>.</li>
-<li><strong>Iceberg</strong>: Configure the Apache Polaris connection (URI, OAuth client credentials, S3 access/secret key) and monitor sync status. See <a href="../iceberg-integration/">Iceberg Integration</a>.</li>
-<li><strong>S3 Backup</strong>: Configure scheduled cluster backups, view backup history, and trigger restore. See <a href="../backup-restore/">Backup &amp; Restore</a>.</li>
-<li><strong>Site Replication</strong>: Configure disaster-recovery peer sites and monitor the leader-only WAL streamer that ships committed writes to them.</li>
-<li><strong>Kafka Ingestion</strong>: Manage Kafka consumer groups and monitor ingestion pipelines</li>
-<li><strong>Query Runner</strong>: Execute SQL against the cluster directly from the browser, with a local query history.</li>
-<li><strong>Shard Operations</strong>: Monitor shard distribution and health, and drive shard/disk repair progress</li>
-</ul>
-<h2 id="rest-api">REST API</h2>
-<p>All operations available in the Admin UI are also accessible via a REST API, enabling automation and integration with external monitoring and management tools.</p>
+<h2 id="verifying-it-on-your-cluster">Verifying it on your cluster</h2>
+<p>Two suites ship with the source tree. Both run against a live cluster over
+<code>psql</code> and take the coordinator's port from the environment. Point them at the
+<strong>leader</strong> coordinator (DDL is forwarded there, and the checks create tables).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Every statement that must be refused, and every wrong answer that must not</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># come back. A FAIL line is a live defect.</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span><span class="w"> </span>bash<span class="w"> </span>tests/e2e-sql-correctness.sh
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># The other half: the constructs the engine does support still answer, and</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># answer correctly. Guards against a refusal that goes too far.</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span><span class="w"> </span>bash<span class="w"> </span>tests/e2e-sql-surface.sh
+</code></pre></div>
+<p>The suites are deliberately split. <code>e2e-sql-correctness.sh</code> asserts the rule at
+the top of this page — for each construct, either the PostgreSQL answer or an
+error. <code>e2e-sql-surface.sh</code> sweeps the supported surface (scalar functions,
+predicates, joins, aggregation, set operators, windows, DML, vector search) and
+fails on an error, which is what catches a fix that closed a hole by refusing
+too much.</p>
+<p>Both are safe to run repeatedly: they create their own tables, prefixed
+<code>sqlc_</code> and <code>rg</code>, and drop them at the end.</p>
 
 
 

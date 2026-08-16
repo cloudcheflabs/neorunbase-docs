@@ -709,6 +709,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/sql-correctness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Correctness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/distributed-sharding/" class="md-nav__link">
         
   
@@ -1996,6 +2024,17 @@
     <span class="md-ellipsis">
       
         Coordinator Cluster Sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coordinator-query-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinator Query Execution
       
     </span>
   </a>
@@ -3594,6 +3633,45 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td><code>neorunbase.coordinator.sync.retry.delay.ms</code></td>
 <td><code>1000</code></td>
 <td>Sleep between sync retry attempts. With <code>max.retries</code> this caps total time spent retrying a single peer per round.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.metadata.refresh.interval.ms</code></td>
+<td><code>30000</code></td>
+<td>How often a follower coordinator re-pulls the metadata snapshot from the leader. The leader pushes on every change, so this is the safety net for a push that never landed — without it a follower that missed one answers "table not found" for a table that exists until it restarts. <code>0</code> disables the pull and relies on pushes alone.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="coordinator-query-execution">Coordinator Query Execution</h2>
+<p>Timeout floors and caps for work the coordinator drives. Each is a floor, not a
+replacement: the general RPC timeout still applies when it is the larger value.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neorunbase.coordinator.gather.min.timeout.seconds</code></td>
+<td><code>30</code></td>
+<td>Floor for how long the coordinator waits while gathering shard results. The internal RPC timeout alone can be shorter than a wide fan-out legitimately takes, and giving up early reports a slow query as a failed one.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.recursive.cte.max.iterations</code></td>
+<td><code>1000</code></td>
+<td>Safety stop for <code>WITH RECURSIVE</code>. A recursive CTE whose termination condition never holds would otherwise run until the coordinator runs out of memory.</td>
+</tr>
+<tr>
+<td><code>neorunbase.coordinator.ddl.forward.min.timeout.ms</code></td>
+<td><code>300000</code></td>
+<td>Floor for the DDL-forwarding call a follower makes to the leader. <code>CREATE TABLE … AS SELECT</code> executes the whole SELECT on the leader, so this waits out a query, not an RPC.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.scan.min.timeout.ms</code></td>
+<td><code>300000</code></td>
+<td>Floor for an Iceberg scan request. Scans read remote object storage, far slower than the cluster-local calls the general RPC timeout is sized for.</td>
 </tr>
 </tbody>
 </table>

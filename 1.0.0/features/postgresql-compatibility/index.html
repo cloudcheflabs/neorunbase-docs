@@ -14,7 +14,7 @@
         <link rel="prev" href="../../installation/nginx-proxy/">
       
       
-        <link rel="next" href="../distributed-sharding/">
+        <link rel="next" href="../sql-correctness/">
       
       
         
@@ -779,6 +779,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#aggregates-and-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregates and windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constraints-and-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constraints and defaults
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -832,6 +854,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sql-correctness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Correctness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1804,10 +1854,10 @@
 <h2 id="sql-support">SQL Support</h2>
 <p>NeorunBase supports standard SQL operations with PostgreSQL conformance:</p>
 <ul>
-<li><strong>DML</strong>: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, and <code>MERGE INTO</code> (upsert / copy-on-write)</li>
-<li><strong>DDL</strong>: <code>CREATE TABLE</code> (incl. <code>FOREIGN KEY (...) REFERENCES ...</code> with <code>ON DELETE</code> / <code>ON UPDATE</code> <code>CASCADE</code> / <code>SET NULL</code> / <code>RESTRICT</code> / <code>NO ACTION</code>), <code>DROP TABLE</code>, <code>ALTER TABLE</code>, <code>CREATE INDEX</code>, <code>DROP INDEX</code>, <code>CREATE SCHEMA</code>, <code>DROP SCHEMA</code></li>
+<li><strong>DML</strong>: <code>SELECT</code>, <code>INSERT</code> (incl. <code>INSERT … SELECT</code> and <code>ON CONFLICT</code>), <code>UPDATE</code>, <code>DELETE</code>, and <code>MERGE INTO</code> (upsert / copy-on-write)</li>
+<li><strong>DDL</strong>: <code>CREATE TABLE</code> (incl. <code>PRIMARY KEY</code>, <code>UNIQUE</code>, <code>CHECK</code>, <code>DEFAULT</code>, and <code>FOREIGN KEY (...) REFERENCES ...</code> with <code>ON DELETE</code> / <code>ON UPDATE</code> <code>CASCADE</code> / <code>SET NULL</code> / <code>RESTRICT</code> / <code>NO ACTION</code>), <code>DROP TABLE [IF EXISTS]</code>, <code>ALTER TABLE</code>, <code>CREATE INDEX</code>, <code>DROP INDEX</code>, <code>CREATE SCHEMA</code>, <code>DROP SCHEMA</code></li>
 <li><strong>Transactions</strong>: <code>BEGIN</code> (or <code>START TRANSACTION</code>), <code>COMMIT</code>, <code>ROLLBACK</code></li>
-<li><strong>Queries</strong>: <code>JOIN</code>, <code>GROUP BY</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>HAVING</code>, subqueries, aggregation functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>), scalar functions (<code>ABS</code>, <code>ROUND</code>, <code>LENGTH</code>, <code>UPPER</code>, <code>LOWER</code>, <code>COALESCE</code>, …), <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
+<li><strong>Queries</strong>: <code>JOIN</code> (incl. <code>NATURAL JOIN</code> and <code>JOIN … USING</code>), <code>GROUP BY</code>, <code>HAVING</code>, <code>ORDER BY</code> (column, alias, expression or ordinal), <code>LIMIT</code> / <code>OFFSET</code>, <code>SELECT DISTINCT</code>, derived tables, <code>WITH</code> (incl. <code>WITH RECURSIVE</code>), set operators (<code>UNION</code>, <code>UNION ALL</code>, <code>INTERSECT</code>, <code>EXCEPT</code>), window functions, <code>TABLESAMPLE BERNOULLI</code>, uncorrelated subqueries, aggregation functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>STRING_AGG</code>, <code>ARRAY_AGG</code>, and their <code>DISTINCT</code> forms), scalar functions (<code>ABS</code>, <code>ROUND</code>, <code>LENGTH</code>, <code>UPPER</code>, <code>LOWER</code>, <code>COALESCE</code>, <code>NULLIF</code>, <code>EXTRACT</code>, <code>TO_CHAR</code>, …), <code>CASE WHEN</code>, <code>CAST</code>, and more</li>
 </ul>
 <p>An aggregate with <strong>no <code>GROUP BY</code> is defined over the whole input, so it returns exactly one row even when nothing matched</strong> — <code>COUNT</code> yields <code>0</code>, the others <code>NULL</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w">   </span><span class="c1">-- one row: 0</span>
@@ -1819,14 +1869,60 @@
 <li><strong>Negated predicates</strong> keep their negation everywhere they can appear — standalone, under
   <code>AND</code>/<code>OR</code>, in <code>SELECT</code>, <code>UPDATE</code> and <code>DELETE</code>: <code>NOT LIKE</code>, <code>NOT ILIKE</code>, <code>NOT BETWEEN</code>,
   <code>NOT IN</code>, <code>IS NOT NULL</code>, <code>NOT (...)</code>, <code>&lt;&gt;</code>.</li>
+<li><strong>Pattern matching</strong>: <code>LIKE</code> / <code>ILIKE</code>, SQL's <code>SIMILAR TO</code> (where <code>%</code> and <code>_</code> are the
+  wildcards and the rest is regex), and the POSIX regex operators <code>~</code>, <code>~*</code>, <code>!~</code>, <code>!~*</code>.</li>
+<li><strong>Boolean tests</strong>: <code>IS TRUE</code>, <code>IS FALSE</code>, <code>IS UNKNOWN</code> and their <code>IS NOT</code> forms. These are
+  not the same as <code>= TRUE</code>: a boolean test answers <code>false</code> for NULL, where the comparison
+  answers NULL.</li>
+<li><strong>Subquery predicates</strong>: <code>EXISTS (…)</code>, <code>x IN (SELECT …)</code>, <code>x NOT IN (SELECT …)</code> and scalar
+  <code>(SELECT …)</code> used as a value. The inner query runs on the coordinator and its result is
+  substituted into the plan. <strong>Correlated</strong> subqueries — ones referring to a column of the
+  outer query — are not supported and report the column they cannot resolve.</li>
+<li><strong>Array subscripting</strong>: <code>arr[1]</code>, 1-based, with an out-of-range subscript yielding NULL.</li>
 <li><strong>String concatenation</strong> uses <code>||</code> (<code>SELECT first_name || ' ' || last_name</code>), equivalent to
   <code>CONCAT(...)</code>.</li>
 <li><strong>A filter is never optional.</strong> If a <code>WHERE</code> or <code>HAVING</code> clause uses something the engine
-  cannot express — an unknown function, for instance — the statement is <strong>refused</strong>. It is not
-  executed with the clause dropped. This matters most for <code>UPDATE</code> and <code>DELETE</code>, where running
-  without the predicate would rewrite or remove every row in the table.</li>
+  cannot express, the statement is <strong>refused</strong>. It is not executed with the clause dropped.
+  This matters most for <code>UPDATE</code> and <code>DELETE</code>, where running without the predicate would
+  rewrite or remove every row in the table.</li>
 <li><strong>An unknown function is an error</strong>, not a value. <code>SELECT bogus_fn(c)</code> fails rather than
   returning something that resembles data.</li>
+<li><strong>An unknown column is an error</strong>, not NULL. <code>WHERE no_such_col = 1</code> and
+  <code>SELECT no_such_col</code> both fail, rather than quietly matching nothing or returning blanks —
+  a misspelled column is a mistake, and an empty result reads exactly like an empty table.</li>
+</ul>
+<h3 id="aggregates-and-windows">Aggregates and windows</h3>
+<ul>
+<li><code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>STRING_AGG(expr, separator)</code> and <code>ARRAY_AGG(expr)</code>,
+  plus <code>COUNT(DISTINCT …)</code>, <code>SUM(DISTINCT …)</code> and <code>AVG(DISTINCT …)</code>. The <code>DISTINCT</code> forms are
+  computed by merging the shards' value sets, not by adding up per-shard counts — a value that
+  appears on two shards is one value.</li>
+<li>Aggregates answer in the type the input implies: <code>SUM</code> over an <code>INT</code> column is an integer,
+  <code>MIN</code>/<code>MAX</code> keep the column's type, <code>AVG</code> is double precision, <code>COUNT</code> is <code>BIGINT</code>.</li>
+<li><code>HAVING</code> may reference an aggregate the <code>SELECT</code> list does not project
+  (<code>SELECT city … GROUP BY city HAVING count(*) &gt; 1</code>). The extra aggregate is computed and
+  then trimmed from the result.</li>
+<li>Window functions: <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code> and <code>COUNT</code> with
+  <code>OVER (PARTITION BY … ORDER BY …)</code>, plus <code>ROW_NUMBER()</code>, <code>RANK()</code> and <code>DENSE_RANK()</code>.
+  With an <code>ORDER BY</code> inside the window the aggregate is running (rows up to the current one);
+  without one it spans the partition. Explicit frame clauses (<code>ROWS BETWEEN …</code>) are not
+  supported yet. Windows are evaluated on the coordinator, since a frame spans rows no single
+  shard holds.</li>
+</ul>
+<h3 id="constraints-and-defaults">Constraints and defaults</h3>
+<p>A constraint that <code>CREATE TABLE</code> accepts is one the engine upholds:</p>
+<ul>
+<li><code>PRIMARY KEY</code> and <code>FOREIGN KEY</code> (with the referential actions listed above).</li>
+<li><code>UNIQUE</code> is checked on <code>INSERT</code> and <code>UPDATE</code>, both against stored rows and within the
+  statement's own batch. It is a check rather than a lock: two concurrent inserts of the same
+  new value can each pass their check and both land. An <code>UPDATE</code> that computes a <code>UNIQUE</code>
+  column from the row itself (<code>SET email = lower(email)</code>) is refused rather than left
+  unverified.</li>
+<li><code>CHECK</code> is evaluated per row — on <code>INSERT</code> by the coordinator, on <code>UPDATE</code> by the data node,
+  which is where the row an update produces first exists. A constraint that evaluates to NULL
+  passes, as SQL defines.</li>
+<li><code>DEFAULT</code> is applied to any column the <code>INSERT</code> did not name. A column the statement did
+  name keeps what it was given, NULL included.</li>
 </ul>
 <h2 id="data-types">Data Types</h2>
 <p>NeorunBase supports a wide range of data types:</p>
