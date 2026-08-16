@@ -438,6 +438,19 @@ CSR (Compressed Sparse Row) materializes a per-shard adjacency-list view of sele
 | --- | --- | --- |
 | `neorunbase.coordinator.sync.max.retries` | `3` | Maximum retries when the leader broadcasts metadata or IAM snapshots to peer coordinators over the internal protocol. |
 | `neorunbase.coordinator.sync.retry.delay.ms` | `1000` | Sleep between sync retry attempts. With `max.retries` this caps total time spent retrying a single peer per round. |
+| `neorunbase.coordinator.metadata.refresh.interval.ms` | `30000` | How often a follower coordinator re-pulls the metadata snapshot from the leader. The leader pushes on every change, so this is the safety net for a push that never landed — without it a follower that missed one answers "table not found" for a table that exists until it restarts. `0` disables the pull and relies on pushes alone. |
+
+## Coordinator Query Execution
+
+Timeout floors and caps for work the coordinator drives. Each is a floor, not a
+replacement: the general RPC timeout still applies when it is the larger value.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.coordinator.gather.min.timeout.seconds` | `30` | Floor for how long the coordinator waits while gathering shard results. The internal RPC timeout alone can be shorter than a wide fan-out legitimately takes, and giving up early reports a slow query as a failed one. |
+| `neorunbase.coordinator.recursive.cte.max.iterations` | `1000` | Safety stop for `WITH RECURSIVE`. A recursive CTE whose termination condition never holds would otherwise run until the coordinator runs out of memory. |
+| `neorunbase.coordinator.ddl.forward.min.timeout.ms` | `300000` | Floor for the DDL-forwarding call a follower makes to the leader. `CREATE TABLE … AS SELECT` executes the whole SELECT on the leader, so this waits out a query, not an RPC. |
+| `neorunbase.iceberg.scan.min.timeout.ms` | `300000` | Floor for an Iceberg scan request. Scans read remote object storage, far slower than the cluster-local calls the general RPC timeout is sized for. |
 
 ## Cluster Bootstrap Fetch
 
