@@ -41,6 +41,7 @@ nav:
       - "NGINX Reverse Proxy": installation/nginx-proxy.md
   - "Features":
       - "PostgreSQL Compatibility": features/postgresql-compatibility.md
+      - "SQL Correctness": features/sql-correctness.md
       - "Distributed Sharding": features/distributed-sharding.md
       - "Replication & High Availability": features/replication-ha.md
       - "Site Replication (DR)": features/site-replication.md
