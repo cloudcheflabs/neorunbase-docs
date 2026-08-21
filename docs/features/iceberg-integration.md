@@ -27,6 +27,8 @@ After Iceberg is enabled, NeorunBase automatically keeps every selected table mi
 
 Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.
 
+**Where a synced table lands.** The Iceberg namespace is taken from the **schema of the source table**, not from the catalog's default namespace: `public.orders` is mirrored as `iceberg.public.orders`, and `sales.orders` as `iceberg.sales.orders`. The namespace is created if it does not exist. `default-namespace` (`neorunbase.iceberg.default.namespace`) applies only to a source table addressed with no schema at all.
+
 A per-shard **high-water mark** (the source changelog position) is stamped into the incremental commit's **snapshot summary**, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.
 
 ## Built-in Time Column + Partitioning
@@ -35,10 +37,16 @@ Every Iceberg table created by NeorunBase carries an extra column **`_neorun_syn
 
 Tables are also automatically:
 
-- **Partitioned** by `days(_neorun_synced_at)` — time-range queries skip whole files.
-- **Sorted** by `[_neorun_synced_at, primary key]` — within-partition primary-key ranges stay clustered.
+- **Partitioned** by `bucket(<primary key>, N)` — N is [`neorunbase.iceberg.cdc.partition.buckets`](../configuration/configuration.md) (default 8).
+- **Sorted** by `[primary key, _neorun_synced_at]` — key ranges stay clustered inside a bucket.
 
-The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.
+The partition is derived from the **primary key**, and that is a correctness requirement rather than a tuning choice. The sync upserts by key and expresses "this key is superseded" as an equality delete, and Iceberg applies a delete file only to data files **in its own partition**. Bucketing by the key puts the delete in the same partition as the row it supersedes, however much later it is written. A partition derived from the write time cannot do that: the updated row moves to a later partition and the delete never reaches the older copy, leaving the key in the table twice.
+
+Time-range queries still prune well without a time partition. An incremental sync commits one instant, so every data file covers a single `_neorun_synced_at` value and file-level min/max statistics skip whole files on a time predicate.
+
+!!! warning "Tables created before NeorunBase 1.0.1"
+
+    Earlier versions partitioned synced tables by `days(_neorun_synced_at)`. On such a table an upsert cannot remove a copy of the key that an earlier partition still holds, so a key updated after its partition rolled over appears **twice**. The partition values live in committed data files and cannot be repaired in place — drop the Iceberg table and let the next sync re-create it in the current layout. The sync logs a warning naming any table still in the old shape.
 
 ## Schema Evolution — `ADD COLUMN`
 
@@ -87,7 +95,7 @@ Multi-format read applies everywhere an external Iceberg table is read:
 
 NeorunBase still **writes Parquet** for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.
 
-`INSERT`, `UPDATE` and `DELETE` run directly against an Iceberg table, as does `MERGE INTO`. `UPDATE` and `DELETE` are **merge-on-read**: the matched rows are recorded as delete files and the data files are never rewritten. See [Row-Level DML on Iceberg Tables](iceberg-dml.md) for what gets written on each format version and how other engines read it.
+`INSERT`, `UPDATE` and `DELETE` run directly against an Iceberg table, as does `MERGE INTO`. `UPDATE`, `DELETE` and `MERGE INTO` are all **merge-on-read**: the matched rows are recorded as position-delete files and the data files are never rewritten. See [Row-Level DML on Iceberg Tables](iceberg-dml.md) for what gets written on each format version and how other engines read it.
 
 ## Open Lakehouse Analytics
 

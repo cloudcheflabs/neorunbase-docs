@@ -191,7 +191,7 @@ knobs — see [Iceberg Serving (LakeBase)](../features/iceberg-serving.md).
 | `neorunbase.iceberg.sync.task.timeout.ms` | `300000` | Per-table sync task timeout. |
 | `neorunbase.iceberg.default.namespace` | `lakebase` | Default Iceberg namespace, auto-created on catalog init. |
 | `neorunbase.iceberg.parquet.compression.codec` | `snappy` | Parquet codec used by NeorunBase's own Iceberg writers (data + delete files): `snappy`, `gzip`, `zstd`, `lz4`, `none`. |
-| `neorunbase.iceberg.cdc.partition.unit` | `days` | Hidden-partition transform on the synthetic `_neorun_synced_at` column for CDC-synced tables: `hours`, `days`, or `months`. |
+| `neorunbase.iceberg.cdc.partition.buckets` | `8` | Number of hidden partitions on CDC-synced tables, which are partitioned by `bucket(<primary key>, N)`. More buckets scope each equality delete to a smaller slice of the table; fewer keep one sync commit from fanning out into many small files. `1` is a single partition. |
 | `neorunbase.iceberg.parquet.read.prefetch.threshold.bytes` | `67108864` | Iceberg-data Parquet read pre-fetch threshold (64 MiB). Files at or below this size are pulled in a single GET to avoid per-chunk seeks. |
 | `neorunbase.iceberg.load.batch.size` | `1000` | Bulk-load batch size used when caching an external Iceberg table into LakeBase. Larger batches amortize per-INSERT overhead at the cost of memory. |
 

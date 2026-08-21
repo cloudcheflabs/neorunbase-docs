@@ -1,6 +1,6 @@
 # Row-Level DML on Iceberg Tables
 
-`INSERT`, `UPDATE` and `DELETE` run directly against a registered Iceberg table, in the same SQL session as everything else:
+`INSERT`, `UPDATE`, `DELETE` and `MERGE INTO` run directly against a registered Iceberg table, in the same SQL session as everything else:
 
 ```sql
 INSERT INTO ice.public.events (id, name, val) VALUES (201, 'a', 1.5), (202, 'b', 2.5);
@@ -8,13 +8,17 @@ INSERT INTO ice.public.events (id, name, val) VALUES (201, 'a', 1.5), (202, 'b',
 DELETE FROM ice.public.events WHERE id BETWEEN 21 AND 40;
 
 UPDATE ice.public.events SET name = 'updated' WHERE id BETWEEN 61 AND 70;
+
+MERGE INTO ice.public.events AS t USING staging AS s ON t.id = s.id
+  WHEN MATCHED THEN UPDATE SET t.name = s.name
+  WHEN NOT MATCHED THEN INSERT (id, name, val) VALUES (s.id, s.name, s.val);
 ```
 
-No copy into a native table first, no `MERGE INTO` workaround, no external engine.
+No copy into a native table first, no external engine.
 
 ## Merge-on-read, never a file rewrite
 
-`UPDATE` and `DELETE` do **not** rewrite data files. The rows that matched are recorded by position — `(data file, row ordinal)` — and written as **delete files**; `UPDATE` additionally appends the updated copies as a new data file. Everything lands in a single Iceberg `RowDelta` commit, so a reader sees the statement as one atomic snapshot change.
+`UPDATE`, `DELETE` and `MERGE INTO` do **not** rewrite data files. The rows that matched are recorded by position — `(data file, row ordinal)` — and written as **delete files**; `UPDATE` and `MERGE` additionally append the updated or inserted copies as new data files. Everything lands in a single Iceberg `RowDelta` commit, so a reader sees the statement as one atomic snapshot change.
 
 Which delete file gets written is decided by the table's format version:
 
@@ -40,6 +44,32 @@ The v3 spec allows a data file **at most one** deletion vector. A second `DELETE
 So two deletes of 20 and 10 rows against one data file leave exactly one vector of cardinality 30, not two vectors.
 
 The `RowDelta` is validated **from the snapshot the statement planned against** (`validateFromSnapshot`). This matters: without that scope, the validation window is the table's entire history and the very vector this statement is deliberately superseding is reported as *"Found concurrently added DV"*, refusing the commit. Scoped correctly, a vector another writer adds for the same data file **after** our snapshot still conflicts — which is what should happen.
+
+## `MERGE INTO`
+
+`MERGE INTO` reads its target, evaluates the `ON` condition against each source row, and commits one
+`RowDelta`: **position deletes for the target rows that matched**, plus a data file holding the merged
+(`WHEN MATCHED THEN UPDATE`) and inserted (`WHEN NOT MATCHED THEN INSERT`) rows.
+
+Deleting by position rather than by key is what makes the statement mean what it says:
+
+- **It removes exactly the rows that matched.** A key-based delete would also remove any other row that
+  happens to share that key, which `MERGE` never asked for.
+- **It works whatever the table is partitioned by.** A delete file applies only to data files in its own
+  partition, and the position deletes are grouped by the partition of the file each match came from — so a
+  target row written long before the statement runs is still reached.
+- **It needs no identifier fields.** A table that declares none can still be a `MERGE` target.
+
+Two further behaviours are worth knowing:
+
+- The target is read from **freshly loaded table metadata**, never from the serving metadata cache, so a
+  `MERGE` issued immediately after another statement cannot plan against a snapshot that statement already
+  superseded.
+- If the same target row is matched by two source rows, the row is deleted once and both merged rows are
+  written. `MERGE` does not silently collapse a cardinality violation into one row.
+- If a data file the statement planned against is gone by commit time (another writer rewrote it), the
+  statement fails with *"the table changed concurrently — retry the statement"* rather than deleting
+  positions that now address different rows.
 
 ## What matching costs
 
@@ -83,5 +113,9 @@ The opposite direction — NeorunBase reading deletion vectors written by *anoth
 
 - The table must be registered as a [catalog](catalogs.md) and addressed as `<catalog>.<namespace>.<table>`.
 - `INSERT INTO` requires an explicit column list.
-- `UPDATE` assigns literal values; the updated rows are re-appended, so on a table partitioned by the CDC sync's `_neorun_synced_at` they move into the current partition.
+- `UPDATE` assigns literal values. The updated rows are re-appended, and because a synced table is
+  partitioned by a [bucket of its primary key](iceberg-integration.md#built-in-time-column-partitioning)
+  they land in the same partition as the rows they replace. (On a table created before that layout —
+  partitioned by `days(_neorun_synced_at)` — they move into the current day's partition instead, which is
+  why such tables have to be dropped and re-synced.)
 - Compaction of accumulated delete files is not automatic — see [What Is Not (Yet) Supported](iceberg-integration.md#what-is-not-yet-supported).
