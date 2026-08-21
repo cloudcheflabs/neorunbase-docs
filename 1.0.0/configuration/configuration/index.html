@@ -2867,9 +2867,9 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td>Parquet codec used by NeorunBase's own Iceberg writers (data + delete files): <code>snappy</code>, <code>gzip</code>, <code>zstd</code>, <code>lz4</code>, <code>none</code>.</td>
 </tr>
 <tr>
-<td><code>neorunbase.iceberg.cdc.partition.unit</code></td>
-<td><code>days</code></td>
-<td>Hidden-partition transform on the synthetic <code>_neorun_synced_at</code> column for CDC-synced tables: <code>hours</code>, <code>days</code>, or <code>months</code>.</td>
+<td><code>neorunbase.iceberg.cdc.partition.buckets</code></td>
+<td><code>8</code></td>
+<td>Number of hidden partitions on CDC-synced tables, which are partitioned by <code>bucket(&lt;primary key&gt;, N)</code>. More buckets scope each equality delete to a smaller slice of the table; fewer keep one sync commit from fanning out into many small files. <code>1</code> is a single partition.</td>
 </tr>
 <tr>
 <td><code>neorunbase.iceberg.parquet.read.prefetch.threshold.bytes</code></td>

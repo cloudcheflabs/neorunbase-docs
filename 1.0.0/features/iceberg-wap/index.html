@@ -1997,8 +1997,8 @@ default (4). Leave all four unset and writes go straight to <code>main</code> (W
 <ul>
 <li><strong>CTAS</strong> — <code>CREATE TABLE iceberg.&lt;ns&gt;.&lt;t&gt; AS SELECT ...</code> stages the new snapshot on the
   branch.</li>
-<li><strong><code>MERGE INTO</code></strong> — <code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; ...</code> (copy-on-write)
-  commits its add-data + delete files to the branch.</li>
+<li><strong><code>MERGE INTO</code></strong> — <code>MERGE INTO iceberg.&lt;ns&gt;.&lt;target&gt; USING &lt;source&gt; ...</code> (merge-on-read)
+  commits its add-data + position-delete files to the branch.</li>
 <li><strong>CDC sync</strong> — the automatic table mirror (full first sync and incremental
   add-data + equality-delete commits) targets the branch. The sync high-water mark is
   still tracked, so restarts resume correctly.</li>

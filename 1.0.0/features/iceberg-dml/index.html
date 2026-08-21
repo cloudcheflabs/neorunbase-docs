@@ -1160,6 +1160,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#merge-into" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MERGE INTO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-matching-costs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1814,16 +1825,20 @@
 
 
 <h1 id="row-level-dml-on-iceberg-tables">Row-Level DML on Iceberg Tables</h1>
-<p><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> run directly against a registered Iceberg table, in the same SQL session as everything else:</p>
+<p><code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> and <code>MERGE INTO</code> run directly against a registered Iceberg table, in the same SQL session as everything else:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">201</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">202</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="mi">5</span><span class="p">);</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">21</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">40</span><span class="p">;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">UPDATE</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;updated&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">61</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">70</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">MERGE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">ice</span><span class="p">.</span><span class="k">public</span><span class="p">.</span><span class="n">events</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">staging</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="k">WHEN</span><span class="w"> </span><span class="n">MATCHED</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">name</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="k">WHEN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">MATCHED</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">INSERT</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">val</span><span class="p">);</span>
 </code></pre></div>
-<p>No copy into a native table first, no <code>MERGE INTO</code> workaround, no external engine.</p>
+<p>No copy into a native table first, no external engine.</p>
 <h2 id="merge-on-read-never-a-file-rewrite">Merge-on-read, never a file rewrite</h2>
-<p><code>UPDATE</code> and <code>DELETE</code> do <strong>not</strong> rewrite data files. The rows that matched are recorded by position — <code>(data file, row ordinal)</code> — and written as <strong>delete files</strong>; <code>UPDATE</code> additionally appends the updated copies as a new data file. Everything lands in a single Iceberg <code>RowDelta</code> commit, so a reader sees the statement as one atomic snapshot change.</p>
+<p><code>UPDATE</code>, <code>DELETE</code> and <code>MERGE INTO</code> do <strong>not</strong> rewrite data files. The rows that matched are recorded by position — <code>(data file, row ordinal)</code> — and written as <strong>delete files</strong>; <code>UPDATE</code> and <code>MERGE</code> additionally append the updated or inserted copies as new data files. Everything lands in a single Iceberg <code>RowDelta</code> commit, so a reader sees the statement as one atomic snapshot change.</p>
 <p>Which delete file gets written is decided by the table's format version:</p>
 <table>
 <thead>
@@ -1861,6 +1876,30 @@
 </ol>
 <p>So two deletes of 20 and 10 rows against one data file leave exactly one vector of cardinality 30, not two vectors.</p>
 <p>The <code>RowDelta</code> is validated <strong>from the snapshot the statement planned against</strong> (<code>validateFromSnapshot</code>). This matters: without that scope, the validation window is the table's entire history and the very vector this statement is deliberately superseding is reported as <em>"Found concurrently added DV"</em>, refusing the commit. Scoped correctly, a vector another writer adds for the same data file <strong>after</strong> our snapshot still conflicts — which is what should happen.</p>
+<h2 id="merge-into"><code>MERGE INTO</code></h2>
+<p><code>MERGE INTO</code> reads its target, evaluates the <code>ON</code> condition against each source row, and commits one
+<code>RowDelta</code>: <strong>position deletes for the target rows that matched</strong>, plus a data file holding the merged
+(<code>WHEN MATCHED THEN UPDATE</code>) and inserted (<code>WHEN NOT MATCHED THEN INSERT</code>) rows.</p>
+<p>Deleting by position rather than by key is what makes the statement mean what it says:</p>
+<ul>
+<li><strong>It removes exactly the rows that matched.</strong> A key-based delete would also remove any other row that
+  happens to share that key, which <code>MERGE</code> never asked for.</li>
+<li><strong>It works whatever the table is partitioned by.</strong> A delete file applies only to data files in its own
+  partition, and the position deletes are grouped by the partition of the file each match came from — so a
+  target row written long before the statement runs is still reached.</li>
+<li><strong>It needs no identifier fields.</strong> A table that declares none can still be a <code>MERGE</code> target.</li>
+</ul>
+<p>Two further behaviours are worth knowing:</p>
+<ul>
+<li>The target is read from <strong>freshly loaded table metadata</strong>, never from the serving metadata cache, so a
+  <code>MERGE</code> issued immediately after another statement cannot plan against a snapshot that statement already
+  superseded.</li>
+<li>If the same target row is matched by two source rows, the row is deleted once and both merged rows are
+  written. <code>MERGE</code> does not silently collapse a cardinality violation into one row.</li>
+<li>If a data file the statement planned against is gone by commit time (another writer rewrote it), the
+  statement fails with <em>"the table changed concurrently — retry the statement"</em> rather than deleting
+  positions that now address different rows.</li>
+</ul>
 <h2 id="what-matching-costs">What matching costs</h2>
 <p>The matched positions come from reading the candidate data files, which means a <code>DELETE</code>/<code>UPDATE</code> reads the rows it touches:</p>
 <ul>
@@ -1912,7 +1951,11 @@
 <ul>
 <li>The table must be registered as a <a href="../catalogs/">catalog</a> and addressed as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code>.</li>
 <li><code>INSERT INTO</code> requires an explicit column list.</li>
-<li><code>UPDATE</code> assigns literal values; the updated rows are re-appended, so on a table partitioned by the CDC sync's <code>_neorun_synced_at</code> they move into the current partition.</li>
+<li><code>UPDATE</code> assigns literal values. The updated rows are re-appended, and because a synced table is
+  partitioned by a <a href="../iceberg-integration/#built-in-time-column-partitioning">bucket of its primary key</a>
+  they land in the same partition as the rows they replace. (On a table created before that layout —
+  partitioned by <code>days(_neorun_synced_at)</code> — they move into the current day's partition instead, which is
+  why such tables have to be dropped and re-synced.)</li>
 <li>Compaction of accumulated delete files is not automatic — see <a href="../iceberg-integration/#what-is-not-yet-supported">What Is Not (Yet) Supported</a>.</li>
 </ul>
 

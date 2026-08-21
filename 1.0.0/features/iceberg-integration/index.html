@@ -1864,15 +1864,21 @@
 <li><strong>Subsequent syncs</strong> are incremental — only changed rows since the last sync are written, as an atomic add-data + equality-delete commit.</li>
 </ul>
 <p>Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.</p>
+<p><strong>Where a synced table lands.</strong> The Iceberg namespace is taken from the <strong>schema of the source table</strong>, not from the catalog's default namespace: <code>public.orders</code> is mirrored as <code>iceberg.public.orders</code>, and <code>sales.orders</code> as <code>iceberg.sales.orders</code>. The namespace is created if it does not exist. <code>default-namespace</code> (<code>neorunbase.iceberg.default.namespace</code>) applies only to a source table addressed with no schema at all.</p>
 <p>A per-shard <strong>high-water mark</strong> (the source changelog position) is stamped into the incremental commit's <strong>snapshot summary</strong>, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.</p>
 <h2 id="built-in-time-column-partitioning">Built-in Time Column + Partitioning</h2>
 <p>Every Iceberg table created by NeorunBase carries an extra column <strong><code>_neorun_synced_at</code></strong> (<code>timestamptz</code>). The column is set automatically — operators don't read or write to it.</p>
 <p>Tables are also automatically:</p>
 <ul>
-<li><strong>Partitioned</strong> by <code>days(_neorun_synced_at)</code> — time-range queries skip whole files.</li>
-<li><strong>Sorted</strong> by <code>[_neorun_synced_at, primary key]</code> — within-partition primary-key ranges stay clustered.</li>
+<li><strong>Partitioned</strong> by <code>bucket(&lt;primary key&gt;, N)</code> — N is <a href="../../configuration/configuration/"><code>neorunbase.iceberg.cdc.partition.buckets</code></a> (default 8).</li>
+<li><strong>Sorted</strong> by <code>[primary key, _neorun_synced_at]</code> — key ranges stay clustered inside a bucket.</li>
 </ul>
-<p>The result is good time-range query performance out of the box without forcing operators to choose a partition column manually.</p>
+<p>The partition is derived from the <strong>primary key</strong>, and that is a correctness requirement rather than a tuning choice. The sync upserts by key and expresses "this key is superseded" as an equality delete, and Iceberg applies a delete file only to data files <strong>in its own partition</strong>. Bucketing by the key puts the delete in the same partition as the row it supersedes, however much later it is written. A partition derived from the write time cannot do that: the updated row moves to a later partition and the delete never reaches the older copy, leaving the key in the table twice.</p>
+<p>Time-range queries still prune well without a time partition. An incremental sync commits one instant, so every data file covers a single <code>_neorun_synced_at</code> value and file-level min/max statistics skip whole files on a time predicate.</p>
+<div class="admonition warning">
+<p class="admonition-title">Tables created before NeorunBase 1.0.1</p>
+<p>Earlier versions partitioned synced tables by <code>days(_neorun_synced_at)</code>. On such a table an upsert cannot remove a copy of the key that an earlier partition still holds, so a key updated after its partition rolled over appears <strong>twice</strong>. The partition values live in committed data files and cannot be repaired in place — drop the Iceberg table and let the next sync re-create it in the current layout. The sync logs a warning naming any table still in the old shape.</p>
+</div>
 <h2 id="schema-evolution-add-column">Schema Evolution — <code>ADD COLUMN</code></h2>
 <p>Adding a column to a NeorunBase table (<code>ALTER TABLE … ADD COLUMN …</code>) is propagated to the matching Iceberg table on the next sync. The column is added as nullable on the Iceberg side (existing snapshots have no value for it).</p>
 <p><code>DROP COLUMN</code>, <code>RENAME COLUMN</code>, and type promotion are not yet propagated — drop and recreate the Iceberg table if the source schema changes that way.</p>
@@ -1925,7 +1931,7 @@ for the index, persistence, maintenance, manual <code>CREATE INDEX</code>, and g
 <li>Loading an external Iceberg table into LakeBase</li>
 </ul>
 <p>NeorunBase still <strong>writes Parquet</strong> for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.</p>
-<p><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> run directly against an Iceberg table, as does <code>MERGE INTO</code>. <code>UPDATE</code> and <code>DELETE</code> are <strong>merge-on-read</strong>: the matched rows are recorded as delete files and the data files are never rewritten. See <a href="../iceberg-dml/">Row-Level DML on Iceberg Tables</a> for what gets written on each format version and how other engines read it.</p>
+<p><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code> run directly against an Iceberg table, as does <code>MERGE INTO</code>. <code>UPDATE</code>, <code>DELETE</code> and <code>MERGE INTO</code> are all <strong>merge-on-read</strong>: the matched rows are recorded as position-delete files and the data files are never rewritten. See <a href="../iceberg-dml/">Row-Level DML on Iceberg Tables</a> for what gets written on each format version and how other engines read it.</p>
 <h2 id="open-lakehouse-analytics">Open Lakehouse Analytics</h2>
 <p>Once a table is synced, any engine that speaks Iceberg can read it: Spark, Trino, Hive, Flink, etc.</p>
 <h2 id="what-is-not-yet-supported">What Is Not (Yet) Supported</h2>
