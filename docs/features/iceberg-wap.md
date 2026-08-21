@@ -88,8 +88,8 @@ When a WAP branch is active, the branch is created if missing (branched off the 
 
 - **CTAS** — `CREATE TABLE iceberg.<ns>.<t> AS SELECT ...` stages the new snapshot on the
   branch.
-- **`MERGE INTO`** — `MERGE INTO iceberg.<ns>.<target> USING <source> ...` (copy-on-write)
-  commits its add-data + delete files to the branch.
+- **`MERGE INTO`** — `MERGE INTO iceberg.<ns>.<target> USING <source> ...` (merge-on-read)
+  commits its add-data + position-delete files to the branch.
 - **CDC sync** — the automatic table mirror (full first sync and incremental
   add-data + equality-delete commits) targets the branch. The sync high-water mark is
   still tracked, so restarts resume correctly.

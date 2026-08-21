@@ -27,6 +27,8 @@ After Iceberg is enabled, NeorunBase automatically keeps every selected table mi
 
 Each table is synced by exactly one coordinator (the leader assigns it, often to a follower), so two coordinators never write the same Iceberg table concurrently.
 
+**Where a synced table lands.** The Iceberg namespace is taken from the **schema of the source table**, not from the catalog's default namespace: `public.orders` is mirrored as `iceberg.public.orders`, and `sales.orders` as `iceberg.sales.orders`. The namespace is created if it does not exist. `default-namespace` (`neorunbase.iceberg.default.namespace`) applies only to a source table addressed with no schema at all.
+
 A per-shard **high-water mark** (the source changelog position) is stamped into the incremental commit's **snapshot summary**, atomically with the synced rows. On a coordinator restart the sync reads the high-water mark back from that snapshot and resumes exactly where it left off — it does not re-read the changelog, so there is no double-sync. Because the watermark lives in the same snapshot as the data (rather than in a separate write), the data and the sync position always advance together.
 
 ## Built-in Time Column + Partitioning
@@ -93,7 +95,7 @@ Multi-format read applies everywhere an external Iceberg table is read:
 
 NeorunBase still **writes Parquet** for its own CDC sync (data and delete files) — that is unchanged. ORC and Avro are supported on the read path only.
 
-`INSERT`, `UPDATE` and `DELETE` run directly against an Iceberg table, as does `MERGE INTO`. `UPDATE` and `DELETE` are **merge-on-read**: the matched rows are recorded as delete files and the data files are never rewritten. See [Row-Level DML on Iceberg Tables](iceberg-dml.md) for what gets written on each format version and how other engines read it.
+`INSERT`, `UPDATE` and `DELETE` run directly against an Iceberg table, as does `MERGE INTO`. `UPDATE`, `DELETE` and `MERGE INTO` are all **merge-on-read**: the matched rows are recorded as position-delete files and the data files are never rewritten. See [Row-Level DML on Iceberg Tables](iceberg-dml.md) for what gets written on each format version and how other engines read it.
 
 ## Open Lakehouse Analytics
 

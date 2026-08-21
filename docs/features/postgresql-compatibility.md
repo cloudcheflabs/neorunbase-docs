@@ -15,7 +15,7 @@ You can connect to NeorunBase using any standard PostgreSQL client, including:
 
 NeorunBase supports standard SQL operations with PostgreSQL conformance:
 
-- **DML**: `SELECT`, `INSERT` (incl. `INSERT … SELECT` and `ON CONFLICT`), `UPDATE`, `DELETE`, and `MERGE INTO` (upsert / copy-on-write)
+- **DML**: `SELECT`, `INSERT` (incl. `INSERT … SELECT` and `ON CONFLICT`), `UPDATE`, `DELETE`, and `MERGE INTO` (upsert; merge-on-read on Iceberg targets)
 - **DDL**: `CREATE TABLE` (incl. `PRIMARY KEY`, `UNIQUE`, `CHECK`, `DEFAULT`, and `FOREIGN KEY (...) REFERENCES ...` with `ON DELETE` / `ON UPDATE` `CASCADE` / `SET NULL` / `RESTRICT` / `NO ACTION`), `DROP TABLE [IF EXISTS]`, `ALTER TABLE`, `CREATE INDEX`, `DROP INDEX`, `CREATE SCHEMA`, `DROP SCHEMA`
 - **Transactions**: `BEGIN` (or `START TRANSACTION`), `COMMIT`, `ROLLBACK`
 - **Queries**: `JOIN` (incl. `NATURAL JOIN` and `JOIN … USING`), `GROUP BY`, `HAVING`, `ORDER BY` (column, alias, expression or ordinal), `LIMIT` / `OFFSET`, `SELECT DISTINCT`, derived tables, `WITH` (incl. `WITH RECURSIVE`), set operators (`UNION`, `UNION ALL`, `INTERSECT`, `EXCEPT`), window functions, `TABLESAMPLE BERNOULLI`, uncorrelated subqueries, aggregation functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `STRING_AGG`, `ARRAY_AGG`, and their `DISTINCT` forms), scalar functions (`ABS`, `ROUND`, `LENGTH`, `UPPER`, `LOWER`, `COALESCE`, `NULLIF`, `EXTRACT`, `TO_CHAR`, …), `CASE WHEN`, `CAST`, and more
