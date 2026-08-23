@@ -1959,6 +1959,14 @@
 <td><code>wap.branch</code></td>
 <td>Default Write-Audit-Publish branch for this catalog's Iceberg writes. See <a href="../iceberg-wap/">Iceberg WAP</a>.</td>
 </tr>
+<tr>
+<td><code>oauth2.token-refresh-enabled</code></td>
+<td>Whether this catalog's session renews its OAuth2 token (default <code>true</code>).</td>
+</tr>
+<tr>
+<td><code>oauth2.token-exchange-enabled</code></td>
+<td>Whether renewal uses an RFC 8693 token exchange (default <code>true</code>) or falls back to <code>client_credentials</code>.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="alter-catalog"><code>ALTER CATALOG</code></h3>

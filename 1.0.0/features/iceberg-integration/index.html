@@ -1093,6 +1093,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#staying-signed-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staying Signed In
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatic-sync-cdc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1857,6 +1868,26 @@
 </ul>
 <p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
 <p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
+<h2 id="staying-signed-in">Staying Signed In</h2>
+<p>The catalog session authenticates with OAuth2 <code>client_credentials</code> and renews its token before it expires
+— by default through an RFC 8693 <strong>token exchange</strong>, falling back to <code>client_credentials</code> when exchange is
+turned off (<code>neorunbase.iceberg.catalog.oauth2.token.exchange.enabled</code>). Polaris accepts either; the switch
+is there for an identity provider that does not implement exchange, and it mirrors the pair Trino exposes.</p>
+<p>Renewal is not retried indefinitely by the Iceberg client. It stops rescheduling the refresh the first time
+one fails — for any reason, including a single restart of the identity provider — and the session is then a
+fixed token waiting to expire. Once it does, <strong>every</strong> catalog call fails with <code>Not authorized</code>, and no
+amount of waiting brings it back.</p>
+<p>NeorunBase therefore treats an unauthorized answer as a dead session rather than as an error to report: it
+signs in again and retries the call once. The replacement session is built from the same credentials, the
+cached table metadata and file plans belonging to the old one are dropped with it, and concurrent queries
+share the single sign-in. A second rejection is surfaced — that one is a real authorization problem, not an
+expired session.</p>
+<div class="admonition warning">
+<p class="admonition-title">A static token cannot be renewed</p>
+<p>A catalog configured with a bare <code>token</code> and no client id/secret has nothing to renew with: the session
+works until that token expires and then fails everything. NeorunBase logs a warning naming the catalog
+at startup. Configure the client credentials instead.</p>
+</div>
 <h2 id="automatic-sync-cdc">Automatic Sync (CDC)</h2>
 <p>After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:</p>
 <ul>

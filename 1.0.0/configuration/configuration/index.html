@@ -2752,6 +2752,16 @@ knobs — see <a href="../../features/iceberg-serving/">Iceberg Serving (LakeBas
 <td>OAuth2 scope requested on the token call. For full catalog access Polaris uses the principal-role wildcard.</td>
 </tr>
 <tr>
+<td><code>neorunbase.iceberg.catalog.oauth2.token.refresh.enabled</code></td>
+<td><code>true</code></td>
+<td>Whether the catalog session renews its OAuth2 token before it expires. Off means the session dies with its first token.</td>
+</tr>
+<tr>
+<td><code>neorunbase.iceberg.catalog.oauth2.token.exchange.enabled</code></td>
+<td><code>true</code></td>
+<td>Whether renewal uses an RFC 8693 <strong>token exchange</strong>; <code>false</code> falls back to <code>client_credentials</code>. Polaris accepts either — turn it off only for an identity provider that does not implement exchange.</td>
+</tr>
+<tr>
 <td><code>neorunbase.iceberg.catalog.rest.uri</code></td>
 <td>(empty)</td>
 <td><em>(legacy, ignored under polaris)</em> Generic REST catalog base URI.</td>
