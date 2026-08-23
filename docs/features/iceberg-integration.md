@@ -18,6 +18,29 @@ You can register more than one Iceberg catalog. See [Catalogs](catalogs.md) for 
 
 S3 access uses the **static access key / secret key** set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.
 
+## Staying Signed In
+
+The catalog session authenticates with OAuth2 `client_credentials` and renews its token before it expires
+— by default through an RFC 8693 **token exchange**, falling back to `client_credentials` when exchange is
+turned off (`neorunbase.iceberg.catalog.oauth2.token.exchange.enabled`). Polaris accepts either; the switch
+is there for an identity provider that does not implement exchange, and it mirrors the pair Trino exposes.
+
+Renewal is not retried indefinitely by the Iceberg client. It stops rescheduling the refresh the first time
+one fails — for any reason, including a single restart of the identity provider — and the session is then a
+fixed token waiting to expire. Once it does, **every** catalog call fails with `Not authorized`, and no
+amount of waiting brings it back.
+
+NeorunBase therefore treats an unauthorized answer as a dead session rather than as an error to report: it
+signs in again and retries the call once. The replacement session is built from the same credentials, the
+cached table metadata and file plans belonging to the old one are dropped with it, and concurrent queries
+share the single sign-in. A second rejection is surfaced — that one is a real authorization problem, not an
+expired session.
+
+!!! warning "A static token cannot be renewed"
+    A catalog configured with a bare `token` and no client id/secret has nothing to renew with: the session
+    works until that token expires and then fails everything. NeorunBase logs a warning naming the catalog
+    at startup. Configure the client credentials instead.
+
 ## Automatic Sync (CDC)
 
 After Iceberg is enabled, NeorunBase automatically keeps every selected table mirrored in Iceberg:
