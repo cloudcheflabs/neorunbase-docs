@@ -168,6 +168,8 @@ knobs — see [Iceberg Serving (LakeBase)](../features/iceberg-serving.md).
 | `neorunbase.iceberg.polaris.client.secret` | (empty) | OAuth2 `client_credentials` secret for the principal above. Credential. |
 | `neorunbase.iceberg.polaris.realm` | `POLARIS` | Value of the `Polaris-Realm` HTTP header sent on every catalog request (selects the Polaris realm/tenant). |
 | `neorunbase.iceberg.polaris.scope` | `PRINCIPAL_ROLE:ALL` | OAuth2 scope requested on the token call. For full catalog access Polaris uses the principal-role wildcard. |
+| `neorunbase.iceberg.catalog.oauth2.token.refresh.enabled` | `true` | Whether the catalog session renews its OAuth2 token before it expires. Off means the session dies with its first token. |
+| `neorunbase.iceberg.catalog.oauth2.token.exchange.enabled` | `true` | Whether renewal uses an RFC 8693 **token exchange**; `false` falls back to `client_credentials`. Polaris accepts either — turn it off only for an identity provider that does not implement exchange. |
 | `neorunbase.iceberg.catalog.rest.uri` | (empty) | *(legacy, ignored under polaris)* Generic REST catalog base URI. |
 | `neorunbase.iceberg.catalog.rest.security` | `NONE` | *(legacy, ignored under polaris)* REST catalog auth mode: `NONE` or `OAUTH2`. |
 | `neorunbase.iceberg.catalog.rest.token-endpoint` | (empty) | *(legacy, ignored under polaris)* OAuth2 token endpoint for client-credentials flow. |

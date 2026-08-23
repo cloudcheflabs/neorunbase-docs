@@ -65,6 +65,8 @@ Option keys may be **bare or quoted** (Trino-style), and values may use single o
 | `default-namespace` | Namespace used when one is not given. |
 | `index.patterns` | Comma-separated `namespace.tableGlob` patterns (`*`/`?` wildcards) selecting which tables get an automatic primary-key serving index. **Blank = opt-in OFF** (nothing auto-indexed) — safe for catalogs with thousands of tables. See [Iceberg Serving](iceberg-serving.md). |
 | `wap.branch` | Default Write-Audit-Publish branch for this catalog's Iceberg writes. See [Iceberg WAP](iceberg-wap.md). |
+| `oauth2.token-refresh-enabled` | Whether this catalog's session renews its OAuth2 token (default `true`). |
+| `oauth2.token-exchange-enabled` | Whether renewal uses an RFC 8693 token exchange (default `true`) or falls back to `client_credentials`. |
 
 ### `ALTER CATALOG`
 
