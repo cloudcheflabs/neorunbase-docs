@@ -56,6 +56,12 @@ call back to ontul — resolves the subject to the mirrored user, and applies th
 Set the shared key with `neorunbase.iam.federation.ontul.jwt.key` (= ontul's `ONTUL_MASTER_KEY`). When blank,
 ontul-token SSO is disabled and mirrored users have no local credential.
 
+!!! note "This is not the only way an external identity reaches pg-wire"
+    The mechanism above is specific to ontul-governed IAM. NeorunBase also
+    federates with any OIDC, SAML 2.0 or LDAP / Active Directory provider, on
+    both the console and pg-wire, independently of IAM mode — see
+    [Single Sign-On](sso.md).
+
 ## Read-only guard
 
 In federated mode every mutating IAM/STS admin request (`POST`/`PUT`/`DELETE` under `/admin/iam` or

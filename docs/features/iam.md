@@ -11,9 +11,11 @@ NeorunBase includes a built-in Identity and Access Management (IAM) system that 
 
 NeorunBase supports creating and managing database users with:
 
-- Username and password-based authentication
+- Username and password-based authentication, with passwords stored as PBKDF2-HMAC-SHA256 hashes
 - Access key and secret key credentials for programmatic access
 - Temporary credentials with configurable expiration
+- Federated identities from an external provider, which carry groups from your directory
+  rather than having an account here — see [Single Sign-On](sso.md)
 
 ## Groups
 
