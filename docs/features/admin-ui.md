@@ -24,6 +24,7 @@ Real-time metrics and monitoring capabilities:
 The Admin UI allows administrators to perform operational tasks:
 
 - **IAM Management**: Create and manage users, groups, policies, access keys, and STS sessions. In federated mode this page is read-only and hosts the standalone ↔ federated mode toggle. See [Identity and Access Management](iam.md).
+- **Single Sign-On**: Configure OIDC, SAML 2.0 and LDAP / Active Directory, import the identity provider's metadata, generate the service-provider keypair, and download the SP metadata to hand back to the provider. Settings are stored on the cluster and replicated to every coordinator, so no file edit or restart is involved. See [Single Sign-On](sso.md).
 - **Security & KMS**: List the KMS key hierarchy, inspect a key's versions, create new keys, and rotate a key to a new version. See [Encryption at Rest](encryption.md).
 - **pg-wire TLS**: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See [pg-wire TLS](pg-wire-tls.md).
 - **Catalogs**: List, create, edit, and drop catalogs (the built-in `lakebase` plus external Iceberg catalogs). Drop is refused for a non-empty catalog and `lakebase` cannot be removed. See [Catalogs](catalogs.md).

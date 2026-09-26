@@ -310,6 +310,71 @@ The out-of-band channel that lets an operator reset the `admin` password on a ru
 | `neorunbase.admin.socket.marker.file` | `coordinator.socket` | File under `<neorunbase.home>/bin/` into which the coordinator writes the socket path it *actually* bound to. `neorunbase-cli.sh` prefers this over re-deriving the path from the properties file, because `neorunbase.base.data.dir` can be overridden with `-D` at launch or edited after startup. Removed on shutdown. |
 | `neorunbase.iam.audit.dir` | `${neorunbase.base.data.dir}/iam-audit` | Directory holding the append-only audit log of admin-socket operations (who reset which password, and when). |
 
+## Authentication — Password Storage
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.auth.password.hash.iterations` | `600000` | PBKDF2-HMAC-SHA256 iterations used when a password is written. The count travels with each stored hash, so raising this does **not** invalidate existing passwords — they are rewritten at the new cost on their owner's next successful login. Values written under the previous unsalted SHA-256 still verify and are upgraded the same way, so nobody is locked out. |
+
+## Single Sign-On (OIDC / SAML / LDAP)
+
+Every setting below can also be managed from the **admin console under Single
+Sign-On**, which stores it on the cluster and replicates it to every coordinator
+— no file edits and no restart. The properties file is read for anything left
+unset. See [Single Sign-On](../features/sso.md) for how the two surfaces differ.
+
+### Identity mapping (all three providers)
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.sso.group.mappings` | (empty) | `idpGroup:localGroup` pairs, comma-separated. Empty means provider group names are used as they are. **Once set the mapping is exhaustive** — a group not named here is dropped, so creating a group at the provider cannot grant access on this cluster by itself. |
+| `neorunbase.sso.allow.unmapped.groups` | `false` | Whether an identity whose groups all map to nothing may still sign in. Off deliberately: such a session has no policies and is denied every action, so admitting it produces a user who is connected and can do nothing. |
+| `neorunbase.sso.federated.session.seconds` | `3600` | Lifetime of a federated session. This bounds how long access outlives a revocation at the identity provider, which the cluster is not told about; shorter is safer. |
+
+### OpenID Connect
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.sso.oidc.enabled` | `false` | Enable the OIDC provider. |
+| `neorunbase.sso.oidc.issuer` | (empty) | Issuer URL. Endpoints and the signing key set are read from its discovery document, so they are not configured individually. |
+| `neorunbase.sso.oidc.client.id` | (empty) | Client id registered at the provider. |
+| `neorunbase.sso.oidc.client.secret` | (empty) | Client secret. Credential. |
+| `neorunbase.sso.oidc.redirect.uri` | `http://localhost:8080/admin/auth/sso/oidc/callback` | Must match the redirect URI registered at the provider exactly, and must be the address browsers reach — the load balancer's, not a node's. |
+| `neorunbase.sso.oidc.scopes` | `openid profile email` | Scopes requested. Deliberately excludes `groups`: it is not a standard scope, and a provider that does not define it rejects the whole authorization request with `invalid_scope`. |
+| `neorunbase.sso.oidc.username.claim` | `preferred_username` | Claim holding the login name. |
+| `neorunbase.sso.oidc.groups.claim` | `groups` | Claim holding group membership. The provider must be configured to include it. |
+| `neorunbase.sso.oidc.audience` | (empty) | Expected audience. Empty falls back to the client id. A token issued for another application is refused even though it is genuine and correctly signed. |
+
+### SAML 2.0
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.sso.saml.enabled` | `false` | Enable the SAML provider. |
+| `neorunbase.sso.saml.idp.entity.id` | (empty) | Identity provider entity ID. Read automatically when IdP metadata is imported from the console. |
+| `neorunbase.sso.saml.idp.sso.url` | (empty) | IdP single sign-on URL. |
+| `neorunbase.sso.saml.idp.certificate` | (empty) | Base64 IdP signing certificate. Assertion signatures are verified against it. |
+| `neorunbase.sso.saml.sp.entity.id` | `neorunbase` | This cluster's entity ID, as it appears in the SP metadata the IdP imports. |
+| `neorunbase.sso.saml.sp.acs.url` | `http://localhost:8080/admin/auth/sso/saml/acs` | Assertion consumer URL. As with the OIDC redirect, this must be the address browsers reach. |
+| `neorunbase.sso.saml.nameid.format` | (empty) | Requested NameID format. Empty omits the request entirely and lets the provider issue what it is configured for — naming one breaks more integrations than it fixes. |
+| `neorunbase.sso.saml.sign.requests` | `false` | Sign authentication requests. Requires an SP keypair, generated from the console; re-import the SP metadata at the provider afterwards so it picks up the certificate. |
+| `neorunbase.sso.saml.username.attribute` | `uid` | Assertion attribute holding the login name. |
+| `neorunbase.sso.saml.groups.attribute` | `groups` | Assertion attribute holding group membership. |
+
+### LDAP / Active Directory
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `neorunbase.sso.ldap.enabled` | `false` | Enable the directory provider. |
+| `neorunbase.sso.ldap.url` | `ldap://ldap.example.com:389` | Directory URL. Use `ldaps://` or enable StartTLS — otherwise the bind password crosses the network in the clear. |
+| `neorunbase.sso.ldap.bind.dn` | (empty) | Service account that searches for user entries. |
+| `neorunbase.sso.ldap.bind.password` | (empty) | Service account password. Credential. |
+| `neorunbase.sso.ldap.user.base.dn` | (empty) | Subtree searched for user entries. |
+| `neorunbase.sso.ldap.user.filter` | `(uid={0})` | Filter locating the user; `{0}` is the login name, escaped per RFC 4515 before substitution. Active Directory usually wants `(sAMAccountName={0})`. |
+| `neorunbase.sso.ldap.group.base.dn` | (empty) | Subtree searched for groups. |
+| `neorunbase.sso.ldap.group.filter` | `(member={0})` | Filter locating groups containing the user; `{0}` is the user's DN. Membership is read both from this search **and** from the user's `memberOf`, because directories disagree about which side records it. |
+| `neorunbase.sso.ldap.group.name.attribute` | `cn` | Attribute holding the group name. |
+| `neorunbase.sso.ldap.starttls` | `false` | Upgrade a plain `ldap://` connection with StartTLS. |
+
 ## Write-Ahead Log (WAL) & Encryption
 
 | Property | Default | Description |
