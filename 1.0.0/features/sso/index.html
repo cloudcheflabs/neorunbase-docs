@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/backup-restore/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/neorunbase-docs/1.0.0/features/sso/">
       
       
-        <link rel="prev" href="../iceberg-wap/">
+        <link rel="prev" href="../iam-federation/">
       
       
-        <link rel="next" href="../kafka-integration/">
+        <link rel="next" href="../admin-password-recovery/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Backup & Restore - NeorunBase</title>
+        <title>Single Sign-On (OIDC/SAML/LDAP) - NeorunBase</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#backup-restore" class="md-skip">
+        <a href="#single-sign-on-oidc-saml-ldap" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Backup & Restore
+              Single Sign-On (OIDC/SAML/LDAP)
             
           </span>
         </div>
@@ -1131,37 +1131,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backup & Restore
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../backup-restore/" class="md-nav__link">
         
   
   
@@ -1177,120 +1150,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-gets-backed-up" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Gets Backed Up
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cron-vs-interval" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cron vs. Interval
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#incremental-by-design" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Incremental by Design
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#history-retention" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        History Retention
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#restore" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Restore
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#specialised-indexes-hnsw-fts-and-backup-safety" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Specialised Indexes (HNSW, FTS) and Backup Safety
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1552,10 +1411,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../sso/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1571,6 +1457,159 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sso-means-two-different-things-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSO means two different things here
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-decides-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What decides permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What decides permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#group-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Group mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring it
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuring it">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openid-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenID Connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saml-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SAML 2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ldap-active-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LDAP / Active Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behind-a-load-balancer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behind a load balancer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#revocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revocation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#password-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Password storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1858,62 +1897,202 @@
 
 
 
-<h1 id="backup-restore">Backup &amp; Restore</h1>
-<p>NeorunBase backs up its critical state to S3-compatible object storage on a schedule. Backups are incremental, opt-in, and can be restored cluster-wide from the admin UI.</p>
-<h2 id="what-gets-backed-up">What Gets Backed Up</h2>
-<p>Every backup run captures both halves of the cluster's state:</p>
-<ul>
-<li><strong>Coordinator state</strong> — KMS keys, IAM users, and cluster metadata.</li>
-<li><strong>Data-node state</strong> — every shard's data and write-ahead log files.</li>
-</ul>
-<p>A single backup run produces a coordinated snapshot — coordinator metadata and data-node shards share the same backup ID, so restore reassembles a consistent point in time.</p>
-<h2 id="configuration">Configuration</h2>
-<p>The <code>S3 Backup</code> page in the admin UI exposes the full configuration:</p>
-<ul>
-<li><strong>Enabled</strong> — master switch (default: off).</li>
-<li><strong>S3 endpoint, region, bucket, prefix</strong> — the destination bucket.</li>
-<li><strong>Access key / secret key</strong> — long-lived static credentials.</li>
-<li><strong>Path-style addressing</strong> — required for ShannonStore / MinIO.</li>
-<li><strong>Interval (minutes)</strong> — how often the scheduled backup runs.</li>
-<li><strong>Cron</strong> — optional 5-field UNIX cron expression for wall-clock schedules (e.g. <code>0 2 * * *</code> daily at 02:00). Coexists with the interval rule; whichever comes due first fires the backup.</li>
-<li><strong>Retention (days)</strong> — how long the visible backup history is kept (default 30 days).</li>
-</ul>
-<p>The same page exposes a <strong>Test Connection</strong> button (verifies the bucket is reachable) and a <strong>Backup now</strong> button (runs an immediate backup).</p>
-<h3 id="cron-vs-interval">Cron vs. Interval</h3>
-<p>The two automatic rules are independent and share the same coordinator tick loop:</p>
-<ul>
-<li><strong>Interval</strong> is a relative "at least N minutes since the last successful backup" timer. Use it as a safety-net cadence.</li>
-<li><strong>Cron</strong> is wall-clock based. Use it for predictable schedules like nightly or weekly runs.</li>
-</ul>
-<p>The cron expression is evaluated in the leader coordinator's local time zone. The first sighting after the cron is set, or after a leader handoff, <strong>arms from "now"</strong> — NeorunBase does not back-fire missed cron times on startup. An invalid cron is rejected with HTTP 400 at config-save time rather than being persisted and silently skipped.</p>
-<h2 id="incremental-by-design">Incremental by Design</h2>
-<p>NeorunBase backs up files only when their content has actually changed:</p>
-<ul>
-<li><strong>First run</strong> uploads everything.</li>
-<li><strong>Subsequent runs</strong> upload only files that differ from prior backups; unchanged files are reused — a re-run with no cluster changes uploads zero bytes.</li>
-</ul>
-<p>Each backup writes a manifest that lists every file alive at backup time, so retention or restore can refer to any single backup ID without re-uploading shared files.</p>
-<h2 id="history-retention">History Retention</h2>
-<p>Past backups are listed in the admin UI and aged out by the <strong>Retention (days)</strong> policy (default 30 days). When an entry passes retention it disappears from the visible history; the underlying objects remain in S3 unless an S3 lifecycle rule removes them. This keeps backup deletes deliberate and reversible — operators decide when to actually reclaim S3 storage.</p>
-<h2 id="restore">Restore</h2>
-<p>Restore is initiated from the admin UI by selecting a backup ID and confirming. The flow is <strong>safe by default</strong>:</p>
+<h1 id="single-sign-on-oidc-saml-ldap">Single Sign-On (OIDC, SAML, LDAP)</h1>
+<p>NeorunBase can hand authentication to an external identity provider, so the
+cluster stops being another place that holds passwords and becomes another thing
+your directory governs. Three providers are supported — OpenID Connect, SAML 2.0,
+and LDAP / Active Directory — and all three work on both surfaces.</p>
+<h2 id="sso-means-two-different-things-here">SSO means two different things here</h2>
+<p>This is the part most integrations get wrong, so it is worth being precise before
+any configuration.</p>
+<p><strong>The admin console is a browser.</strong> It can be redirected, so it uses the flows
+built for that: OIDC Authorization Code with PKCE, or SAML 2.0 Web Browser SSO.</p>
+<p><strong>pg-wire is not a browser and cannot redirect anywhere.</strong> <code>psql</code>, a JDBC driver
+and a BI tool have nowhere to display a login page — and the protocol offers
+exactly one field for a secret. So the identity arrives in that field:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>  Console                              pg-wire
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ───────                              ───────
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  browser → provider → back here       password field carries one of:
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  (Authorization Code + PKCE)            • an OIDC ID token the app already holds
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  (SAML Web Browser SSO)                 • a base64 SAML assertion
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                         • a directory password, verified by bind
+</code></pre></div>
+<p>Which one it is, is recognised rather than configured: three dot-separated base64
+segments is a JWT, a long value beginning <code>PH</code> is base64 of <code>&lt;?</code> and therefore an
+XML document, and anything else is tried against the directory. <strong>No Postgres
+client needs changing</strong> — a token goes in the password field of any connection
+string, driver or DSN that already exists.</p>
+<p>Both paths end at the same verification and the same group mapping, so an
+identity has exactly the permissions on pg-wire that it has in the console.</p>
+<h2 id="what-decides-permissions">What decides permissions</h2>
+<p>Nothing about the provider does. A federated identity arrives carrying group
+names; those are mapped to groups <strong>on this cluster</strong>, and the policies attached
+to those groups authorize every statement. The evaluation is the same code path
+as a local user — only where the group list came from differs.</p>
+<p>No local user account is created. A federated caller has no password and nothing
+to persist; your directory is the record. Creating an account for each person who
+ever signed in would put them all in the IAM list and in the replicated snapshot,
+and removing them from the directory would leave the copy behind.</p>
+<h3 id="group-mapping">Group mapping</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">neorunbase.sso.group.mappings</span><span class="o">=</span><span class="s">db-admins:nb-admins,analysts:nb-readers</span>
+</code></pre></div>
+<p>Left empty, provider group names are used as they are — the common case where the
+directory already uses this product's group names. <strong>Once set, the mapping is
+exhaustive:</strong> a group not named in it is dropped, so creating a group at the
+provider cannot grant access here by itself.</p>
+<p>An identity whose groups all map to nothing is refused, not admitted with no
+groups. Such a session has no policies and is denied every action, so letting it
+in produces someone who is connected and can do nothing, left to work out why
+from permission errors. Set <code>neorunbase.sso.allow.unmapped.groups=true</code> if you
+would rather allow it.</p>
+<h2 id="configuring-it">Configuring it</h2>
+<p>Everything below can be set in the <strong>admin console under Single Sign-On</strong>, which
+stores it on the cluster and replicates it to every coordinator — no file edits,
+no restart. The properties file is still read for anything left unset, so a
+cluster configured by file keeps working untouched.</p>
+<p>Local passwords keep working while SSO is on. Enabling it cannot lock you out.</p>
+<h3 id="openid-connect">OpenID Connect</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="na">neorunbase.sso.oidc.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">neorunbase.sso.oidc.issuer</span><span class="o">=</span><span class="s">https://keycloak.example.com/realms/company</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="na">neorunbase.sso.oidc.client.id</span><span class="o">=</span><span class="s">neorunbase-console</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="na">neorunbase.sso.oidc.client.secret</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="na">neorunbase.sso.oidc.redirect.uri</span><span class="o">=</span><span class="s">https://console.example.com/admin/auth/sso/oidc/callback</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="na">neorunbase.sso.oidc.groups.claim</span><span class="o">=</span><span class="s">groups</span>
+</code></pre></div>
+<p>Endpoints are read from the issuer's discovery document, so they are not
+configured individually. The ID token's signature is verified against the
+provider's published key set, and its issuer, audience and expiry are all
+checked — a token issued for a different application is refused even though it is
+genuine and correctly signed.</p>
+<div class="admonition note">
+<p class="admonition-title">The <code>groups</code> scope</p>
+<p><code>neorunbase.sso.oidc.scopes</code> deliberately does <strong>not</strong> include <code>groups</code>. It is
+not a standard scope, and a provider that does not define it rejects the whole
+authorization request with <code>invalid_scope</code> — so asking for it by default logs
+nobody in. Group membership comes from a claim the provider is configured to
+include. Add a scope here only if your provider documents one.</p>
+</div>
+<h3 id="saml-20">SAML 2.0</h3>
+<p>A SAML integration is an exchange of metadata, not a form-filling exercise.</p>
 <ol>
-<li>Each node downloads the files referenced by the chosen backup into a <em>staging directory</em> alongside its live data — the running cluster keeps serving traffic and is never touched in place.</li>
-<li>The admin UI confirms the staging is complete and prompts the operator to restart the containers.</li>
-<li>On restart, every node automatically swaps the staged tree into place <strong>before</strong> opening its databases. The previous live data is moved aside (kept on disk as <code>&lt;dir&gt;.pre-restore-&lt;id&gt;</code>, not deleted) so the restore is reversible.</li>
+<li><strong>Download this cluster's metadata</strong> from the console (or
+   <code>GET /admin/sso/saml/metadata</code>) and give it to whoever administers your
+   identity provider. It carries the entity ID, the assertion consumer URL and,
+   if a keypair has been generated, the certificate.</li>
+<li><strong>Paste your provider's metadata</strong> into the console. The entity ID, sign-on
+   URL and signing certificate are read from it — which beats transcribing three
+   fields by hand, where the typos are.</li>
 </ol>
-<p>A failed or partial swap leaves the staging directory intact, so the next restart retries instead of silently considering the restore "applied." Operators can clean up the <code>.pre-restore-&lt;id&gt;</code> directories once they're satisfied with the restored state.</p>
-<h2 id="specialised-indexes-hnsw-fts-and-backup-safety">Specialised Indexes (HNSW, FTS) and Backup Safety</h2>
-<p>Vector (HNSW) and full-text (FTS) indexes live as encrypted sidecars in each shard's directory, so they ride along with the shard tree on every backup — no separate path. Two safeguards keep them consistent with the row store:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">neorunbase.sso.saml.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">neorunbase.sso.saml.idp.entity.id</span><span class="o">=</span><span class="s">https://idp.example.com/realms/company</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">neorunbase.sso.saml.idp.sso.url</span><span class="o">=</span><span class="s">https://idp.example.com/protocol/saml</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">neorunbase.sso.saml.idp.certificate</span><span class="o">=</span><span class="s">MIIC…</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="na">neorunbase.sso.saml.sp.entity.id</span><span class="o">=</span><span class="s">neorunbase</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="na">neorunbase.sso.saml.sp.acs.url</span><span class="o">=</span><span class="s">https://console.example.com/admin/auth/sso/saml/acs</span>
+</code></pre></div>
+<p>Every assertion is checked four ways, and each one is a real attack if skipped:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What it prevents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signature, against the provider's certificate</td>
+<td>An assertion the caller wrote</td>
+</tr>
+<tr>
+<td>Audience</td>
+<td>A genuine assertion for another service logging in here</td>
+</tr>
+<tr>
+<td>Validity window</td>
+<td>A captured assertion replayed forever</td>
+</tr>
+<tr>
+<td>Issuer</td>
+<td>Any provider the caller can reach being trusted</td>
+</tr>
+</tbody>
+</table>
+<p>On top of those, an assertion already used is refused. That record is kept <strong>in
+ZooKeeper, not in one JVM</strong>: an assertion is a bearer document, and the replay
+arrives at whichever coordinator the load balancer picks — which is usually not
+the one that saw the original. Remembering it locally would leave the protection
+missing in exactly the deployment that needs it.</p>
+<p><strong>Encrypted assertions and signed requests.</strong> Several providers encrypt
+assertions or require the authentication request to be signed. Both need a
+service-provider keypair — generate one from the console, then re-import the SP
+metadata at your provider so it picks up the new certificate. An encrypted
+assertion must carry its own signature: encryption proves who the assertion was
+<em>for</em>, never who wrote it.</p>
+<p><strong>NameID format</strong> is left empty by default, which omits the request entirely and
+lets the provider issue whatever it is configured for. Naming one breaks more
+integrations than it fixes — several providers refuse a request asking for a
+format they do not issue.</p>
+<h3 id="ldap-active-directory">LDAP / Active Directory</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="na">neorunbase.sso.ldap.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">neorunbase.sso.ldap.url</span><span class="o">=</span><span class="s">ldaps://ad.example.com:636</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">neorunbase.sso.ldap.bind.dn</span><span class="o">=</span><span class="s">cn=svc-neorunbase,ou=service,dc=example,dc=com</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="na">neorunbase.sso.ldap.bind.password</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="na">neorunbase.sso.ldap.user.base.dn</span><span class="o">=</span><span class="s">ou=people,dc=example,dc=com</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="na">neorunbase.sso.ldap.user.filter</span><span class="o">=</span><span class="s">(sAMAccountName={0})</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="na">neorunbase.sso.ldap.group.base.dn</span><span class="o">=</span><span class="s">ou=groups,dc=example,dc=com</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="na">neorunbase.sso.ldap.group.filter</span><span class="o">=</span><span class="s">(member={0})</span>
+</code></pre></div>
+<p>Authentication is <strong>search then bind</strong>. A service account finds the user's entry
+— their DN is something the product cannot construct, since Active Directory puts
+people under <code>CN=John Doe,OU=Staff,…</code> where neither component is the login name —
+and the password is then checked by binding as that DN.</p>
+<p>That second bind <em>is</em> the authentication. Reading a password attribute and
+comparing it would be wrong even where the directory allows it: only the server
+knows how its own hashes are salted, and account lockout, expiry and disabled
+flags are enforced on bind and nowhere else.</p>
+<p>Group membership is read <strong>both ways</strong>: from the user's <code>memberOf</code> and from a
+search of the group tree. Directories disagree about which side records it —
+OpenLDAP usually keeps it on the group, Active Directory mirrors it onto the user
+— and reading only one way silently returns no groups against half the servers in
+the field.</p>
+<p>This is also the provider that makes pg-wire SSO trivial: the directory password
+goes in the password field, so an existing <code>psql</code> or JDBC connection works with
+directory credentials and no token handling at all.</p>
+<div class="admonition warning">
+<p class="admonition-title">Use TLS</p>
+<p>Without <code>ldaps://</code> or <code>neorunbase.sso.ldap.starttls=true</code>, the bind password
+crosses the network in the clear.</p>
+</div>
+<h2 id="behind-a-load-balancer">Behind a load balancer</h2>
+<p>Both browser flows work on any coordinator, regardless of which one started them.
+The login state — including the PKCE verifier — is sealed with a key every node
+derives from the shared master key and carried in the <code>state</code> parameter itself
+rather than held in memory on one node. Unsealing it is also what proves this
+cluster issued it, which is the login-CSRF check.</p>
+<p>This is not a detail: held on one node, SSO works on a single server and fails on
+roughly half of all attempts in a cluster — and it fails looking like a problem
+at the identity provider.</p>
+<h2 id="revocation">Revocation</h2>
+<p>Disabling someone at the provider stops new logins immediately. Sessions already
+issued keep working until they expire — this cluster is not told about the
+change. <code>neorunbase.sso.federated.session.seconds</code> (default 3600) bounds how long
+that gap lasts; shorter is safer.</p>
+<p>A console session is not renewable for the same reason: a refresh token would
+keep someone signed in after the directory disabled them.</p>
+<h2 id="password-storage">Password storage</h2>
+<p>Independent of SSO, local passwords are stored as PBKDF2-HMAC-SHA256 hashes.
+Values written under the previous unsalted SHA-256 still verify and are rewritten
+on the owner's next successful login, which is the only moment the plaintext is
+available to hash — nobody is locked out by the change. The iteration count
+travels with each stored hash, so raising
+<code>neorunbase.auth.password.hash.iterations</code> does not invalidate existing
+passwords. See <a href="../../configuration/configuration/">Configuration</a>.</p>
+<h2 id="see-also">See also</h2>
 <ul>
-<li><strong>Periodic flush</strong> — both index types run a background scheduler that flushes the in-memory authoritative state to its sidecar at a configurable interval (default 30 s for ANN and FTS each).</li>
-<li><strong>Pre-backup flush hook</strong> — every backup run triggers an explicit flush on each Data Node <em>before</em> any file is uploaded, so the backup captures the live in-memory state, not the last-flushed snapshot. The window between a write and a backup that doesn't include that write is therefore zero.</li>
-</ul>
-<p>If a sidecar is missing or stale on a restored cluster, the shard rebuilds it from authoritative RocksDB rows on the next mutation (HNSW path) — so a restore that loses sidecar files alone still converges. The FTS rebuild-on-mutation path is on the roadmap; until it lands, FTS sidecars depend on the standard backup → restore round-trip preserving the sidecar files (which it does).</p>
-<h2 id="limitations">Limitations</h2>
-<ul>
-<li>Restore requires a coordinated restart of all coordinator and data-node containers — there is no online (in-place) restore.</li>
-<li>Backups capture cluster state only; native PostgreSQL <code>pg_dump</code>-style logical exports are out of scope.</li>
+<li><a href="../iam/">Identity and Access Management</a> — the groups and policies a federated identity maps onto.</li>
+<li><a href="../iam-federation/">IAM Federation (ontul)</a> — the other way an external identity reaches pg-wire.</li>
+<li><a href="../admin-ui/">Admin UI</a> — where all of the above is configured.</li>
+<li><a href="../../configuration/configuration/">Configuration Reference</a> — every setting, with its default.</li>
 </ul>
 
 

@@ -14,7 +14,7 @@
         <link rel="prev" href="../iam-policy/">
       
       
-        <link rel="next" href="../admin-password-recovery/">
+        <link rel="next" href="../sso/">
       
       
         
@@ -1555,6 +1555,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../admin-password-recovery/" class="md-nav__link">
         
   
@@ -1898,6 +1926,13 @@ password field. NeorunBase validates the token <strong>locally</strong> using a 
 call back to ontul — resolves the subject to the mirrored user, and applies that user's synced policies.</p>
 <p>Set the shared key with <code>neorunbase.iam.federation.ontul.jwt.key</code> (= ontul's <code>ONTUL_MASTER_KEY</code>). When blank,
 ontul-token SSO is disabled and mirrored users have no local credential.</p>
+<div class="admonition note">
+<p class="admonition-title">This is not the only way an external identity reaches pg-wire</p>
+<p>The mechanism above is specific to ontul-governed IAM. NeorunBase also
+federates with any OIDC, SAML 2.0 or LDAP / Active Directory provider, on
+both the console and pg-wire, independently of IAM mode — see
+<a href="../sso/">Single Sign-On</a>.</p>
+</div>
 <h2 id="read-only-guard">Read-only guard</h2>
 <p>In federated mode every mutating IAM/STS admin request (<code>POST</code>/<code>PUT</code>/<code>DELETE</code> under <code>/admin/iam</code> or
 <code>/admin/sts</code>) is rejected with <strong>HTTP 403 — "IAM is managed by ontul"</strong>. Reads are allowed, and the mode toggle

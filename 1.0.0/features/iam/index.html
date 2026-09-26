@@ -1505,6 +1505,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../admin-password-recovery/" class="md-nav__link">
         
   
@@ -1791,9 +1819,11 @@ policies (read-only) to enforce them for clients connecting directly to NeorunBa
 <h2 id="user-management">User Management</h2>
 <p>NeorunBase supports creating and managing database users with:</p>
 <ul>
-<li>Username and password-based authentication</li>
+<li>Username and password-based authentication, with passwords stored as PBKDF2-HMAC-SHA256 hashes</li>
 <li>Access key and secret key credentials for programmatic access</li>
 <li>Temporary credentials with configurable expiration</li>
+<li>Federated identities from an external provider, which carry groups from your directory
+  rather than having an account here — see <a href="../sso/">Single Sign-On</a></li>
 </ul>
 <h2 id="groups">Groups</h2>
 <p>Users can be organized into IAM groups. Policies attached to a group apply to all members, simplifying access management for teams and applications.</p>
