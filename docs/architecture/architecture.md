@@ -13,8 +13,6 @@ enabling automatic synchronization of transactional data to an open lakehouse fo
 
 ## NeorunBase Architecture
 
-<img width="1200" src="../../images/architecture/neorunbase-architecture.png" align="center"/>
-
 NeorunBase consists of two main deployable components: **Coordinator** and **Data Node**.
 
 ### Coordinator
