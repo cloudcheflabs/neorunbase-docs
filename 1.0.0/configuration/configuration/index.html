@@ -2424,6 +2424,11 @@
 <td>Maximum time to wait when first establishing a TCP connection to a ZooKeeper server before trying another endpoint.</td>
 </tr>
 <tr>
+<td><code>neorunbase.admin.zookeeper.probe.timeout.ms</code></td>
+<td><code>2000</code></td>
+<td>Admin UI Topology view: connect + read timeout when a Coordinator asks each ZooKeeper server for its status (<code>srvr</code>). Servers are probed in parallel; one that does not answer in time is shown as DOWN.</td>
+</tr>
+<tr>
 <td><code>neorunbase.base.data.dir</code></td>
 <td><code>./data</code></td>
 <td>Root directory for all on-disk state. Most other path properties derive from this. Must be a persistent mount in containers.</td>

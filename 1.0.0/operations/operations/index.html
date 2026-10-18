@@ -2208,7 +2208,7 @@ process itself.</p>
 <p>The Admin UI is the primary operator surface. It is served by every Coordinator at <code>http://&lt;coordinator-host&gt;:&lt;neorunbase.admin.http.port&gt;/admin/</code> (default <code>8080</code>).</p>
 <p>It exposes:</p>
 <ul>
-<li>Cluster topology (Coordinators, Data Nodes, leader, ZooKeeper, version).</li>
+<li>Cluster topology: Coordinators with the leader, Data Nodes with disks and shard counts, and the ZooKeeper ensemble — each server's role, status, version, connections, latency and zxid, plus the Coordinator's own ZooKeeper session. See <a href="../../features/admin-ui/#topology">Admin UI → Topology</a>.</li>
 <li>Tables, columns, indexes, and shard maps including replica placement.</li>
 <li>Live and historical metrics charts driven by the Coordinator's metrics RocksDB store.</li>
 <li>IAM management — users, roles, policies, and STS sessions.</li>

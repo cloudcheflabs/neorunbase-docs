@@ -1530,10 +1530,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cluster-overview" class="md-nav__link">
+  <a href="#dashboard" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cluster Overview
+        Dashboard
       
     </span>
   </a>
@@ -1541,10 +1541,82 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring" class="md-nav__link">
+  <a href="#topology" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitoring
+        Topology
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Topology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#zookeeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ZooKeeper
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coordinators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk-repair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Repair
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shards
       
     </span>
   </a>
@@ -1810,21 +1882,128 @@
 
 <h1 id="admin-ui">Admin UI</h1>
 <p>NeorunBase includes a built-in web-based Admin UI for monitoring and managing the cluster.</p>
-<h2 id="cluster-overview">Cluster Overview</h2>
-<p>The Admin UI provides a visual overview of the cluster, including:</p>
-<ul>
-<li>List of active Coordinators and Data Nodes</li>
-<li>Node status and health information</li>
-<li>Shard distribution across Data Nodes</li>
-</ul>
-<h2 id="monitoring">Monitoring</h2>
-<p>Real-time metrics and monitoring capabilities:</p>
-<ul>
-<li>Query throughput and latency metrics</li>
-<li>Storage usage per node and per table</li>
-<li>Cluster-wide performance dashboards</li>
-<li>Time-series metrics with configurable retention</li>
-</ul>
+<h2 id="dashboard">Dashboard</h2>
+<p>The Dashboard (<code>/admin/</code>) counts the live Coordinators and Data Nodes and charts the last hour of
+CPU usage (%), memory usage (MB), query TPS and DML TPS (1-minute rates), per node or aggregated.
+The series come from the leader Coordinator's metrics store (<code>GET /admin/monitoring/metrics</code>); see
+<a href="../../operations/operations/#metrics">Operations → Metrics</a> for collection interval and retention.</p>
+<h2 id="topology">Topology</h2>
+<p>The Topology page (<code>/admin/nodes</code>) is the live map of the cluster. It refreshes every 10 seconds and
+on <strong>Refresh</strong>, and has four sections:</p>
+<h3 id="zookeeper">ZooKeeper</h3>
+<p>Every server in <code>neorunbase.zookeeper.server.list</code>, as the Coordinator serving the page sees it:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server</td>
+<td><code>host:port</code> from the connect string. The server this Coordinator's own session is connected to is tagged <em>this coordinator's session</em>.</td>
+</tr>
+<tr>
+<td>Role</td>
+<td><code>leader</code>, <code>follower</code>, <code>observer</code> or <code>standalone</code> (a single-server ZooKeeper)</td>
+</tr>
+<tr>
+<td>Status</td>
+<td><strong>Online</strong> — the server answered; <strong>Down</strong> — it refused the connection or did not answer in time (the error is shown under the badge); <strong>Not serving</strong> — it is running but has no quorum; <strong>Unknown</strong> — it refuses the status command (see below)</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>ZooKeeper server version</td>
+</tr>
+<tr>
+<td>Connections</td>
+<td>client connections open on that server</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>request latency min / avg / max, in milliseconds</td>
+</tr>
+<tr>
+<td>Znodes</td>
+<td>number of znodes</td>
+</tr>
+<tr>
+<td>Zxid</td>
+<td>last committed transaction id</td>
+</tr>
+</tbody>
+</table>
+<p>Below the table, the Coordinator's own ZooKeeper session: state (<code>CONNECTED</code>, <code>CONNECTING</code>, …),
+session id, negotiated session timeout and the server it is connected to. The header shows how many
+servers are up, so a lost ensemble member is visible before it costs quorum.</p>
+<p>The Coordinator gathers this by sending each server ZooKeeper's <code>srvr</code> four-letter command, in
+parallel, waiting at most <code>neorunbase.admin.zookeeper.probe.timeout.ms</code> (default <code>2000</code>) per server.
+<code>srvr</code> is in ZooKeeper's default <code>4lw.commands.whitelist</code> (3.5 and later) and the ZooKeeper bundled
+with NeorunBase allows all four-letter words (<code>conf/zk/zoo.cfg</code>). An ensemble configured with a
+whitelist that leaves out <code>srvr</code> shows its servers as <strong>Unknown</strong>; add <code>srvr</code> to the whitelist to see
+them. The Coordinator must be able to reach the client port (default <code>2181</code>) of every listed server,
+which it already needs to coordinate.</p>
+<p>Any Coordinator answers — the view does not go through the leader — so during a failover the page
+still shows which ZooKeeper servers are reachable from the Coordinator you are looking at.</p>
+<h3 id="coordinators">Coordinators</h3>
+<p>Node id, host, pg-wire port, admin port, and the <strong>Leader</strong> / <strong>Follower</strong> role. <strong>Logs</strong> streams that
+Coordinator's log in place.</p>
+<h3 id="data-nodes">Data Nodes</h3>
+<p>Node id, host, internal port, the number of shard replicas the node holds, and its host / rack / zone
+labels (see <a href="../topology-aware-placement/">Topology-Aware Shard Placement</a>). Expanding a node shows
+each data disk's capacity, used and available space. <strong>Logs</strong> streams the node's log.</p>
+<h3 id="disk-repair">Disk Repair</h3>
+<p>The disk repair service's status (enabled, in progress, last cycle, repaired / failed / scanned
+counts, dead disks being tracked) with <strong>Scan</strong> — list healthy and dead disks and how long each dead
+disk has been gone — and <strong>Trigger</strong> — run a repair cycle now. See
+<a href="../reactive-shard-repair/">Reactive Shard Repair</a>.</p>
+<h3 id="rest-endpoints">REST endpoints</h3>
+<p>The page reads these admin endpoints (Bearer token from <code>POST /admin/auth/login</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /admin/topology</code></td>
+<td><code>coordinators</code> (with <code>isLeader</code>) and <code>dataNodes</code> (with <code>disks</code> and <code>shardCount</code>)</td>
+</tr>
+<tr>
+<td><code>GET /admin/zookeeper</code></td>
+<td><code>connectString</code>, <code>rootPath</code>, <code>servers[]</code> and <code>session</code> — see below</td>
+</tr>
+<tr>
+<td><code>GET /admin/nodes/coordinators</code>, <code>GET /admin/nodes/datanodes</code></td>
+<td>the registered nodes, without leader / disk / shard details</td>
+</tr>
+</tbody>
+</table>
+<p><code>GET /admin/zookeeper</code> example (three-server ensemble, one server stopped):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;connectString&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;zk-1:2181,zk-2:2181,zk-3:2181&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;rootPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/neorunbase&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;servers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;zk-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2181</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UP&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;leader&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3.9.1&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">     </span><span class="nt">&quot;zxid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x100000045&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;connections&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;outstanding&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">     </span><span class="nt">&quot;latencyMin&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;latencyAvg&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.43</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;latencyMax&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;nodeCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">57</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">},</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;zk-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2181</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DOWN&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;zxid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">     </span><span class="nt">&quot;connections&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;outstanding&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;latencyMin&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;latencyAvg&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">     </span><span class="nt">&quot;latencyMax&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;nodeCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;connect timed out&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;zk-3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2181</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UP&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;follower&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3.9.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;...&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;connected&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CONNECTED&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;sessionId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x1000a1b2c3d0004&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">              </span><span class="nt">&quot;sessionTimeoutMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30000</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;connectedServer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;zk-1:2181&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>status</code> is <code>UP</code>, <code>DOWN</code>, <code>NOT_SERVING</code> or <code>UNKNOWN</code>; fields a server did not report are <code>null</code>.</p>
+<h2 id="shards">Shards</h2>
+<p>The Shards page shows replica distribution by node and by table, and per-table shard detail. The
+Shard Repair page drives rebalancing (status, plan, trigger) and replica repair (status, scan,
+trigger).</p>
 <h2 id="management">Management</h2>
 <p>The Admin UI allows administrators to perform operational tasks:</p>
 <ul>
@@ -1838,7 +2017,7 @@
 <li><strong>Site Replication</strong>: Configure disaster-recovery peer sites and monitor the leader-only WAL streamer that ships committed writes to them.</li>
 <li><strong>Kafka Ingestion</strong>: Manage Kafka consumer groups and monitor ingestion pipelines</li>
 <li><strong>Query Runner</strong>: Execute SQL against the cluster directly from the browser, with a local query history.</li>
-<li><strong>Shard Operations</strong>: Monitor shard distribution and health, and drive shard/disk repair progress</li>
+<li><strong>Shard Operations</strong>: Monitor shard distribution and health, and drive shard/disk repair progress (see <a href="#shards">Shards</a> and <a href="#disk-repair">Disk Repair</a>)</li>
 </ul>
 <h2 id="rest-api">REST API</h2>
 <p>All operations available in the Admin UI are also accessible via a REST API, enabling automation and integration with external monitoring and management tools.</p>
