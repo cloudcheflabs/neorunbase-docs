@@ -209,7 +209,7 @@ The Admin UI is the primary operator surface. It is served by every Coordinator 
 
 It exposes:
 
-- Cluster topology (Coordinators, Data Nodes, leader, ZooKeeper, version).
+- Cluster topology: Coordinators with the leader, Data Nodes with disks and shard counts, and the ZooKeeper ensemble — each server's role, status, version, connections, latency and zxid, plus the Coordinator's own ZooKeeper session. See [Admin UI → Topology](../features/admin-ui.md#topology).
 - Tables, columns, indexes, and shard maps including replica placement.
 - Live and historical metrics charts driven by the Coordinator's metrics RocksDB store.
 - IAM management — users, roles, policies, and STS sessions.
