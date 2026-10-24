@@ -59,6 +59,11 @@ API (leader-forwarded from any coordinator):
 | `GET /admin/api/kafka/config` | Fetch the current Kafka consumer configuration. |
 | `POST /admin/api/kafka/config` | Update the configuration (enable/disable, groups, per-group keys). |
 | `GET /admin/api/kafka/status` | Report per-group running status. |
+
+Credential-like entries in a group's `extra.properties` (keys containing `password`, `secret`, `jaas`,
+`token`, `credential` or `ssl.key`) are returned as `********`. Posting the configuration back with the
+mask in place keeps the stored value, so the Admin UI can save a group without ever receiving its
+secrets. See [Admin UI → Kafka](admin-ui.md#kafka).
 | `POST /admin/api/kafka/groups/<name>/start` | Start a consumer group. |
 | `POST /admin/api/kafka/groups/<name>/stop` | Stop a consumer group. |
 

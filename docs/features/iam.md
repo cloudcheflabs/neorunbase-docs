@@ -33,6 +33,10 @@ NeorunBase uses policy-based access control to manage permissions:
 
 ## Admin API
 
-User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the Admin UI.
+User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the [Admin UI](admin-ui.md#iam).
+
+The admin API is for **administrators** (a policy allowing `*` on `*`, e.g. through `admin-group`). A signed-in user who is not an administrator can read only the cluster view (`/admin/nodes/*`, `/admin/topology`, `/admin/zookeeper`, `/admin/monitoring/metrics`); every other endpoint — including all IAM endpoints and the REST SQL endpoints `/admin/query/execute` and `/v1/api/*`, which do not go through pg-wire's per-user policy evaluation — answers **403**. Non-administrators work with data over pg-wire, where their policies, column masks and row filters apply. See [Admin UI → Who Can Use What](admin-ui.md#who-can-use-what).
+
+Access keys and STS temporary credentials work on pg-wire: an access key signs in as user name with its secret as the password; temporary credentials sign in with the temporary access key as user name and `<secret>::<session token>` as the password. Temporary credentials replicate to every coordinator, so they work whichever coordinator a client reaches.
 
 For the full policy JSON schema, resource format, action catalog, column- and row-level ACL, and worked examples, see the [IAM Policy Reference](iam-policy.md).

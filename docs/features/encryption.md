@@ -14,6 +14,16 @@ NeorunBase includes a built-in Key Management Service that:
 - Distributes keys securely across the cluster
 - Synchronizes keys between Coordinators and Data Nodes automatically
 
+### Managing keys
+
+Keys are created and rotated from the Admin UI's **Security & KMS** page or the admin API
+(`POST /admin/kms/create {"keyId": "..."}`, `POST /admin/kms/rotate/<keyId>`, `GET /admin/kms/list`,
+`GET /admin/kms/status/<keyId>`). Creating a key ID that already exists is refused with **409** —
+rotation (a new active version, the previous one retired but still decrypting) is always an explicit
+action. Key IDs may contain letters, digits, `.`, `_` and `-`. The status endpoint reports each version's
+number, state and creation time; key material is never returned. All KMS endpoints require an
+administrator.
+
 ## What Is Encrypted
 
 - **Row data**: Stored in append-only heap segment files on each Data Node, with AES-256-GCM applied per record using a per-segment Data Encryption Key.

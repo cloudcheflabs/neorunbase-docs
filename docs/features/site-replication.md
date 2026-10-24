@@ -147,6 +147,8 @@ Apply a new config. The streamer is stopped, the in-memory outboxes are rebuilt 
 
 Returns `{"status":"ok"}`.
 
+A peer whose `secretKey` is omitted or empty keeps its stored secret (matched by `siteId`), so the Admin UI can save the configuration without ever receiving the secret. The config and status endpoints are answered by the leader, which runs the streamer.
+
 #### `GET /admin/api/site-replication/status`
 
 Live status snapshot:

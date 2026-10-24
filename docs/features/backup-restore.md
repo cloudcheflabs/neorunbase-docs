@@ -23,7 +23,9 @@ The `S3 Backup` page in the admin UI exposes the full configuration:
 - **Cron** — optional 5-field UNIX cron expression for wall-clock schedules (e.g. `0 2 * * *` daily at 02:00). Coexists with the interval rule; whichever comes due first fires the backup.
 - **Retention (days)** — how long the visible backup history is kept (default 30 days).
 
-The same page exposes a **Test Connection** button (verifies the bucket is reachable) and a **Backup now** button (runs an immediate backup).
+The same page exposes a **Test Connection** button (verifies the bucket is reachable) and a **Backup now** button (runs an immediate backup and answers when it has finished). The secret key is write-only: the API reports `secretKeySet`, and a save without a secret keeps the stored one.
+
+Backups run on the leader coordinator. Through a follower (for example behind a load balancer) the request is forwarded to the leader with a long read timeout — `neorunbase.admin.http.proxy.long.read.timeout.ms`, default 15 minutes — so a long backup or restore staging is not cut off by the regular 30-second proxy timeout; the backup history is likewise read from the leader.
 
 ### Cron vs. Interval
 
