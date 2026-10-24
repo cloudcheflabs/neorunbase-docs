@@ -1093,6 +1093,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#configuring-from-the-admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring from the Admin UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#staying-signed-in" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1896,6 +1907,24 @@
 </ul>
 <p>You can register more than one Iceberg catalog. See <a href="../catalogs/">Catalogs</a> for the full create/alter/drop surface.</p>
 <p>S3 access uses the <strong>static access key / secret key</strong> set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.</p>
+<h2 id="configuring-from-the-admin-ui">Configuring from the Admin UI</h2>
+<p>The <strong>Iceberg</strong> page of the <a href="../admin-ui/#iceberg">Admin UI</a> holds the connection the sync job writes to:
+Polaris URI, OAuth token endpoint, catalog name, realm, client credentials and scope, plus the S3
+endpoint and static keys. Saving it:</p>
+<ul>
+<li>applies the connection on <strong>every coordinator</strong> (followers receive it from the leader) and persists it,
+  so it survives a leader restart or failover;</li>
+<li>registers it as the SQL catalog named after the Polaris catalog name, so its tables are queryable as
+  <code>&lt;polaris-catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code> immediately — further catalogs are added on the Catalogs page;</li>
+<li>never returns the client secret or the S3 secret key (the API reports only whether each is set).</li>
+</ul>
+<p>The <strong>Sync Job</strong> tab starts and stops the sync on every coordinator at once (each coordinator syncs the
+tables assigned to it), and stores the table filters and auto-start flag cluster-wide. <strong>Sync Activity</strong>
+merges the per-coordinator status of every table. <strong>Sync All Dirty</strong> asks every coordinator to sync the
+tables written since their last sync — a table is marked dirty on the coordinator that executed the
+write — and reports how many tables were synced. A table that already existed before Iceberg was enabled
+is picked up on its next write, or immediately with
+<code>POST /admin/api/iceberg/sync/trigger {"table": "&lt;schema&gt;.&lt;table&gt;"}</code>.</p>
 <h2 id="staying-signed-in">Staying Signed In</h2>
 <p>The catalog session authenticates with OAuth2 <code>client_credentials</code> and renews its token before it expires
 — by default through an RFC 8693 <strong>token exchange</strong>, falling back to <code>client_credentials</code> when exchange is

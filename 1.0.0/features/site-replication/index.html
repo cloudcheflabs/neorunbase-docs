@@ -2200,6 +2200,7 @@
 </tbody>
 </table>
 <p>Returns <code>{"status":"ok"}</code>.</p>
+<p>A peer whose <code>secretKey</code> is omitted or empty keeps its stored secret (matched by <code>siteId</code>), so the Admin UI can save the configuration without ever receiving the secret. The config and status endpoints are answered by the leader, which runs the streamer.</p>
 <h4 id="get-adminapisite-replicationstatus"><code>GET /admin/api/site-replication/status</code></h4>
 <p>Live status snapshot:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>

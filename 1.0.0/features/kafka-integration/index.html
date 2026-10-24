@@ -1967,16 +1967,14 @@ API (leader-forwarded from any coordinator):</p>
 <td><code>GET /admin/api/kafka/status</code></td>
 <td>Report per-group running status.</td>
 </tr>
-<tr>
-<td><code>POST /admin/api/kafka/groups/&lt;name&gt;/start</code></td>
-<td>Start a consumer group.</td>
-</tr>
-<tr>
-<td><code>POST /admin/api/kafka/groups/&lt;name&gt;/stop</code></td>
-<td>Stop a consumer group.</td>
-</tr>
 </tbody>
 </table>
+<p>Credential-like entries in a group's <code>extra.properties</code> (keys containing <code>password</code>, <code>secret</code>, <code>jaas</code>,
+<code>token</code>, <code>credential</code> or <code>ssl.key</code>) are returned as <code>********</code>. Posting the configuration back with the
+mask in place keeps the stored value, so the Admin UI can save a group without ever receiving its
+secrets. See <a href="../admin-ui/#kafka">Admin UI → Kafka</a>.
+| <code>POST /admin/api/kafka/groups/&lt;name&gt;/start</code> | Start a consumer group. |
+| <code>POST /admin/api/kafka/groups/&lt;name&gt;/stop</code> | Stop a consumer group. |</p>
 <p>Because consumers run on the Data Nodes, these leader endpoints fan out the start/stop and
 config changes to the Data Nodes over the internal protocol.</p>
 

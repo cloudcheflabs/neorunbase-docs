@@ -1878,7 +1878,8 @@
 <li><strong>Cron</strong> — optional 5-field UNIX cron expression for wall-clock schedules (e.g. <code>0 2 * * *</code> daily at 02:00). Coexists with the interval rule; whichever comes due first fires the backup.</li>
 <li><strong>Retention (days)</strong> — how long the visible backup history is kept (default 30 days).</li>
 </ul>
-<p>The same page exposes a <strong>Test Connection</strong> button (verifies the bucket is reachable) and a <strong>Backup now</strong> button (runs an immediate backup).</p>
+<p>The same page exposes a <strong>Test Connection</strong> button (verifies the bucket is reachable) and a <strong>Backup now</strong> button (runs an immediate backup and answers when it has finished). The secret key is write-only: the API reports <code>secretKeySet</code>, and a save without a secret keeps the stored one.</p>
+<p>Backups run on the leader coordinator. Through a follower (for example behind a load balancer) the request is forwarded to the leader with a long read timeout — <code>neorunbase.admin.http.proxy.long.read.timeout.ms</code>, default 15 minutes — so a long backup or restore staging is not cut off by the regular 30-second proxy timeout; the backup history is likewise read from the leader.</p>
 <h3 id="cron-vs-interval">Cron vs. Interval</h3>
 <p>The two automatic rules are independent and share the same coordinator tick loop:</p>
 <ul>

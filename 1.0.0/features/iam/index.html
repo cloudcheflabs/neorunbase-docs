@@ -1837,7 +1837,9 @@ policies (read-only) to enforce them for clients connecting directly to NeorunBa
 <li>Catalog management (<code>CREATE</code> / <code>ALTER</code> / <code>DROP CATALOG</code>) is gated by catalog-level resources (<code>db:catalog:&lt;name&gt;</code>).</li>
 </ul>
 <h2 id="admin-api">Admin API</h2>
-<p>User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the Admin UI.</p>
+<p>User, group, and policy management is available through the NeorunBase Admin API, allowing administrators to manage access control programmatically or through the <a href="../admin-ui/#iam">Admin UI</a>.</p>
+<p>The admin API is for <strong>administrators</strong> (a policy allowing <code>*</code> on <code>*</code>, e.g. through <code>admin-group</code>). A signed-in user who is not an administrator can read only the cluster view (<code>/admin/nodes/*</code>, <code>/admin/topology</code>, <code>/admin/zookeeper</code>, <code>/admin/monitoring/metrics</code>); every other endpoint — including all IAM endpoints and the REST SQL endpoints <code>/admin/query/execute</code> and <code>/v1/api/*</code>, which do not go through pg-wire's per-user policy evaluation — answers <strong>403</strong>. Non-administrators work with data over pg-wire, where their policies, column masks and row filters apply. See <a href="../admin-ui/#who-can-use-what">Admin UI → Who Can Use What</a>.</p>
+<p>Access keys and STS temporary credentials work on pg-wire: an access key signs in as user name with its secret as the password; temporary credentials sign in with the temporary access key as user name and <code>&lt;secret&gt;::&lt;session token&gt;</code> as the password. Temporary credentials replicate to every coordinator, so they work whichever coordinator a client reaches.</p>
 <p>For the full policy JSON schema, resource format, action catalog, column- and row-level ACL, and worked examples, see the <a href="../iam-policy/">IAM Policy Reference</a>.</p>
 
 

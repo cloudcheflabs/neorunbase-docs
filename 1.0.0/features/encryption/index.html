@@ -1017,6 +1017,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Built-in KMS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#managing-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1841,6 +1858,14 @@
 <li>Distributes keys securely across the cluster</li>
 <li>Synchronizes keys between Coordinators and Data Nodes automatically</li>
 </ul>
+<h3 id="managing-keys">Managing keys</h3>
+<p>Keys are created and rotated from the Admin UI's <strong>Security &amp; KMS</strong> page or the admin API
+(<code>POST /admin/kms/create {"keyId": "..."}</code>, <code>POST /admin/kms/rotate/&lt;keyId&gt;</code>, <code>GET /admin/kms/list</code>,
+<code>GET /admin/kms/status/&lt;keyId&gt;</code>). Creating a key ID that already exists is refused with <strong>409</strong> —
+rotation (a new active version, the previous one retired but still decrypting) is always an explicit
+action. Key IDs may contain letters, digits, <code>.</code>, <code>_</code> and <code>-</code>. The status endpoint reports each version's
+number, state and creation time; key material is never returned. All KMS endpoints require an
+administrator.</p>
 <h2 id="what-is-encrypted">What Is Encrypted</h2>
 <ul>
 <li><strong>Row data</strong>: Stored in append-only heap segment files on each Data Node, with AES-256-GCM applied per record using a per-segment Data Encryption Key.</li>

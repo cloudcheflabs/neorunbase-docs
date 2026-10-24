@@ -1530,6 +1530,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#signing-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signing In
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#who-can-use-what" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who Can Use What
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dashboard" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1624,10 +1646,120 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#management" class="md-nav__link">
+  <a href="#shard-repair" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Management
+        Shard Repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-sign-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Sign-On
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security &amp; KMS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pg-wire-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pg-wire TLS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s3-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 Backup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#site-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Site Replication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-runner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Runner
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#catalogs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalogs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iceberg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iceberg
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kafka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kafka
       
     </span>
   </a>
@@ -1881,12 +2013,47 @@
 
 
 <h1 id="admin-ui">Admin UI</h1>
-<p>NeorunBase includes a built-in web-based Admin UI for monitoring and managing the cluster.</p>
+<p>NeorunBase includes a built-in web console for monitoring and operating the cluster. Every coordinator
+serves it at <code>http://&lt;coordinator&gt;:&lt;neorunbase.admin.http.port&gt;/admin/</code> (default port <code>8080</code>), and every
+coordinator answers every page: requests that need the leader (IAM changes, repair, backup, catalog
+changes, …) are forwarded to it, and pages that show leader-held state (repair / rebalance / reshard
+progress, backup history, site-replication status) are answered by the leader. The console therefore
+behaves the same behind a load balancer whichever coordinator a request lands on.</p>
+<p>Every page and action is covered by the browser end-to-end suite in the product repository
+(<code>tests/ui-e2e</code>), which checks each action both on the page and against the server.</p>
+<h2 id="signing-in">Signing In</h2>
+<p>The login form takes a user ID and password. Depending on the <a href="../sso/">Single Sign-On</a> settings it also
+offers:</p>
+<ul>
+<li><strong>Single Sign-On</strong> / <strong>Sign In with SAML</strong> buttons when OIDC or SAML is enabled — they redirect to the
+  identity provider and come back signed in;</li>
+<li><strong>Use your directory account instead</strong> when LDAP / Active Directory is enabled — the same form then
+  checks the credentials against the directory (<strong>Sign In with Directory</strong>).</li>
+</ul>
+<p><strong>First sign-in.</strong> The built-in <code>admin</code> account starts with the password <code>admin</code>. Signing in with it
+opens a mandatory <em>Password Change Required</em> dialog; until the password is changed, the session's token
+can call nothing but the password-change endpoint. The new password must be at least 6 characters (the
+server additionally refuses weak passwords) and must differ from the current one.</p>
+<p>The header shows the signed-in user and the role (<strong>Administrator</strong> or <strong>User</strong>); the sidebar footer
+shows the product version. <strong>Sign out</strong> (the icon at the top right) clears the session in the browser.
+Pages can be opened directly by URL or reloaded (<code>/admin/nodes</code>, <code>/admin/iam</code>, <code>/admin/query</code>, …); an
+expired or missing session shows the login form instead of the page.</p>
+<h2 id="who-can-use-what">Who Can Use What</h2>
+<p>The console and the admin REST API are for <strong>administrators</strong> — users whose groups carry a policy with
+<code>"Action": "*"</code> on <code>"Resource": "*"</code> (for example the built-in <code>admin-group</code>).</p>
+<p>A signed-in user who is not an administrator sees only <strong>Dashboard</strong> and <strong>Topology</strong> (read-only). Every
+other page shows <em>Administrators only</em>, and the server enforces the same rule: apart from
+<code>GET /admin/nodes/*</code>, <code>GET /admin/topology</code>, <code>GET /admin/zookeeper</code> and <code>GET /admin/monitoring/metrics</code>,
+every admin endpoint answers <strong>403</strong> to a non-administrator. That includes the REST SQL endpoints
+(<code>/admin/query/execute</code>, <code>/v1/api/*</code>) and graph traversal (<code>/admin/graph/*</code>), which run SQL outside
+pg-wire's per-user policy evaluation — non-administrators query data over pg-wire with their own
+credentials, where their IAM policies, column masks and row filters apply.</p>
 <h2 id="dashboard">Dashboard</h2>
-<p>The Dashboard (<code>/admin/</code>) counts the live Coordinators and Data Nodes and charts the last hour of
-CPU usage (%), memory usage (MB), query TPS and DML TPS (1-minute rates), per node or aggregated.
-The series come from the leader Coordinator's metrics store (<code>GET /admin/monitoring/metrics</code>); see
-<a href="../../operations/operations/#metrics">Operations → Metrics</a> for collection interval and retention.</p>
+<p>The Dashboard (<code>/admin/</code>) counts the live Coordinators and Data Nodes and charts the last hour of CPU
+usage (%), memory usage (MB), query TPS and DML TPS (1-minute rates). <strong>Overall / Coordinators / Data
+Nodes</strong> (or a click on a count card) filters the charts to one kind of node. The page refreshes every 30
+seconds. The series come from the leader Coordinator's metrics store (<code>GET /admin/monitoring/metrics</code>);
+see <a href="../../operations/operations/#metrics">Operations → Metrics</a> for collection interval and retention.</p>
 <h2 id="topology">Topology</h2>
 <p>The Topology page (<code>/admin/nodes</code>) is the live map of the cluster. It refreshes every 10 seconds and
 on <strong>Refresh</strong>, and has four sections:</p>
@@ -1948,7 +2115,9 @@ which it already needs to coordinate.</p>
 still shows which ZooKeeper servers are reachable from the Coordinator you are looking at.</p>
 <h3 id="coordinators">Coordinators</h3>
 <p>Node id, host, pg-wire port, admin port, and the <strong>Leader</strong> / <strong>Follower</strong> role. <strong>Logs</strong> streams that
-Coordinator's log in place.</p>
+Coordinator's log in place: <strong>LIVE / PAUSED</strong> stops and resumes the stream, the refresh button reloads the
+last 200 lines, and the view keeps the last 1,000 lines. Logs can be read only from nodes registered in
+the cluster — the coordinator relays the request to that node and to no other host.</p>
 <h3 id="data-nodes">Data Nodes</h3>
 <p>Node id, host, internal port, the number of shard replicas the node holds, and its host / rack / zone
 labels (see <a href="../topology-aware-placement/">Topology-Aware Shard Placement</a>). Expanding a node shows
@@ -2001,26 +2170,200 @@ disk has been gone — and <strong>Trigger</strong> — run a repair cycle now. 
 </code></pre></div>
 <p><code>status</code> is <code>UP</code>, <code>DOWN</code>, <code>NOT_SERVING</code> or <code>UNKNOWN</code>; fields a server did not report are <code>null</code>.</p>
 <h2 id="shards">Shards</h2>
-<p>The Shards page shows replica distribution by node and by table, and per-table shard detail. The
-Shard Repair page drives rebalancing (status, plan, trigger) and replica repair (status, scan,
-trigger).</p>
-<h2 id="management">Management</h2>
-<p>The Admin UI allows administrators to perform operational tasks:</p>
+<p>The Shards page (<code>/admin/shards</code>) has four tabs and a refresh button:</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>By Node</strong></td>
+<td>total nodes (live), total shards, average per node; each data node with its shard count — expand a node to see, per table, how many shards it holds and their ids. A node with no shards is tagged <em>NEW</em>, a dead one <em>OFFLINE</em>.</td>
+</tr>
+<tr>
+<td><strong>By Table</strong></td>
+<td>each table with its shard count and per-node distribution; expand a table for the replica placement of every shard.</td>
+</tr>
+<tr>
+<td><strong>Detail</strong></td>
+<td>pick a table to list every shard with its row count, primary and replicas, plus the table's replication factor and approximate total rows.</td>
+</tr>
+<tr>
+<td><strong>Manage</strong></td>
+<td>every table with shard key, shard count, replication factor, status and column count. Click the name to list columns and indexes.</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>Manage</strong> actions:</p>
 <ul>
-<li><strong>IAM Management</strong>: Create and manage users, groups, policies, access keys, and STS sessions. In federated mode this page is read-only and hosts the standalone ↔ federated mode toggle. See <a href="../iam/">Identity and Access Management</a>.</li>
-<li><strong>Single Sign-On</strong>: Configure OIDC, SAML 2.0 and LDAP / Active Directory, import the identity provider's metadata, generate the service-provider keypair, and download the SP metadata to hand back to the provider. Settings are stored on the cluster and replicated to every coordinator, so no file edit or restart is involved. See <a href="../sso/">Single Sign-On</a>.</li>
-<li><strong>Security &amp; KMS</strong>: List the KMS key hierarchy, inspect a key's versions, create new keys, and rotate a key to a new version. See <a href="../encryption/">Encryption at Rest</a>.</li>
-<li><strong>pg-wire TLS</strong>: Upload, rotate, and remove the cluster-wide PostgreSQL wire protocol certificate. Activation propagates to every Coordinator with no restart and existing connections are unaffected. See <a href="../pg-wire-tls/">pg-wire TLS</a>.</li>
-<li><strong>Catalogs</strong>: List, create, edit, and drop catalogs (the built-in <code>lakebase</code> plus external Iceberg catalogs). Drop is refused for a non-empty catalog and <code>lakebase</code> cannot be removed. See <a href="../catalogs/">Catalogs</a>.</li>
-<li><strong>Iceberg</strong>: Configure the Apache Polaris connection (URI, OAuth client credentials, S3 access/secret key) and monitor sync status. See <a href="../iceberg-integration/">Iceberg Integration</a>.</li>
-<li><strong>S3 Backup</strong>: Configure scheduled cluster backups, view backup history, and trigger restore. See <a href="../backup-restore/">Backup &amp; Restore</a>.</li>
-<li><strong>Site Replication</strong>: Configure disaster-recovery peer sites and monitor the leader-only WAL streamer that ships committed writes to them.</li>
-<li><strong>Kafka Ingestion</strong>: Manage Kafka consumer groups and monitor ingestion pipelines</li>
-<li><strong>Query Runner</strong>: Execute SQL against the cluster directly from the browser, with a local query history.</li>
-<li><strong>Shard Operations</strong>: Monitor shard distribution and health, and drive shard/disk repair progress (see <a href="#shards">Shards</a> and <a href="#disk-repair">Disk Repair</a>)</li>
+<li><strong>Lock / Unlock</strong> — make the table read-only (writes are refused over pg-wire with a read-only error)
+  or writable again (<code>POST /admin/tables/&lt;table&gt;/readonly</code>).</li>
+<li><strong>RF</strong> — change the replication factor; the table is read-only while replicas are added or removed
+  (<code>POST /admin/tables/&lt;table&gt;/replicas</code>).</li>
+<li><strong>Reshard</strong> — redistribute the table over a new shard count. All rows are rehashed and moved, the
+  table is read-only meanwhile, and the dialog shows the phase, rows migrated and elapsed time until
+  <em>Resharding complete</em> (<code>POST</code> / <code>GET /admin/tables/&lt;table&gt;/reshard</code>).</li>
 </ul>
+<h2 id="shard-repair">Shard Repair</h2>
+<p>The Shard Repair page (<code>/admin/repair</code>):</p>
+<ul>
+<li><strong>Reactive Shard Repair (continuous)</strong> — the leader's background worker that compares replica row
+  counts and re-replicates a diverging replica: enabled, running, queue depth, last scan, detected /
+  repaired / failed counts. See <a href="../reactive-shard-repair/">Reactive Shard Repair</a>.</li>
+<li><strong>Scan Dead Nodes</strong> — lists dead data nodes, how long they have been gone, and every affected shard
+  with its surviving replicas and whether it is recoverable.</li>
+<li><strong>Trigger Repair</strong> (with confirmation) — re-replicates the shards of dead nodes onto live ones; the
+  status panel shows the cycle result and repaired / failed / scanned counts.</li>
+<li><strong>Shard Rebalancing</strong> — the current per-node shard distribution and imbalance; <strong>Preview Plan</strong> lists
+  the moves a rebalance would make, <strong>Trigger Rebalance</strong> (with confirmation) runs them.</li>
+</ul>
+<h2 id="iam">IAM</h2>
+<p>The IAM page (<code>/admin/iam</code>) manages local identities. See <a href="../iam/">Identity and Access Management</a> and
+the <a href="../iam-policy/">IAM Policy Reference</a>.</p>
+<ul>
+<li><strong>Users</strong> — <strong>New User</strong> (user ID + password). Each row shows the user's groups (<strong>Join</strong> adds the
+  user to a group) and access keys. <strong>New Keypair</strong> generates an access key (optionally with an expiry
+  date) and shows the access key ID and secret in a banner; pg-wire accepts the access key as the user
+  name and the secret as the password, with the user's policies. Each key has a download icon (CSV with
+  the key pair) and a revoke button. The <code>admin</code> user cannot be deleted.</li>
+<li><strong>Groups</strong> — <strong>New Group</strong>; expand a group to see its members (remove one with its ×) and policies
+  (<strong>Attach Custom</strong> attaches a policy, × detaches it). Policies attached to a group apply to every
+  member.</li>
+<li><strong>Policies</strong> — <strong>New Policy</strong> with a policy name and JSON document; <strong>Governance Template</strong> fills the
+  document from a template (Read-Only Analyst, App Read-Write, Schema Admin, Column-Restricted Read,
+  Row-Level Filter, Iceberg Read-Only, …). Invalid JSON is rejected before anything is sent. Hover a
+  policy to edit or delete it (<code>AdministratorAccess</code> cannot be deleted).</li>
+<li><strong>STS Sessions</strong> — generate temporary credentials from a parent access key with a lifetime (hours /
+  minutes) and an optional session name. The banner shows the temporary access key, secret and session
+  token (the eye buttons reveal them, the copy buttons copy them, <strong>Download CSV</strong> saves them). A pg-wire
+  client signs in with the temporary access key as the user name and <code>&lt;secret&gt;::&lt;session token&gt;</code> as the
+  password. The table lists sessions with their time left; sessions can be downloaded or revoked, and
+  <strong>Clear Expired</strong> removes expired ones. Revoked or expired credentials no longer sign in.</li>
+<li><strong>IAM Authority Mode</strong> — <strong>standalone</strong> (this cluster owns its IAM) or <strong>federated</strong> (ontul is the
+  authority: users, groups and policies are pulled from ontul and local IAM becomes read-only). Federated
+  mode takes the ontul admin URL, a service token (stored, never shown again — the label says
+  <em>— set</em>), and the sync interval. See <a href="../iam-federation/">IAM Federation (ontul)</a>. The mode is kept
+  across restarts and applies on every coordinator.</li>
+</ul>
+<h2 id="single-sign-on">Single Sign-On</h2>
+<p>The Single Sign-On page (<code>/admin/sso</code>) connects the console and pg-wire to an identity provider —
+<strong>OpenID Connect</strong>, <strong>SAML 2.0</strong> and <strong>LDAP / Active Directory</strong> tabs (a green dot marks an enabled
+provider) plus the group mapping shared by all three. Secrets (OIDC client secret, LDAP bind password,
+SAML private key) are write-only: the page shows <em>· stored</em> and an empty field keeps the stored value.</p>
+<ul>
+<li><strong>Save</strong> stores the settings on the cluster and applies them on every coordinator.</li>
+<li><strong>Test connection</strong> checks the selected provider and reports the result.</li>
+<li><strong>Discard changes</strong> reloads the stored settings.</li>
+<li>SAML: <strong>Download SP metadata</strong> saves the service-provider metadata to hand to the IdP; <strong>Generate
+  keypair</strong> creates the SP signing/encryption keypair (the private key never leaves the cluster); <strong>Read
+  metadata</strong> imports the IdP's metadata document and fills in entity ID, sign-on URL and certificate.</li>
+</ul>
+<p>See <a href="../sso/">Single Sign-On</a> for each setting.</p>
+<h2 id="security-kms">Security &amp; KMS</h2>
+<p>The Security &amp; KMS page (<code>/admin/kms</code>):</p>
+<ul>
+<li><strong>Create New Master Key</strong> — enter a key ID (letters, digits, <code>.</code>, <code>_</code>, <code>-</code>) and <strong>Generate Key</strong>, then
+  confirm. An ID that already exists is refused — rotating is a separate, explicit action.</li>
+<li>The key list shows each key's current version and last rotation; <strong>Manage Key</strong> opens the key's
+  version lifecycle (each version's state — ACTIVE, RETIRED — and creation time) and <strong>Rotate Key Now</strong>
+  (with confirmation) adds a new active version and retires the previous one, which keeps decrypting.
+  Key material is never returned by the API.</li>
+<li><strong>Change Admin Password</strong> — change the signed-in administrator's password (current + new + confirm).</li>
+</ul>
+<p>See <a href="../encryption/">Encryption at Rest</a>.</p>
+<h2 id="pg-wire-tls">pg-wire TLS</h2>
+<p>The pg-wire TLS page (<code>/admin/tls</code>) shows the installed certificate (subject, issuer, validity, SHA-256
+fingerprint, signature algorithm, serial, who uploaded it and when; it turns amber within 30 days of
+expiry) and installs or replaces one: paste the PEM certificate chain and the unencrypted PKCS#8 private
+key and click <strong>Install</strong> / <strong>Replace</strong>. A key that does not match is refused. <strong>Remove</strong> (with
+confirmation) turns TLS off cluster-wide. Changes reach every coordinator without a restart; the private
+key is never returned. See <a href="../pg-wire-tls/">pg-wire TLS</a>.</p>
+<h2 id="s3-backup">S3 Backup</h2>
+<p>The S3 Backup page (<code>/admin/backup</code>):</p>
+<ul>
+<li><strong>Configuration</strong> — enable scheduled backups, S3 endpoint, region, bucket, prefix, access key, secret
+  key (write-only: <em>(unchanged — paste to overwrite)</em>), interval (minutes), retention (days), optional
+  cron, and path-style addressing. The form is enabled once the stored configuration has loaded.
+  <strong>Save</strong>, <strong>Test connection</strong> (uses the values in the form, including a secret typed but not yet
+  saved), and <strong>Backup now</strong> (only while backups are enabled; it answers when the backup finishes).</li>
+<li><strong>Available backups (from S3)</strong> — the backups recorded in the bucket (they survive a leader restart),
+  with file count and uploaded bytes. <strong>Restore</strong> → <strong>Stage restore</strong> downloads the chosen backup into a
+  staging directory on every coordinator and data node and shows, per node, the files and bytes staged.
+  The swap happens on the next restart of all containers.</li>
+<li><strong>History</strong> — recent runs (when, trigger, status, files, uploaded bytes, reused files, error), with the
+  run in progress.</li>
+</ul>
+<p>See <a href="../backup-restore/">Backup &amp; Restore</a>.</p>
+<h2 id="site-replication">Site Replication</h2>
+<p>The Site Replication page (<code>/admin/site-replication</code>) shows the live status of the leader's WAL streamer
+(enabled, role, leader, records enqueued / sent / failed, per-peer queue depth and last applied
+sequence) and edits its configuration: enabled, role (<code>primary</code> / <code>standby</code>), batch limits, tick, and the
+peer sites (site ID, internal endpoint, access key, secret key). A peer's secret is write-only — the
+label says <em>(already set — leave blank to keep)</em> and saving without retyping keeps it. See
+<a href="../site-replication/">Site Replication (DR)</a>.</p>
+<h2 id="query-runner">Query Runner</h2>
+<p>The Query Runner (<code>/admin/query</code>) executes SQL as an administrator. Type a statement and click
+<strong>Execute</strong> or press <strong>Ctrl/Cmd + Enter</strong>; <strong>Tab</strong> indents. A <code>SELECT</code> shows the column names with their
+types, <code>NULL</code> values, and 50 rows per page (previous / next); DDL and DML show the command tag and
+affected rows; errors are shown in red. The last 20 statements are kept in the browser as a history —
+click an entry to load it, <strong>Clear All</strong> to empty it. <strong>Clear</strong> empties the editor.</p>
+<h2 id="catalogs">Catalogs</h2>
+<p>The Catalogs page (<code>/admin/catalogs</code>) lists the built-in <code>lakebase</code> catalog (no edit or delete) and every
+registered Iceberg catalog with its connector, type, URI and default namespace.</p>
+<ul>
+<li><strong>New Catalog</strong> — name, catalog type (<code>rest</code>), REST URI, warehouse (the Polaris catalog name), security
+  (<code>OAUTH2</code> / <code>NONE</code>), default namespace, OAuth client id / secret, extra properties (for Polaris:
+  <code>prefix=&lt;catalog&gt;,header.Polaris-Realm=POLARIS,scope=PRINCIPAL_ROLE:ALL</code>), S3 endpoint / region /
+  access key / secret key / path-style access, an optional WAP branch, and index table patterns.</li>
+<li><strong>Edit</strong> (pencil) — changes only what you change: secret fields are blank with <em>(unchanged)</em> and keep
+  the stored value; clearing the WAP branch switches the catalog back to <code>main</code>.</li>
+<li><strong>Delete</strong> (bin) — refused while the catalog still contains a namespace with tables.</li>
+</ul>
+<p>Secrets are never returned: the secret key and client secret are shown as <code>********</code>. A registered
+catalog is queried as <code>&lt;catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code> over pg-wire. See <a href="../catalogs/">Catalogs</a>.</p>
+<h2 id="iceberg">Iceberg</h2>
+<p>The Iceberg page (<code>/admin/iceberg</code>) configures the cluster's Iceberg connection, which the sync job
+writes to. The header shows <strong>ENABLED</strong> / <strong>DISABLED</strong>.</p>
+<ul>
+<li><strong>Connection</strong> — catalog type (<code>polaris</code> or <code>none</code>), warehouse, default namespace; the Polaris URI,
+  OAuth token endpoint, catalog name, realm, client ID / secret and scope; S3 endpoint, region, access
+  key, secret key and path-style access. Secrets are write-only (the eye button reveals what you type).
+  S3 access always uses these static keys — Polaris STS / vended credentials are not used. <strong>Save</strong>
+  applies the connection on every coordinator and registers it as the SQL catalog named after its
+  Polaris catalog, so its tables are queryable as <code>&lt;polaris-catalog&gt;.&lt;namespace&gt;.&lt;table&gt;</code> right away.
+  The connection is kept across restarts.</li>
+<li><strong>Table Browser</strong> — namespaces, the tables in a namespace, and a table's columns (type, nullable) with
+  ready-to-run <code>SELECT</code> / <code>MERGE</code> statements.</li>
+<li><strong>Sync Job</strong> — <strong>Start / Stop</strong> the background sync on every coordinator (each syncs the tables
+  assigned to it); table filters (<code>schema.table</code>, <code>*</code> wildcards; empty = all tables) added as chips and
+  saved with <strong>Save Filters</strong>; auto-start on restart. <strong>Sync Activity</strong> lists synced tables across all
+  coordinators with status, last update and error; <strong>Sync All Dirty</strong> makes every coordinator sync the
+  tables written since their last sync and reports how many it synced; <strong>Sync Now</strong> syncs one table.</li>
+<li><strong>Query Guide</strong> — example SQL for reading Iceberg tables, joining them with LakeBase tables, and
+  <code>MERGE</code> in both directions.</li>
+</ul>
+<p>See <a href="../iceberg-integration/">Iceberg Integration</a>.</p>
+<h2 id="kafka">Kafka</h2>
+<p>The Kafka page (<code>/admin/kafka</code>):</p>
+<ul>
+<li><strong>Configuration</strong> — enable the Kafka consumer, <strong>Add Group</strong>, and per group: brokers, topics, group ID
+  (defaults to <code>neorunbase-&lt;name&gt;</code>), target table, format (JSON), batch size, poll timeout, auto offset
+  reset, max consumers and extra properties (<code>key=value,…</code>). Credential-like extra properties
+  (<code>*password*</code>, <code>*secret*</code>, <code>*jaas*</code>, <code>*token*</code>, …) are shown as <code>********</code>; saving with the mask in
+  place keeps the stored value. <strong>Remove</strong> deletes a group; <strong>Save</strong> applies the configuration.</li>
+<li><strong>Consumer Status</strong> — per group: state (RUNNING, STARTING, STOPPED, ERROR), topics, target table, last
+  activity, rows ingested, error count and last error, merged over the data nodes that run it; <strong>Start</strong>
+  and <strong>Stop</strong> control the group.</li>
+</ul>
+<p>See <a href="../kafka-integration/">Kafka Integration</a>.</p>
 <h2 id="rest-api">REST API</h2>
-<p>All operations available in the Admin UI are also accessible via a REST API, enabling automation and integration with external monitoring and management tools.</p>
+<p>Everything the console does goes through the admin REST API on the same port, authenticated with the
+Bearer token from <code>POST /admin/auth/login</code> (<code>{"username": "...", "password": "..."}</code>), so it can be
+automated. All endpoints except the read-only cluster view listed under
+<a href="#who-can-use-what">Who Can Use What</a> require an administrator.</p>
 
 
 
