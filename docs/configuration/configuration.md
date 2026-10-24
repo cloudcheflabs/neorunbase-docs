@@ -112,6 +112,7 @@ Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unr
 | `neorunbase.admin.shutdown.timeout.seconds` | `5` | Grace period the admin HTTP server waits for in-flight requests on shutdown before forcing termination. |
 | `neorunbase.admin.http.proxy.connect.timeout.ms` | `5000` | Connect timeout for HTTP proxy calls between admin servers (e.g. leader-only endpoints forwarded from non-leaders). |
 | `neorunbase.admin.http.proxy.read.timeout.ms` | `30000` | Read timeout for the same proxy calls. Increase for large log-tail responses or slow links. |
+| `neorunbase.admin.http.proxy.long.read.timeout.ms` | `900000` | Read timeout when a follower forwards a long-running leader operation that answers only when done — **Backup now** and staging a restore. |
 
 ## Metrics Collection
 

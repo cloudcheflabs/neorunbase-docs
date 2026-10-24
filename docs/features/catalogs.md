@@ -101,7 +101,7 @@ The startup properties `neorunbase.iceberg.*` **seed a DEFAULT catalog at boot**
 
 ## Admin REST API
 
-Catalog management is also available through the admin REST API. All endpoints are JWT-authenticated and **leader-forwarded** (non-leaders proxy the call to the leader). Secrets are **masked** in responses.
+Catalog management is also available through the admin REST API. All endpoints are JWT-authenticated, require an administrator, and are **leader-forwarded** (non-leaders proxy the call to the leader). Secrets are **masked** in responses: `s3SecretKey` and `clientSecret` are returned as `********` when set (never partially), access key and client id are partially masked.
 
 | Method & Path | Description |
 |---------------|-------------|
@@ -135,7 +135,7 @@ POST /admin/api/catalogs
 }
 ```
 
-Alter a catalog (patch — unspecified options are preserved):
+Alter a catalog (patch — unspecified options, including secrets, keep their stored values; an option sent with an empty value, such as `"wap.branch": ""`, clears it):
 
 ```json
 PUT /admin/api/catalogs/iceberg-east
@@ -148,7 +148,9 @@ PUT /admin/api/catalogs/iceberg-east
 
 ## Admin UI
 
-The Admin UI includes a **Catalogs** page in the sidebar. It lists every catalog and lets you create, edit, and drop them through a form. As with the SQL and REST paths, a drop is **refused for a non-empty catalog**, and `lakebase` cannot be removed.
+The Admin UI includes a **Catalogs** page in the sidebar. It lists every catalog and lets you create, edit, and drop them through a form. Editing changes only the fields you change — secret fields stay blank with *(unchanged)* and keep the stored value, and clearing the WAP branch switches the catalog back to `main`. As with the SQL and REST paths, a drop is **refused for a non-empty catalog**, and `lakebase` cannot be removed. See [Admin UI → Catalogs](admin-ui.md#catalogs).
+
+The Iceberg connection configured on the Admin UI's **Iceberg** page is registered automatically as a catalog named after its Polaris catalog name (the same seeding the leader performs at startup for `neorunbase.iceberg.*`), so it appears in `SHOW CATALOGS` as soon as it is saved.
 
 ## Authorization
 

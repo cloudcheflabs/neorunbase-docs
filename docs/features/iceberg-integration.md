@@ -18,6 +18,26 @@ You can register more than one Iceberg catalog. See [Catalogs](catalogs.md) for 
 
 S3 access uses the **static access key / secret key** set above. Polaris's STS / vended-credentials path is intentionally not used — every read and write goes through the same long-lived credentials configured in the admin UI.
 
+## Configuring from the Admin UI
+
+The **Iceberg** page of the [Admin UI](admin-ui.md#iceberg) holds the connection the sync job writes to:
+Polaris URI, OAuth token endpoint, catalog name, realm, client credentials and scope, plus the S3
+endpoint and static keys. Saving it:
+
+- applies the connection on **every coordinator** (followers receive it from the leader) and persists it,
+  so it survives a leader restart or failover;
+- registers it as the SQL catalog named after the Polaris catalog name, so its tables are queryable as
+  `<polaris-catalog>.<namespace>.<table>` immediately — further catalogs are added on the Catalogs page;
+- never returns the client secret or the S3 secret key (the API reports only whether each is set).
+
+The **Sync Job** tab starts and stops the sync on every coordinator at once (each coordinator syncs the
+tables assigned to it), and stores the table filters and auto-start flag cluster-wide. **Sync Activity**
+merges the per-coordinator status of every table. **Sync All Dirty** asks every coordinator to sync the
+tables written since their last sync — a table is marked dirty on the coordinator that executed the
+write — and reports how many tables were synced. A table that already existed before Iceberg was enabled
+is picked up on its next write, or immediately with
+`POST /admin/api/iceberg/sync/trigger {"table": "<schema>.<table>"}`.
+
 ## Staying Signed In
 
 The catalog session authenticates with OAuth2 `client_credentials` and renews its token before it expires
