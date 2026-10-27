@@ -2050,6 +2050,8 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/stop-coordinator.sh<span class="w"> </span>&lt;pg-port&gt;
 </code></pre></div>
 <p>The stop script sends <code>SIGTERM</code> and waits up to 30 seconds for the process to exit before falling back to <code>SIGKILL</code>.</p>
+<p>With no argument, <code>bin/stop-coordinator.sh</code> stops the Coordinator running from this installation. The start script names the PID file after the instance's port (<code>bin/coordinator-&lt;port&gt;.pid</code>, the PostgreSQL port), and the stop script looks there. When several Coordinators run from the same installation it does not guess: it lists their ports and exits 1, and you pass the port of the one to stop, e.g. <code>bin/stop-coordinator.sh 5432</code>. It reports "not running" only when no Coordinator from this installation is running.
+<code>bin/stop-datanode.sh</code> works the same way with the Data Node's internal port.</p>
 <h3 id="data-node">Data Node</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>bin/start-datanode.sh
 </code></pre></div>
