@@ -36,6 +36,9 @@ bin/stop-coordinator.sh <pg-port>
 
 The stop script sends `SIGTERM` and waits up to 30 seconds for the process to exit before falling back to `SIGKILL`.
 
+With no argument, `bin/stop-coordinator.sh` stops the Coordinator running from this installation. The start script names the PID file after the instance's port (`bin/coordinator-<port>.pid`, the PostgreSQL port), and the stop script looks there. When several Coordinators run from the same installation it does not guess: it lists their ports and exits 1, and you pass the port of the one to stop, e.g. `bin/stop-coordinator.sh 5432`. It reports "not running" only when no Coordinator from this installation is running.
+`bin/stop-datanode.sh` works the same way with the Data Node's internal port.
+
 ### Data Node
 
 ```bash
