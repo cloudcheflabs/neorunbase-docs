@@ -72,3 +72,11 @@ Multiple Coordinators can run simultaneously. NeorunBase uses ZooKeeper-based le
 Leader election is **sticky** by default (`neorunbase.cluster.election.sticky.enabled=true`; `neorunbase.properties`, section 22c): the previously-elected leader's node id is persisted to ZooKeeper, and on startup non-incumbent nodes wait `neorunbase.cluster.election.deference.window.ms` (default 3000) before joining the election queue, so a restarting incumbent reclaims leadership without a leadership toggle — avoiding a double-init of leader-only services (metrics collection, the repair workers, the site-replication streamer). Setting `sticky.enabled=false` falls back to first-lock-wins.
 
 On every startup, non-leader coordinators and data nodes perform a mandatory **bootstrap fetch** — they pull authoritative KMS / metadata / IAM snapshots from the leader and overwrite their local RocksDB before signaling ready in ZooKeeper, so a node never serves stale state. If retries are exhausted the process exits with code 1 so the supervisor restarts it (`neorunbase.properties`, section 22b).
+
+### Stalls longer than the ZooKeeper session
+
+A Coordinator or Data Node that stalls longer than its ZooKeeper session timeout (a long GC pause, a frozen VM, a network partition) loses its registration with the session. When it reconnects, it registers again and catches up on what it missed: a follower Coordinator pulls KMS, metadata and IAM from the leader, and a Data Node pulls KMS. Its log records `Re-registered … the previous session expired`. Until this happens, the node is missing from the cluster view: a Data Node gets no new shards, and a Coordinator does not receive state changes.
+
+A leader that stalls this long loses leadership. When it comes back, it steps down at once and stops its leader-only services. From then on, it forwards writes to the new leader instead of applying them itself.
+
+A password change sent to a follower Coordinator is applied on the leader. The follower answers only once it accepts the new password itself. If it cannot catch up, the answer is `502`, which says the old password still works on that Coordinator. You never get a success while the old password is still valid there.
