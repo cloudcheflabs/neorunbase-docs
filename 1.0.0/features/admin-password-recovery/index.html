@@ -1596,6 +1596,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multiple-coordinators-ha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple coordinators (HA)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#federated-iam-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Federated IAM mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1951,7 +1973,7 @@ rotation.</p>
 </tr>
 <tr>
 <td><strong>Cluster sync</strong></td>
-<td>automatic — leader pushes the new state to followers and data nodes</td>
+<td>automatic — the reset is applied on the leader, which pushes the new state to every coordinator; run on a follower, it is forwarded to the leader (see <a href="#multiple-coordinators-ha">Multiple coordinators</a>)</td>
 </tr>
 <tr>
 <td><strong>Audit log</strong></td>
@@ -2018,6 +2040,10 @@ set automatically).</p>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="na">neorunbase.admin.socket.marker.file</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">coordinator.socket</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Append-only audit trail of socket operations.</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="na">neorunbase.iam.audit.dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${neorunbase.base.data.dir}/iam-audit</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># On a follower coordinator: how long (ms) to wait for the leader to apply a</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># forwarded reset. The forwarded request carries a deadline of one third of this;</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># a leader that receives it later discards it.</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="na">neorunbase.admin.socket.forward.timeout.ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">30000</span>
 </code></pre></div>
 <p>The socket follows <code>neorunbase.base.data.dir</code>. If you launch the coordinator with
 <code>-Dneorunbase.base.data.dir=/var/lib/neorunbase</code> the socket moves to
@@ -2090,6 +2116,84 @@ running a start script, not the CLI.</p>
 <a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="c1"># 6. Non-interactive automation, password from stdin so it never reaches argv:</span>
 <a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;S0me!Strong!Pass&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/neorunbase-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span>-
 </code></pre></div>
+<h2 id="multiple-coordinators-ha">Multiple coordinators (HA)</h2>
+<p>IAM is owned by the leader coordinator: the leader applies every change and pushes
+the new snapshot to the other coordinators. The CLI always talks to the coordinator
+on its own host, so it matters which one that is. <code>ping</code> tells you:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>bin/neorunbase-cli.sh<span class="w"> </span>ping
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># pong (leader coordinator-1)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># pong (follower coordinator-2; leader: coordinator-1 (nb-coord1:7100))</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Where you run the reset</th>
+<th>What happens</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Leader</strong></td>
+<td>Applied there and pushed to every coordinator.</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><strong>Follower, leader reachable</strong></td>
+<td>Forwarded to the leader (internal protocol, KMS-encrypted), applied there and pushed to every coordinator. The follower then checks that its own copy has the new password and pulls IAM from the leader if the push has not arrived yet. The CLI notes <code>applied on the leader &lt;node&gt;</code>.</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><strong>Follower, no leader elected</strong></td>
+<td>Nothing is changed. The error says so.</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><strong>Follower, leader does not answer</strong> (paused, partitioned, killed but its ZooKeeper session not yet expired)</td>
+<td>Nothing is changed. The error names the leader and says <code>the password was NOT changed</code>.</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>error: this coordinator (coordinator-2) is a follower and the leader coordinator-1 (nb-coord1:7100)
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>did not apply the reset (no answer within 30000 ms); the password was NOT changed. ...
+</code></pre></div>
+<p><strong>A failed reset never lands later.</strong> The forwarded request carries a deadline of
+one third of <code>neorunbase.admin.socket.forward.timeout.ms</code>. A leader that was frozen
+and receives the request after that deadline discards it, so a reset the CLI reported
+as failed does not come into effect when the leader wakes up. The leader also refuses
+a forwarded reset if it is no longer the leader by the time it arrives.
+(The deadline is compared against the leader's clock, so keep coordinator clocks in sync.)</p>
+<p><strong>If the leader's answer is lost after it applied the reset</strong>, the follower checks its
+own copy: if the leader's push has already delivered the new password there, the CLI
+reports success (with a note) rather than a false failure. For a generated password the
+follower creates the password itself before forwarding, so it can do this check too.</p>
+<p>Before this behaviour, a reset run on a follower changed only that follower's copy,
+exited <code>0</code>, and was silently overwritten by the leader's next IAM write — the old
+password kept working.</p>
+<p>After a fail-over, run the reset on the new leader or on any follower; a coordinator
+that rejoins pulls the current IAM state from the leader before it serves logins.</p>
+<h2 id="federated-iam-mode">Federated IAM mode</h2>
+<p>When <code>neorunbase.iam.mode=federated</code>, ontul is the IAM authority and NeorunBase's
+IAM is read-only (the Admin UI and REST refuse IAM writes). The CLI follows the same
+rule, with one deliberate exception:</p>
+<ul>
+<li><strong>Ontul-managed users are refused</strong> (exit <code>1</code>): <code>... is managed by ontul (it has no
+  NeorunBase password; the next pull from ontul would overwrite one set here) - reset it
+  in ontul.</code> Such a user has no NeorunBase password at all; a password set here would
+  either vanish at the next pull or become a second credential that bypasses ontul.</li>
+<li><strong>NeorunBase-local users can still be reset</strong> — the bootstrap <code>admin</code> and any other
+  user ontul does not know. They are preserved across every pull from ontul, and they
+  are the break-glass account for the NeorunBase console. Refusing them would remove
+  the only recovery path exactly when it is needed (for example, while ontul is down).
+  A reset of a local user and a concurrent pull from ontul are serialised, so the pull
+  cannot restore the old password.</li>
+<li>A preserved local user also keeps its own groups and policies across a pull
+  (for the bootstrap admin: <code>admin-group</code> and <code>AdministratorAccess</code>), unless ontul
+  defines a group or policy of the same name, in which case ontul's wins. Previously
+  the admin survived the pull but lost administrator access, so nobody could use the
+  console — not even to switch federation back off.</li>
+</ul>
 <h2 id="security-model">Security model</h2>
 <p><strong>1. The socket is OS-gated.</strong>
 At startup the coordinator creates <code>data/admin.sock</code> with mode <code>600</code>
@@ -2097,10 +2201,16 @@ At startup the coordinator creates <code>data/admin.sock</code> with mode <code>
 cannot connect. There is no token, no shared secret, no network listener.</p>
 <p><strong>2. The audit log records every reset.</strong>
 Every successful reset appends a JSON line to <code>data/iam-audit/reset.log</code>
-(mode <code>600</code>). The plaintext password is <strong>never</strong> logged — only the first
-8 characters of its hash, the user, whether it was coordinator-generated,
-and the OS user that invoked the CLI.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-05-23T16:00:46.922Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;OYV/Ojf/&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">}</span>
+(mode <code>600</code>). The plaintext password is <strong>never</strong> logged, and neither is any part
+of the stored hash. <code>hashFp</code> is a fingerprint: the first 48 bits (Base64) of a
+SHA-256 over the stored, salted PBKDF2 hash. It cannot be turned back into the hash
+or used to test a password guess (that would need the salt), yet it changes on every
+reset — even to the same password — because each reset draws a fresh salt. Two
+coordinators with the same fingerprint hold the same password. The line also records
+the user, whether the password was generated, the OS user that invoked the CLI, and —
+in a multi-coordinator cluster — the route: <code>forwardedTo=&lt;leader&gt;</code> on the follower
+where the CLI ran, <code>forwardedFrom=&lt;follower&gt;</code> on the leader that applied it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-10-27T11:02:13.511Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;OYV/Ojf/&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="s2">&quot;forwardedFrom=coordinator-2&quot;</span><span class="p">}</span>
 </code></pre></div>
 <p><strong>3. The new password is exposed exactly once.</strong>
 For coordinator-generated passwords, the plaintext is returned only on
@@ -2121,6 +2231,9 @@ reset is to be on the host <em>and</em> have the coordinator running <em>and</em
 its filesystem identity.</p>
 <h2 id="limitations">Limitations</h2>
 <ul>
+<li><strong>A leader must be reachable for a reset on a follower.</strong> With no elected or
+  reachable leader the CLI fails (exit <code>1</code>) and changes nothing; wait for a leader
+  to be elected, or run it on the leader host.</li>
 <li><strong>Coordinator must be running.</strong> If the coordinator is down, this CLI
   cannot help. Bring the coordinator back up first, then run the CLI.</li>
 <li><strong>No knowledge factor.</strong> Any process that shares the coordinator's

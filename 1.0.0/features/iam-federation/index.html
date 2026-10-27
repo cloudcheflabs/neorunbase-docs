@@ -1909,7 +1909,10 @@ direct-serving stays fast.</p>
    policy editor offers a <strong>"NeorunBase serving policy" template</strong> for exactly this.</li>
 <li><strong>NeorunBase pulls</strong> <code>GET /admin/iam/{users,groups,policies}</code> from ontul on each sync interval (leader only),
    and imports them into its replicated IAM store <strong>verbatim</strong> — no translation. The local bootstrap admin is
-   preserved so the NeorunBase console keeps working.</li>
+   preserved — together with its own groups and policies (<code>admin-group</code>, <code>AdministratorAccess</code>) unless ontul
+   defines the same names — so the NeorunBase console keeps working. A lost admin password can still be reset
+   with <code>neorunbase-cli iam:reset-password</code> (local users only; ontul-managed users are reset in ontul) — see
+   <a href="../admin-password-recovery/#federated-iam-mode">Admin Password Recovery</a>.</li>
 <li><strong>Enforcement</strong> is identical to standalone mode: a query's user → effective policies → column masking, column
    deny, and row-level filters are applied on the <a href="../iceberg-serving/">serving path</a>, including Iceberg catalog
    tables.</li>
