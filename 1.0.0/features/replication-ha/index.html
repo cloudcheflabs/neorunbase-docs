@@ -910,6 +910,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Coordinator High Availability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stalls-longer-than-the-zookeeper-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stalls longer than the ZooKeeper session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1907,6 +1924,10 @@
 <p>Multiple Coordinators can run simultaneously. NeorunBase uses ZooKeeper-based leader election (Curator <code>LeaderSelector</code>) to designate a primary Coordinator for metadata management, while all Coordinators can serve client queries. If the leader Coordinator fails, a new leader is automatically elected.</p>
 <p>Leader election is <strong>sticky</strong> by default (<code>neorunbase.cluster.election.sticky.enabled=true</code>; <code>neorunbase.properties</code>, section 22c): the previously-elected leader's node id is persisted to ZooKeeper, and on startup non-incumbent nodes wait <code>neorunbase.cluster.election.deference.window.ms</code> (default 3000) before joining the election queue, so a restarting incumbent reclaims leadership without a leadership toggle — avoiding a double-init of leader-only services (metrics collection, the repair workers, the site-replication streamer). Setting <code>sticky.enabled=false</code> falls back to first-lock-wins.</p>
 <p>On every startup, non-leader coordinators and data nodes perform a mandatory <strong>bootstrap fetch</strong> — they pull authoritative KMS / metadata / IAM snapshots from the leader and overwrite their local RocksDB before signaling ready in ZooKeeper, so a node never serves stale state. If retries are exhausted the process exits with code 1 so the supervisor restarts it (<code>neorunbase.properties</code>, section 22b).</p>
+<h3 id="stalls-longer-than-the-zookeeper-session">Stalls longer than the ZooKeeper session</h3>
+<p>A Coordinator or Data Node that stalls longer than its ZooKeeper session timeout (a long GC pause, a frozen VM, a network partition) loses its registration with the session. When it reconnects, it registers again and catches up on what it missed: a follower Coordinator pulls KMS, metadata and IAM from the leader, and a Data Node pulls KMS. Its log records <code>Re-registered … the previous session expired</code>. Until this happens, the node is missing from the cluster view: a Data Node gets no new shards, and a Coordinator does not receive state changes.</p>
+<p>A leader that stalls this long loses leadership. When it comes back, it steps down at once and stops its leader-only services. From then on, it forwards writes to the new leader instead of applying them itself.</p>
+<p>A password change sent to a follower Coordinator is applied on the leader. The follower answers only once it accepts the new password itself. If it cannot catch up, the answer is <code>502</code>, which says the old password still works on that Coordinator. You never get a success while the old password is still valid there.</p>
 
 
 
