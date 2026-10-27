@@ -164,8 +164,8 @@ The CLI supports exactly two commands:
 
 | Command | Purpose |
 | --- | --- |
-| `ping` | Check that the local admin socket is reachable (prints `pong`). |
-| `iam:reset-password` | Reset a user's password — the recovery path when the admin password is lost and you cannot log into the Admin UI. |
+| `ping` | Check that the local admin socket is reachable, and show this Coordinator's role: `pong (leader <node>)` or `pong (follower <node>; leader: <node> (host:port))`. |
+| `iam:reset-password` | Reset a user's password — the recovery path when the admin password is lost and you cannot log into the Admin UI. On a follower Coordinator it is forwarded to the leader and applies to the whole cluster; with no reachable leader it exits `1` and the password is NOT changed. |
 
 ### Password Recovery
 
@@ -190,6 +190,8 @@ printf 'my-new-secret' | bin/neorunbase-cli.sh iam:reset-password --user admin -
 ```
 
 The reset account is flagged to require a password change on next login.
+
+With several Coordinators, IAM is leader-owned: a reset run on a follower is forwarded to the leader, which applies it and pushes it to every Coordinator; if the leader is missing or does not answer within `neorunbase.admin.socket.forward.timeout.ms` (default `30000`), the CLI exits `1`, names the leader and says the password was NOT changed — and a leader that receives the request late discards it. In federated IAM mode only NeorunBase-local users (such as the bootstrap `admin`) can be reset; ontul-managed users are reset in ontul. See [Admin Password Recovery](../features/admin-password-recovery.md#multiple-coordinators-ha).
 
 ## Cluster Lifecycle Notes
 

@@ -42,7 +42,7 @@ rotation.
 | **Socket path marker** | `bin/coordinator.socket` — written when the socket binds, removed on shutdown |
 | **Network surface** | none — Unix domain socket only |
 | **Downtime** | none — applied in-process on the live coordinator |
-| **Cluster sync** | automatic — leader pushes the new state to followers and data nodes |
+| **Cluster sync** | automatic — the reset is applied on the leader, which pushes the new state to every coordinator; run on a follower, it is forwarded to the leader (see [Multiple coordinators](#multiple-coordinators-ha)) |
 | **Audit log** | `data/iam-audit/reset.log` (mode `600`, append-only) |
 | **Post-reset state** | `requirePasswordChange = true` (forced rotation on next login) |
 
@@ -88,6 +88,10 @@ neorunbase.admin.socket.path         = ${neorunbase.base.data.dir}/admin.sock
 neorunbase.admin.socket.marker.file  = coordinator.socket
 # Append-only audit trail of socket operations.
 neorunbase.iam.audit.dir = ${neorunbase.base.data.dir}/iam-audit
+# On a follower coordinator: how long (ms) to wait for the leader to apply a
+# forwarded reset. The forwarded request carries a deadline of one third of this;
+# a leader that receives it later discards it.
+neorunbase.admin.socket.forward.timeout.ms = 30000
 ```
 
 The socket follows `neorunbase.base.data.dir`. If you launch the coordinator with
@@ -180,6 +184,71 @@ bin/neorunbase-cli.sh --socket /var/lib/neorunbase/admin.sock iam:reset-password
 echo 'S0me!Strong!Pass' | bin/neorunbase-cli.sh iam:reset-password --new-password -
 ```
 
+## Multiple coordinators (HA)
+
+IAM is owned by the leader coordinator: the leader applies every change and pushes
+the new snapshot to the other coordinators. The CLI always talks to the coordinator
+on its own host, so it matters which one that is. `ping` tells you:
+
+```bash
+bin/neorunbase-cli.sh ping
+# pong (leader coordinator-1)
+# pong (follower coordinator-2; leader: coordinator-1 (nb-coord1:7100))
+```
+
+| Where you run the reset | What happens | Exit |
+|---|---|---|
+| **Leader** | Applied there and pushed to every coordinator. | `0` |
+| **Follower, leader reachable** | Forwarded to the leader (internal protocol, KMS-encrypted), applied there and pushed to every coordinator. The follower then checks that its own copy has the new password and pulls IAM from the leader if the push has not arrived yet. The CLI notes `applied on the leader <node>`. | `0` |
+| **Follower, no leader elected** | Nothing is changed. The error says so. | `1` |
+| **Follower, leader does not answer** (paused, partitioned, killed but its ZooKeeper session not yet expired) | Nothing is changed. The error names the leader and says `the password was NOT changed`. | `1` |
+
+```text
+error: this coordinator (coordinator-2) is a follower and the leader coordinator-1 (nb-coord1:7100)
+did not apply the reset (no answer within 30000 ms); the password was NOT changed. ...
+```
+
+**A failed reset never lands later.** The forwarded request carries a deadline of
+one third of `neorunbase.admin.socket.forward.timeout.ms`. A leader that was frozen
+and receives the request after that deadline discards it, so a reset the CLI reported
+as failed does not come into effect when the leader wakes up. The leader also refuses
+a forwarded reset if it is no longer the leader by the time it arrives.
+(The deadline is compared against the leader's clock, so keep coordinator clocks in sync.)
+
+**If the leader's answer is lost after it applied the reset**, the follower checks its
+own copy: if the leader's push has already delivered the new password there, the CLI
+reports success (with a note) rather than a false failure. For a generated password the
+follower creates the password itself before forwarding, so it can do this check too.
+
+Before this behaviour, a reset run on a follower changed only that follower's copy,
+exited `0`, and was silently overwritten by the leader's next IAM write — the old
+password kept working.
+
+After a fail-over, run the reset on the new leader or on any follower; a coordinator
+that rejoins pulls the current IAM state from the leader before it serves logins.
+
+## Federated IAM mode
+
+When `neorunbase.iam.mode=federated`, ontul is the IAM authority and NeorunBase's
+IAM is read-only (the Admin UI and REST refuse IAM writes). The CLI follows the same
+rule, with one deliberate exception:
+
+- **Ontul-managed users are refused** (exit `1`): `... is managed by ontul (it has no
+  NeorunBase password; the next pull from ontul would overwrite one set here) - reset it
+  in ontul.` Such a user has no NeorunBase password at all; a password set here would
+  either vanish at the next pull or become a second credential that bypasses ontul.
+- **NeorunBase-local users can still be reset** — the bootstrap `admin` and any other
+  user ontul does not know. They are preserved across every pull from ontul, and they
+  are the break-glass account for the NeorunBase console. Refusing them would remove
+  the only recovery path exactly when it is needed (for example, while ontul is down).
+  A reset of a local user and a concurrent pull from ontul are serialised, so the pull
+  cannot restore the old password.
+- A preserved local user also keeps its own groups and policies across a pull
+  (for the bootstrap admin: `admin-group` and `AdministratorAccess`), unless ontul
+  defines a group or policy of the same name, in which case ontul's wins. Previously
+  the admin survived the pull but lost administrator access, so nobody could use the
+  console — not even to switch federation back off.
+
 ## Security model
 
 **1. The socket is OS-gated.**
@@ -189,12 +258,18 @@ cannot connect. There is no token, no shared secret, no network listener.
 
 **2. The audit log records every reset.**
 Every successful reset appends a JSON line to `data/iam-audit/reset.log`
-(mode `600`). The plaintext password is **never** logged — only the first
-8 characters of its hash, the user, whether it was coordinator-generated,
-and the OS user that invoked the CLI.
+(mode `600`). The plaintext password is **never** logged, and neither is any part
+of the stored hash. `hashFp` is a fingerprint: the first 48 bits (Base64) of a
+SHA-256 over the stored, salted PBKDF2 hash. It cannot be turned back into the hash
+or used to test a password guess (that would need the salt), yet it changes on every
+reset — even to the same password — because each reset draws a fresh salt. Two
+coordinators with the same fingerprint hold the same password. The line also records
+the user, whether the password was generated, the OS user that invoked the CLI, and —
+in a multi-coordinator cluster — the route: `forwardedTo=<leader>` on the follower
+where the CLI ran, `forwardedFrom=<follower>` on the leader that applied it.
 
 ```json
-{"ts":"2026-05-23T16:00:46.922Z","event":"iam.reset-password","user":"admin","generated":true,"hashFp":"OYV/Ojf/","invokedAs":"root"}
+{"ts":"2026-10-27T11:02:13.511Z","event":"iam.reset-password","user":"admin","generated":false,"hashFp":"OYV/Ojf/","invokedAs":"root","route":"forwardedFrom=coordinator-2"}
 ```
 
 **3. The new password is exposed exactly once.**
@@ -219,6 +294,9 @@ its filesystem identity.
 
 ## Limitations
 
+- **A leader must be reachable for a reset on a follower.** With no elected or
+  reachable leader the CLI fails (exit `1`) and changes nothing; wait for a leader
+  to be elected, or run it on the leader host.
 - **Coordinator must be running.** If the coordinator is down, this CLI
   cannot help. Bring the coordinator back up first, then run the CLI.
 - **No knowledge factor.** Any process that shares the coordinator's

@@ -34,7 +34,10 @@ from ontul and enforces it locally.
    policy editor offers a **"NeorunBase serving policy" template** for exactly this.
 2. **NeorunBase pulls** `GET /admin/iam/{users,groups,policies}` from ontul on each sync interval (leader only),
    and imports them into its replicated IAM store **verbatim** — no translation. The local bootstrap admin is
-   preserved so the NeorunBase console keeps working.
+   preserved — together with its own groups and policies (`admin-group`, `AdministratorAccess`) unless ontul
+   defines the same names — so the NeorunBase console keeps working. A lost admin password can still be reset
+   with `neorunbase-cli iam:reset-password` (local users only; ontul-managed users are reset in ontul) — see
+   [Admin Password Recovery](admin-password-recovery.md#federated-iam-mode).
 3. **Enforcement** is identical to standalone mode: a query's user → effective policies → column masking, column
    deny, and row-level filters are applied on the [serving path](iceberg-serving.md), including Iceberg catalog
    tables.
