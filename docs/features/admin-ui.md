@@ -63,6 +63,7 @@ Every server in `neorunbase.zookeeper.server.list`, as the Coordinator serving t
 | Column | Meaning |
 |---|---|
 | Server | `host:port` from the connect string. The server this Coordinator's own session is connected to is tagged *this coordinator's session*. |
+| Server id | the server's own id (`myid`) as it reports it to `conf`, or `server id unknown (...)` with the reason — see [Server ids](#server-ids-myid) |
 | Role | `leader`, `follower`, `observer` or `standalone` (a single-server ZooKeeper) |
 | Status | **Online** — the server answered; **Down** — it refused the connection or did not answer in time (the error is shown under the badge); **Not serving** — it is running but has no quorum; **Unknown** — it refuses the status command (see below) |
 | Version | ZooKeeper server version |
@@ -75,8 +76,8 @@ Below the table, the Coordinator's own ZooKeeper session: state (`CONNECTED`, `C
 session id, negotiated session timeout and the server it is connected to. The header shows how many
 servers are up, so a lost ensemble member is visible before it costs quorum.
 
-The Coordinator gathers this by sending each server ZooKeeper's `srvr` four-letter command, in
-parallel, waiting at most `neorunbase.admin.zookeeper.probe.timeout.ms` (default `2000`) per server.
+The Coordinator gathers this by sending each server ZooKeeper's `srvr` four-letter command (and
+`conf` for the server id), in parallel, waiting at most `neorunbase.admin.zookeeper.probe.timeout.ms` (default `2000`) per server.
 `srvr` is in ZooKeeper's default `4lw.commands.whitelist` (3.5 and later) and the ZooKeeper bundled
 with NeorunBase allows all four-letter words (`conf/zk/zoo.cfg`). An ensemble configured with a
 whitelist that leaves out `srvr` shows its servers as **Unknown**; add `srvr` to the whitelist to see
@@ -85,6 +86,38 @@ which it already needs to coordinate.
 
 Any Coordinator answers — the view does not go through the leader — so during a failover the page
 still shows which ZooKeeper servers are reachable from the Coordinator you are looking at.
+
+#### Server ids (myid)
+
+Every server of an ensemble needs its own id (`myid`). Two servers with the same id — typically
+left behind by a scale-out or a rebuild that reused an instance number — or servers that do not
+agree on who is in the ensemble break it **silently**: ZooKeeper raises no error, and clients just
+see an unstable or split service. The section therefore also asks each server that answers with the
+`conf` four-letter word, which reports the server's own `serverId` and the ensemble membership it
+was configured with (its `server.N=` lines). The **Server id** column shows the id, or
+`server id unknown (...)` with the reason, and a red line above the table names each problem:
+
+| Warning | Meaning |
+|---|---|
+| `Duplicate ZooKeeper server id 2 on zk2:2181, zk3:2181 — the ensemble is misconfigured; give every server a unique myid` | two or more configured servers report the same id |
+| `ZooKeeper server zk4:2181 reports server id 4, which is not in its own ensemble membership (1, 2, 3) — check its myid` | a server's id is not among the `server.N` entries it was configured with |
+| `ZooKeeper servers disagree about the ensemble membership: zk1:2181, zk2:2181 list server ids 1, 2, 3; zk3:2181 lists server ids 2 — every server must be configured with the same server.N list` | the servers were configured with different ensembles |
+| `ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist) — a duplicate myid cannot be ruled out` | the id could not be read (here `conf` is not whitelisted; also `server is down`, `server is not serving requests`) — the check is never reported as passing for those servers |
+| `ZooKeeper servers zk1:2181, zk2:2181 run standalone — a standalone server is a separate single-server ZooKeeper, not part of one ensemble with the other configured servers` | the connect string lists several servers but some of them run standalone |
+
+A healthy ensemble shows each server's id and no warning; a single standalone ZooKeeper reports id
+`0` and is not a warning. To fix a duplicate or a mismatch, correct the `myid` file in the server's
+data directory (`ZOO_MY_ID` for the `zookeeper` Docker image) and its `server.N=` lines so that
+every server has a unique id and all of them list the same ensemble, then restart that server.
+
+`conf` is **not** on ZooKeeper's default whitelist. Add it next to `srvr`, for example
+`4lw.commands.whitelist=srvr,conf` (`ZOO_4LW_COMMANDS_WHITELIST=srvr,conf` for the Docker image).
+Without it every server's id reads `server id unknown (conf not in 4lw.commands.whitelist)`.
+The ZooKeeper bundled with NeorunBase (`conf/zk/zoo.cfg`) allows all four-letter words (`*`),
+so `conf` is allowed there.
+
+`tests/e2e-zk-myid.sh` verifies all of this on a real three-server ensemble, on the API and on the
+Topology page from a non-secure origin (`tests/ui-e2e/45-zk-myid.mjs`).
 
 ### Coordinators
 
@@ -113,7 +146,7 @@ The page reads these admin endpoints (Bearer token from `POST /admin/auth/login`
 | Endpoint | Returns |
 |---|---|
 | `GET /admin/topology` | `coordinators` (with `isLeader`) and `dataNodes` (with `disks` and `shardCount`) |
-| `GET /admin/zookeeper` | `connectString`, `rootPath`, `servers[]` and `session` — see below |
+| `GET /admin/zookeeper` | `connectString`, `rootPath`, `servers[]`, `warnings[]` and `session` — see below |
 | `GET /admin/nodes/coordinators`, `GET /admin/nodes/datanodes` | the registered nodes, without leader / disk / shard details |
 
 `GET /admin/zookeeper` example (three-server ensemble, one server stopped):
@@ -125,18 +158,25 @@ The page reads these admin endpoints (Bearer token from `POST /admin/auth/login`
   "servers": [
     {"host": "zk-1", "port": 2181, "status": "UP", "mode": "leader", "version": "3.9.1",
      "zxid": "0x100000045", "connections": 4, "outstanding": 0,
-     "latencyMin": 0.0, "latencyAvg": 0.43, "latencyMax": 7.0, "nodeCount": 57, "error": null},
+     "latencyMin": 0.0, "latencyAvg": 0.43, "latencyMax": 7.0, "nodeCount": 57, "error": null,
+     "serverId": 1, "serverIdNote": null,
+     "membership": {"1": "zk-1:2888:3888:participant;0.0.0.0:2181",
+                    "2": "zk-2:2888:3888:participant;0.0.0.0:2181",
+                    "3": "zk-3:2888:3888:participant;0.0.0.0:2181"}},
     {"host": "zk-2", "port": 2181, "status": "DOWN", "mode": null, "version": null, "zxid": null,
      "connections": null, "outstanding": null, "latencyMin": null, "latencyAvg": null,
-     "latencyMax": null, "nodeCount": null, "error": "connect timed out"},
-    {"host": "zk-3", "port": 2181, "status": "UP", "mode": "follower", "version": "3.9.1", "...": "..."}
+     "latencyMax": null, "nodeCount": null, "error": "connect timed out",
+     "serverId": null, "serverIdNote": "server id unknown (server is down)", "membership": {}},
+    {"host": "zk-3", "port": 2181, "status": "UP", "mode": "follower", "version": "3.9.1", "serverId": 3, "...": "..."}
   ],
+  "warnings": ["ZooKeeper server id unknown on zk-2:2181 (server is down) — a duplicate myid cannot be ruled out"],
   "session": {"connected": true, "state": "CONNECTED", "sessionId": "0x1000a1b2c3d0004",
               "sessionTimeoutMs": 30000, "connectedServer": "zk-1:2181"}
 }
 ```
 
 `status` is `UP`, `DOWN`, `NOT_SERVING` or `UNKNOWN`; fields a server did not report are `null`.
+`warnings` is empty when every server reported a unique id and all of them agree on the membership.
 
 ## Shards
 
