@@ -2426,7 +2426,7 @@
 <tr>
 <td><code>neorunbase.admin.zookeeper.probe.timeout.ms</code></td>
 <td><code>2000</code></td>
-<td>Admin UI Topology view: connect + read timeout when a Coordinator asks each ZooKeeper server for its status (<code>srvr</code>). Servers are probed in parallel; one that does not answer in time is shown as DOWN.</td>
+<td>Admin UI Topology view: connect + read timeout when a Coordinator asks each ZooKeeper server for its status (<code>srvr</code>) and server id (<code>conf</code> — not on ZooKeeper's default 4lw whitelist; add it or the id shows as unknown). Servers are probed in parallel; one that does not answer in time is shown as DOWN.</td>
 </tr>
 <tr>
 <td><code>neorunbase.base.data.dir</code></td>
