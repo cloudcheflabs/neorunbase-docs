@@ -45,6 +45,13 @@ NeorunBase backs up files only when their content has actually changed:
 
 Each backup writes a manifest that lists every file alive at backup time, so retention or restore can refer to any single backup ID without re-uploading shared files.
 
+### Every upload is verified
+
+A `200` from the object store is not taken as proof that the bytes arrived. After each upload the node checks what the store now holds: the object size (HEAD) must equal the size recorded in the manifest, and the ETag must equal the MD5 of the bytes sent wherever the ETag is one (plain single-part PUT; not SSE-KMS / SSE-C). A mismatch fails that node's backup with a message naming the object, instead of leaving an empty or short object to be discovered at restore time.
+
+- A file that keeps growing while it is read (a RocksDB info `LOG`) is uploaded at exactly the size recorded in the manifest; a file that shrinks while it is read fails the backup.
+- A file is reused from an earlier backup only when the stored object has the recorded size. A damaged object (for example one an object store acknowledged but kept empty) is uploaded again rather than trusted.
+
 ## History Retention
 
 Past backups are listed in the admin UI and aged out by the **Retention (days)** policy (default 30 days). When an entry passes retention it disappears from the visible history; the underlying objects remain in S3 unless an S3 lifecycle rule removes them. This keeps backup deletes deliberate and reversible — operators decide when to actually reclaim S3 storage.
@@ -53,7 +60,7 @@ Past backups are listed in the admin UI and aged out by the **Retention (days)**
 
 Restore is initiated from the admin UI by selecting a backup ID and confirming. The flow is **safe by default**:
 
-1. Each node downloads the files referenced by the chosen backup into a *staging directory* alongside its live data — the running cluster keeps serving traffic and is never touched in place.
+1. Each node downloads the files referenced by the chosen backup into a *staging directory* alongside its live data — the running cluster keeps serving traffic and is never touched in place. Every downloaded file must have the size its manifest recorded. A node whose download fails for any reason reports the error and removes what it had staged; the marker that tells the restart to swap the staged tree in is written only once every file is in place, so a partial or short download can never be swapped in.
 2. The admin UI confirms the staging is complete and prompts the operator to restart the containers.
 3. On restart, every node automatically swaps the staged tree into place **before** opening its databases. The previous live data is moved aside (kept on disk as `<dir>.pre-restore-<id>`, not deleted) so the restore is reversible.
 
