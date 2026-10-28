@@ -43,7 +43,7 @@ Losing the master key makes all encrypted on-disk state and KMS-wrapped DEKs unr
 | `neorunbase.zookeeper.root.path` | `/neorunbase` | Chroot/root znode under which all NeorunBase znodes are created. Must start with `/`. |
 | `neorunbase.zookeeper.session.timeout.ms` | `30000` | ZooKeeper session timeout. Too low triggers spurious failovers on GC pauses; too high slows failure detection. |
 | `neorunbase.zookeeper.connection.timeout.ms` | `10000` | Maximum time to wait when first establishing a TCP connection to a ZooKeeper server before trying another endpoint. |
-| `neorunbase.admin.zookeeper.probe.timeout.ms` | `2000` | Admin UI Topology view: connect + read timeout when a Coordinator asks each ZooKeeper server for its status (`srvr`). Servers are probed in parallel; one that does not answer in time is shown as DOWN. |
+| `neorunbase.admin.zookeeper.probe.timeout.ms` | `2000` | Admin UI Topology view: connect + read timeout when a Coordinator asks each ZooKeeper server for its status (`srvr`) and server id (`conf` — not on ZooKeeper's default 4lw whitelist; add it or the id shows as unknown). Servers are probed in parallel; one that does not answer in time is shown as DOWN. |
 | `neorunbase.base.data.dir` | `./data` | Root directory for all on-disk state. Most other path properties derive from this. Must be a persistent mount in containers. |
 
 ## Coordinator Node
