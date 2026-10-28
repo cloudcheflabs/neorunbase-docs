@@ -79,7 +79,7 @@ servers are up, so a lost ensemble member is visible before it costs quorum.
 The Coordinator gathers this by sending each server ZooKeeper's `srvr` four-letter command (and
 `conf` for the server id), in parallel, waiting at most `neorunbase.admin.zookeeper.probe.timeout.ms` (default `2000`) per server.
 `srvr` is in ZooKeeper's default `4lw.commands.whitelist` (3.5 and later) and the ZooKeeper bundled
-with NeorunBase allows all four-letter words (`conf/zk/zoo.cfg`). An ensemble configured with a
+with NeorunBase allows it (`conf/zk/zoo.cfg`: `4lw.commands.whitelist=srvr,conf,ruok,stat,mntr`). An ensemble configured with a
 whitelist that leaves out `srvr` shows its servers as **Unknown**; add `srvr` to the whitelist to see
 them. The Coordinator must be able to reach the client port (default `2181`) of every listed server,
 which it already needs to coordinate.
@@ -102,7 +102,7 @@ was configured with (its `server.N=` lines). The **Server id** column shows the 
 | `Duplicate ZooKeeper server id 2 on zk2:2181, zk3:2181 — the ensemble is misconfigured; give every server a unique myid` | two or more configured servers report the same id |
 | `ZooKeeper server zk4:2181 reports server id 4, which is not in its own ensemble membership (1, 2, 3) — check its myid` | a server's id is not among the `server.N` entries it was configured with |
 | `ZooKeeper servers disagree about the ensemble membership: zk1:2181, zk2:2181 list server ids 1, 2, 3; zk3:2181 lists server ids 2 — every server must be configured with the same server.N list` | the servers were configured with different ensembles |
-| `ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist) — a duplicate myid cannot be ruled out` | the id could not be read (here `conf` is not whitelisted; also `server is down`, `server is not serving requests`) — the check is never reported as passing for those servers |
+| `ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server) — a duplicate myid cannot be ruled out` | the id could not be read (here `conf` is not whitelisted; also `server is down`, `server is not serving requests`) — the check is never reported as passing for those servers |
 | `ZooKeeper servers zk1:2181, zk2:2181 run standalone — a standalone server is a separate single-server ZooKeeper, not part of one ensemble with the other configured servers` | the connect string lists several servers but some of them run standalone |
 
 A healthy ensemble shows each server's id and no warning; a single standalone ZooKeeper reports id
@@ -111,10 +111,11 @@ data directory (`ZOO_MY_ID` for the `zookeeper` Docker image) and its `server.N=
 every server has a unique id and all of them list the same ensemble, then restart that server.
 
 `conf` is **not** on ZooKeeper's default whitelist. Add it next to `srvr`, for example
-`4lw.commands.whitelist=srvr,conf` (`ZOO_4LW_COMMANDS_WHITELIST=srvr,conf` for the Docker image).
-Without it every server's id reads `server id unknown (conf not in 4lw.commands.whitelist)`.
-The ZooKeeper bundled with NeorunBase (`conf/zk/zoo.cfg`) allows all four-letter words (`*`),
-so `conf` is allowed there.
+`4lw.commands.whitelist=srvr,conf` (`ZOO_4LW_COMMANDS_WHITELIST=srvr,conf` for the Docker image),
+and restart that ZooKeeper server: ZooKeeper reads the whitelist only at startup.
+Without it every server's id reads `server id unknown (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server)`.
+The ZooKeeper bundled with NeorunBase (`conf/zk/zoo.cfg`) ships with
+`4lw.commands.whitelist=srvr,conf,ruok,stat,mntr`, so `conf` is allowed there.
 
 `tests/e2e-zk-myid.sh` verifies all of this on a real three-server ensemble, on the API and on the
 Topology page from a non-secure origin (`tests/ui-e2e/45-zk-myid.mjs`).
