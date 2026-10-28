@@ -2128,7 +2128,7 @@ servers are up, so a lost ensemble member is visible before it costs quorum.</p>
 <p>The Coordinator gathers this by sending each server ZooKeeper's <code>srvr</code> four-letter command (and
 <code>conf</code> for the server id), in parallel, waiting at most <code>neorunbase.admin.zookeeper.probe.timeout.ms</code> (default <code>2000</code>) per server.
 <code>srvr</code> is in ZooKeeper's default <code>4lw.commands.whitelist</code> (3.5 and later) and the ZooKeeper bundled
-with NeorunBase allows all four-letter words (<code>conf/zk/zoo.cfg</code>). An ensemble configured with a
+with NeorunBase allows it (<code>conf/zk/zoo.cfg</code>: <code>4lw.commands.whitelist=srvr,conf,ruok,stat,mntr</code>). An ensemble configured with a
 whitelist that leaves out <code>srvr</code> shows its servers as <strong>Unknown</strong>; add <code>srvr</code> to the whitelist to see
 them. The Coordinator must be able to reach the client port (default <code>2181</code>) of every listed server,
 which it already needs to coordinate.</p>
@@ -2163,7 +2163,7 @@ was configured with (its <code>server.N=</code> lines). The <strong>Server id</s
 <td>the servers were configured with different ensembles</td>
 </tr>
 <tr>
-<td><code>ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist) — a duplicate myid cannot be ruled out</code></td>
+<td><code>ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server) — a duplicate myid cannot be ruled out</code></td>
 <td>the id could not be read (here <code>conf</code> is not whitelisted; also <code>server is down</code>, <code>server is not serving requests</code>) — the check is never reported as passing for those servers</td>
 </tr>
 <tr>
@@ -2177,10 +2177,11 @@ was configured with (its <code>server.N=</code> lines). The <strong>Server id</s
 data directory (<code>ZOO_MY_ID</code> for the <code>zookeeper</code> Docker image) and its <code>server.N=</code> lines so that
 every server has a unique id and all of them list the same ensemble, then restart that server.</p>
 <p><code>conf</code> is <strong>not</strong> on ZooKeeper's default whitelist. Add it next to <code>srvr</code>, for example
-<code>4lw.commands.whitelist=srvr,conf</code> (<code>ZOO_4LW_COMMANDS_WHITELIST=srvr,conf</code> for the Docker image).
-Without it every server's id reads <code>server id unknown (conf not in 4lw.commands.whitelist)</code>.
-The ZooKeeper bundled with NeorunBase (<code>conf/zk/zoo.cfg</code>) allows all four-letter words (<code>*</code>),
-so <code>conf</code> is allowed there.</p>
+<code>4lw.commands.whitelist=srvr,conf</code> (<code>ZOO_4LW_COMMANDS_WHITELIST=srvr,conf</code> for the Docker image),
+and restart that ZooKeeper server: ZooKeeper reads the whitelist only at startup.
+Without it every server's id reads <code>server id unknown (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server)</code>.
+The ZooKeeper bundled with NeorunBase (<code>conf/zk/zoo.cfg</code>) ships with
+<code>4lw.commands.whitelist=srvr,conf,ruok,stat,mntr</code>, so <code>conf</code> is allowed there.</p>
 <p><code>tests/e2e-zk-myid.sh</code> verifies all of this on a real three-server ensemble, on the API and on the
 Topology page from a non-secure origin (<code>tests/ui-e2e/45-zk-myid.mjs</code>).</p>
 <h3 id="coordinators">Coordinators</h3>
