@@ -1241,6 +1241,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Incremental by Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#every-upload-is-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Every upload is verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1894,12 +1911,18 @@
 <li><strong>Subsequent runs</strong> upload only files that differ from prior backups; unchanged files are reused — a re-run with no cluster changes uploads zero bytes.</li>
 </ul>
 <p>Each backup writes a manifest that lists every file alive at backup time, so retention or restore can refer to any single backup ID without re-uploading shared files.</p>
+<h3 id="every-upload-is-verified">Every upload is verified</h3>
+<p>A <code>200</code> from the object store is not taken as proof that the bytes arrived. After each upload the node checks what the store now holds: the object size (HEAD) must equal the size recorded in the manifest, and the ETag must equal the MD5 of the bytes sent wherever the ETag is one (plain single-part PUT; not SSE-KMS / SSE-C). A mismatch fails that node's backup with a message naming the object, instead of leaving an empty or short object to be discovered at restore time.</p>
+<ul>
+<li>A file that keeps growing while it is read (a RocksDB info <code>LOG</code>) is uploaded at exactly the size recorded in the manifest; a file that shrinks while it is read fails the backup.</li>
+<li>A file is reused from an earlier backup only when the stored object has the recorded size. A damaged object (for example one an object store acknowledged but kept empty) is uploaded again rather than trusted.</li>
+</ul>
 <h2 id="history-retention">History Retention</h2>
 <p>Past backups are listed in the admin UI and aged out by the <strong>Retention (days)</strong> policy (default 30 days). When an entry passes retention it disappears from the visible history; the underlying objects remain in S3 unless an S3 lifecycle rule removes them. This keeps backup deletes deliberate and reversible — operators decide when to actually reclaim S3 storage.</p>
 <h2 id="restore">Restore</h2>
 <p>Restore is initiated from the admin UI by selecting a backup ID and confirming. The flow is <strong>safe by default</strong>:</p>
 <ol>
-<li>Each node downloads the files referenced by the chosen backup into a <em>staging directory</em> alongside its live data — the running cluster keeps serving traffic and is never touched in place.</li>
+<li>Each node downloads the files referenced by the chosen backup into a <em>staging directory</em> alongside its live data — the running cluster keeps serving traffic and is never touched in place. Every downloaded file must have the size its manifest recorded. A node whose download fails for any reason reports the error and removes what it had staged; the marker that tells the restart to swap the staged tree in is written only once every file is in place, so a partial or short download can never be swapped in.</li>
 <li>The admin UI confirms the staging is complete and prompts the operator to restart the containers.</li>
 <li>On restart, every node automatically swaps the staged tree into place <strong>before</strong> opening its databases. The previous live data is moved aside (kept on disk as <code>&lt;dir&gt;.pre-restore-&lt;id&gt;</code>, not deleted) so the restore is reversible.</li>
 </ol>
